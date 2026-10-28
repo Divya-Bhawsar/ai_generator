@@ -14,7 +14,9 @@ The source repository is the public GitHub repository `Divya-Bhawsar/ai_generato
 - Remote: `https://github.com/Divya-Bhawsar/ai_generator.git` (`origin`)
 - Initial source/documentation commit: `25ef998` (`chore: bootstrap VidyaMotion app and docs`)
 - Remote branch check: no branches were present before the initial push.
-- Push result: **Pending GitHub authentication**. `git push -u origin main` could not read an HTTPS username because this machine has no GitHub CLI login or Git credential helper. The commit is available locally; no credential was added to the repository. Resume pushing after the GitHub connection is available.
+- The initial source/documentation commit is on local `main`; all subsequent status commits are also awaiting publication. Use `git log --oneline main` for the complete current list of unpublished commits.
+- Push result: **Pending GitHub authentication**. The HTTPS push could not obtain a password from the configured macOS Keychain helper. The GitHub connector is not yet available to this session; its browser setup is awaiting GitHub identity verification. No credential was added to the repository.
+- Resume with `git push -u origin main` once GitHub access is fully authorized in this session.
 
 ## Current milestone
 
