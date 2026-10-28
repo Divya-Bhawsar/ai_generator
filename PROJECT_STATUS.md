@@ -13,7 +13,7 @@ The source repository is the public GitHub repository `Divya-Bhawsar/ai_generato
 
 - Remote: `https://github.com/Divya-Bhawsar/ai_generator.git` (`origin`)
 - The initial source and documentation commits were pushed to `main` after GitHub access became available.
-- Published `main` head: `59180fb99e1bb6ecf78d7ff01a05dfb9d6dc508e` (`docs: clarify GitHub authorization status`), confirmed through the connected GitHub integration.
+- Previous confirmed `main` head before this status refresh: `0fb28909d5633a10d6d8d0a59d05f50091e8e2e4` (`docs: record initial GitHub publication`), confirmed through the connected GitHub integration.
 - The local `main` branch tracks `origin/main`. Further milestones should continue to follow the commit-and-push rule below.
 
 ## Current milestone
