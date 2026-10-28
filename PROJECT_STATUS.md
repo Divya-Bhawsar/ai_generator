@@ -6,8 +6,13 @@
 
 ## Repository workflow
 
-The source repository is the public GitHub repository `Divya-Bhawsar/ai_generator`. Commit and push after every code-changing step to `origin`, including each feature milestone, and record the latest commit hash and push result in this file. Keep `.env.local`, provider credentials, generated media, and local caches out of Git. Before every push, inspect the staged file list and confirm ignored credentials/artifacts are not included.
+The source repository is the public GitHub repository `Divya-Bhawsar/ai_generator`. Develop features on `dev`; commit and push after every code-changing step to `origin/dev`, including each feature milestone, and record the latest commit hash and push result in this file. Merge finalized work from `dev` into `main` when it is ready. Keep `.env.local`, provider credentials, generated media, and local caches out of Git. Before every push, inspect the staged file list and confirm ignored credentials/artifacts are not included.
 
+
+## Branch workflow
+
+- `main` contains the published baseline and receives work after it is finalized.
+- `dev` is the active feature-development branch. Feature milestones are committed and pushed to `origin/dev`; promote finalized work to `main` by merging `dev`.
 
 ## Initial GitHub publication
 
