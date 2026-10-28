@@ -8,6 +8,14 @@
 
 The source repository is the public GitHub repository `Divya-Bhawsar/ai_generator`. Commit and push each completed feature slice/milestone to `origin`, and record the commit hash and push result in this file. Keep `.env.local`, provider credentials, generated media, and local caches out of Git. Before every push, inspect the staged file list and confirm ignored credentials/artifacts are not included.
 
+
+## Initial GitHub publication
+
+- Remote: `https://github.com/Divya-Bhawsar/ai_generator.git` (`origin`)
+- Initial source/documentation commit: `25ef998` (`chore: bootstrap VidyaMotion app and docs`)
+- Remote branch check: no branches were present before the initial push.
+- Push result: **Pending GitHub authentication**. `git push -u origin main` could not read an HTTPS username because this machine has no GitHub CLI login or Git credential helper. The commit is available locally; no credential was added to the repository. Resume pushing after the GitHub connection is available.
+
 ## Current milestone
 
 **Milestone 0 — Web scaffold and approved homepage**
