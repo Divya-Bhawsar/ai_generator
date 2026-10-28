@@ -6,7 +6,7 @@
 
 ## Repository workflow
 
-The source repository is the public GitHub repository `Divya-Bhawsar/ai_generator`. Commit and push each completed feature slice/milestone to `origin`, and record the commit hash and push result in this file. Keep `.env.local`, provider credentials, generated media, and local caches out of Git. Before every push, inspect the staged file list and confirm ignored credentials/artifacts are not included.
+The source repository is the public GitHub repository `Divya-Bhawsar/ai_generator`. Commit and push after every code-changing step to `origin`, including each feature milestone, and record the latest commit hash and push result in this file. Keep `.env.local`, provider credentials, generated media, and local caches out of Git. Before every push, inspect the staged file list and confirm ignored credentials/artifacts are not included.
 
 
 ## Initial GitHub publication
@@ -68,5 +68,5 @@ The workspace previously contained product/technical documentation and a standal
 - Keep statuses explicit: **Not started**, **In progress**, **Implemented**, **Verified**, or **Blocked**. Use **Verified** only after the named check was actually run and passed.
 - Record evidence as file paths, routes, API behavior, or a dated validation result; do not mark a feature complete based only on a design mockup.
 - Never place provider credentials in source files. `.env.local` is ignored by `.gitignore`; use server-side environment variables for secrets.
-- After each completed feature slice or milestone, update this document, inspect the staged changes, then commit and push to `origin`.
+- After every code-changing step, update this document, inspect the staged changes, then commit and push to `origin`; do this at each feature milestone at minimum.
 - Preserve the approved V1 scope and palette; record scope decisions against the PRD before implementing additional product behavior.
