@@ -1,0 +1,32 @@
+{
+  "title": "Why do pressure cookers cook food faster?",
+  "audience": "General Indian audience",
+  "language": "English",
+  "target_duration_seconds": "60-90",
+  "scenes": [
+    {
+      "title": "Why pressure cooks faster",
+      "narration": "Ever noticed how rajma or chana can take hours in an ordinary pot, but much less time in a pressure cooker? The secret is not a special ingredient. It is the pressure changing the temperature of the water around the food.",
+      "visual_label": "Rajma and chana soften faster when cooking temperature rises.",
+      "visual_type": "hook"
+    },
+    {
+      "title": "Steam gets trapped",
+      "narration": "In an open pot, steam escapes as water boils, so liquid water stays near one hundred degrees Celsius at sea level. A pressure cooker traps steam. As more steam collects inside, pressure increases; the regulator lets excess steam escape and helps keep pressure controlled.",
+      "visual_label": "Trapped steam raises pressure while a regulator releases excess.",
+      "visual_type": "flow"
+    },
+    {
+      "title": "Water gets hotter",
+      "narration": "Higher pressure raises water’s boiling point. That means water and steam inside a properly working cooker can become hotter than water boiling in an open pot. The hotter liquid transfers heat to the rajma or chana more quickly, helping it soften sooner. Imagine a small thermometer beside each pot: the cooker can reach the higher temperature.",
+      "visual_label": "Higher pressure raises boiling temperature and speeds heat transfer.",
+      "visual_type": "bars"
+    },
+    {
+      "title": "Pressure, heat, faster cooking",
+      "narration": "The safety valve and vent matter because they control pressure and release excess steam. Keep them clear and follow the cooker’s instructions. The core idea is simple: trapped steam raises pressure, pressure lets water get hotter, and hotter water cooks food faster. That is why a pressure cooker can save time and fuel.",
+      "visual_label": "Clear vent + working regulator = controlled pressure.",
+      "visual_type": "safety"
+    }
+  ]
+}

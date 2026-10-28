@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+.Rhistory
+prototype/live/
+prototype/output/
+prototype/work/
+__pycache__/
+*.py[cod]
+.next/
+node_modules/
+.npm-cache/
+out/
+coverage/
+*.tsbuildinfo
+.vercel/
