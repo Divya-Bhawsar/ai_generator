@@ -56,6 +56,7 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 - Added a personal workspace shell with Clerk account controls and a clear first-run empty state. It contains no project data yet; the project dashboard is F02.
 - Connected the public homepage’s sign-in and create actions to the authentication routes.
 - Added `.env.example` and local setup instructions. Real Clerk keys must remain in `.env.local` or deployment secret settings.
+- F01 implementation was published to `origin/dev` at commit `c0880a7` through the connected GitHub integration; the standard local HTTPS push could not obtain Git credentials.
 
 ## Not implemented
 
