@@ -23,16 +23,16 @@ The source repository is the public GitHub repository `Divya-Bhawsar/ai_generato
 
 ## Current milestone
 
-**Milestone 0 — Web scaffold and approved homepage**
+**Milestone 1 — Self-service authentication and personal workspace shell**
 
-The workspace previously contained product/technical documentation and a standalone video-rendering prototype, but no Next.js application. The initial web scaffold and selected public homepage have now been added. App workflows, authentication, persistence, provider calls, and Instagram publishing are not implemented yet.
+The web scaffold and approved public homepage are in place. This milestone adds Clerk sign-up/sign-in routes and the first authenticated, user-specific workspace shell. Project creation, project persistence, provider calls, and Instagram publishing remain separate future milestones.
 
 ## Feature roadmap
 
 | ID | Feature slice | Status | Completion evidence |
 |---|---|---|---|
 | F00 | Next.js App Router scaffold, design tokens, responsive approved homepage | **Verified** | `package.json`, `package-lock.json`, `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx`; local browser returned HTTP 200 and showed the homepage |
-| F01 | Self-service sign-up/sign-in and session-protected personal workspace | Not started | Clerk integration and protected routes; ownership derived from authenticated identity |
+| F01 | Self-service sign-up/sign-in and session-protected personal workspace | **Implemented** | Clerk sign-up/sign-in routes, `src/proxy.ts`, and `/dashboard` session check; end-to-end login awaits Clerk environment keys |
 | F02 | Personal dashboard, project list, search/status filters, empty/loading/error states | Not started | User-owned projects loaded from persistence with PRD status states |
 | F03 | Create project, topic entry, optional brainstorm, autosave | Not started | Project CRUD and saved conversation; empty-topic validation |
 | F04 | Generate combined script/storyboard, review, conversational revisions, approval/version restore | Not started | Structured storyboard versions; user approval before render |
@@ -49,9 +49,18 @@ The workspace previously contained product/technical documentation and a standal
 - Kept binary-search illustration data internally consistent: array `[12, 24, 31, 42, 56, 73, 88]`, inspect midpoint `42`, narrow to `[56, 73, 88]`, find `73` at index 5.
 - Added a root README linking the product and engineering source documents.
 
+## Implemented in F01
+
+- Added Clerk 7 self-service sign-up and sign-in pages at `/sign-up` and `/sign-in`, styled with the approved VidyaMotion palette and responsive auth layout.
+- Added Clerk request handling in `src/proxy.ts`; `/dashboard` checks the authenticated Clerk user on the server and redirects signed-out visitors to `/sign-in`.
+- Added a personal workspace shell with Clerk account controls and a clear first-run empty state. It contains no project data yet; the project dashboard is F02.
+- Connected the public homepage’s sign-in and create actions to the authentication routes.
+- Added `.env.example` and local setup instructions. Real Clerk keys must remain in `.env.local` or deployment secret settings.
+
 ## Not implemented
 
-- Authentication, user sessions, dashboard persistence, project APIs, MongoDB, queues/workers, Gemini, ElevenLabs, captions, rendering, R2 storage, Meta OAuth, and Instagram publishing.
+- Clerk end-to-end sign-up/sign-in has not been exercised in this workspace because runtime credentials must be configured locally. Do not copy credentials into Git.
+- Dashboard persistence, project APIs, MongoDB, queues/workers, Gemini, ElevenLabs, captions, rendering, R2 storage, Meta OAuth, and Instagram publishing.
 - The homepage call-to-action is presentational until the authentication and creation workflow slices are built.
 - The existing `prototype/` pipeline is a separate proof of concept; it is not wired into the web app.
 
@@ -65,6 +74,9 @@ The workspace previously contained product/technical documentation and a standal
 | 2026-10-29 | Dependency installation | `npm install` completed: 29 packages added; audit reported 0 vulnerabilities. Resolved Next.js version: 16.4.3. |
 | 2026-10-29 | Development server | Started at `http://127.0.0.1:3000`; sandbox required permission to bind a local port. Next.js generated the root `AGENTS.md` guidance file and changed `jsx` to `react-jsx` in `tsconfig.json`. |
 | 2026-10-29 | Homepage browser check | `GET /` returned 200; browser accessibility tree and screenshot confirmed hero, three-scene binary-search storyboard, workflow, examples, and footer rendered. |
+| 2026-10-29 | Clerk SDK installation | `@clerk/nextjs` 7.9.22 installed; npm reported 0 vulnerabilities. |
+| 2026-10-29 | TypeScript validation after F01 | `npx tsc --noEmit` passed. |
+| 2026-10-29 | Clerk sign-up/sign-in runtime flow | Not exercised; requires the developer’s Clerk publishable and secret keys in `.env.local`. |
 | 2026-10-29 | Production build | Not run. |
 
 ## Development rules
@@ -73,5 +85,5 @@ The workspace previously contained product/technical documentation and a standal
 - Keep statuses explicit: **Not started**, **In progress**, **Implemented**, **Verified**, or **Blocked**. Use **Verified** only after the named check was actually run and passed.
 - Record evidence as file paths, routes, API behavior, or a dated validation result; do not mark a feature complete based only on a design mockup.
 - Never place provider credentials in source files. `.env.local` is ignored by `.gitignore`; use server-side environment variables for secrets.
-- After every code-changing step, update this document, inspect the staged changes, then commit and push to `origin`; do this at each feature milestone at minimum.
+- After every code-changing step, update this document, inspect the staged changes, then commit and push to `origin/dev`; do this at each feature milestone at minimum.
 - Preserve the approved V1 scope and palette; record scope decisions against the PRD before implementing additional product behavior.

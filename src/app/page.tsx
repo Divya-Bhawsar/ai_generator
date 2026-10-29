@@ -59,8 +59,8 @@ export default function HomePage() {
           <a href="#examples">Examples</a>
         </nav>
         <div className="header-actions">
-          <a className="text-link" href="#get-started">Sign in</a>
-          <a className="button button-small" href="#get-started">Create an explainer <span aria-hidden="true">↗</span></a>
+          <a className="text-link" href="/sign-in">Sign in</a>
+          <a className="button button-small" href="/sign-up">Create an explainer <span aria-hidden="true">↗</span></a>
         </div>
       </header>
 
@@ -72,7 +72,7 @@ export default function HomePage() {
             Create a 60–90 second animated explainer with synchronized voiceover and burned-in captions, ready to export or share.
           </p>
           <div className="hero-actions" id="get-started">
-            <a className="button" href="#how-it-works">Create an explainer <span aria-hidden="true">↗</span></a>
+            <a className="button" href="/sign-up">Create an explainer <span aria-hidden="true">↗</span></a>
             <a className="button button-quiet" href="#examples"><span className="play-icon" aria-hidden="true">▶</span> See how it works</a>
           </div>
           <p className="hero-note">Made for clear teaching, not complicated editing.</p>
@@ -159,7 +159,7 @@ export default function HomePage() {
           <p className="eyebrow">YOUR NEXT EXPLANATION STARTS HERE</p>
           <h2>Give your idea a clearer shape.</h2>
         </div>
-        <a className="button" href="#top">Create an explainer <span aria-hidden="true">↗</span></a>
+        <a className="button" href="/sign-up">Create an explainer <span aria-hidden="true">↗</span></a>
       </section>
 
       <footer className="site-footer section-wrap">

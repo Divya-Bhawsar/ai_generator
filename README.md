@@ -1,5 +1,14 @@
 # VidyaMotion
 
+## Local setup
+
+1. Install dependencies with `npm install`.
+2. Create a Clerk application and copy its publishable key and secret key from Clerk's API keys page.
+3. Copy `.env.example` to `.env.local` and fill in the Clerk keys. `.env.local` is ignored by Git; never commit real keys.
+4. Start the app with `npm run dev`.
+
+The public homepage is available at `/`. Sign-up and sign-in live at `/sign-up` and `/sign-in`; authenticated users land in their private `/dashboard` workspace.
+
 VidyaMotion turns educational ideas into short narrated motion-graphic explainers. The product requirements and technical decisions live in the linked documents below.
 
 ## Product and engineering documents
@@ -14,7 +23,7 @@ VidyaMotion turns educational ideas into short narrated motion-graphic explainer
 
 ## Web app
 
-The Next.js App Router scaffold lives in `src/app`. The first implementation slice is the approved public homepage and the shared Color Lives in the Story design tokens. Product workflows and provider integrations will be added in the feature order tracked in `PROJECT_STATUS.md`.
+The Next.js App Router application lives in `src/app`. The approved public homepage, Clerk sign-up/sign-in, and protected personal workspace shell are implemented. Remaining product workflows are tracked in `PROJECT_STATUS.md`.
 
 ### Prerequisites
 

@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.22",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"
