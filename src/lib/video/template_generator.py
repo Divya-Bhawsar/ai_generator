@@ -68,9 +68,9 @@ def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str =
     )
 
     combined_text = (narration + " " + topic + " " + title).lower()
-    is_algo = bool(re.search(r"binary|search|array|sort|index|algorithm|pointer|target|element", combined_text))
-    is_cooking = bool(re.search(r"cook|pressure|pot|boil|heat|temperature|steam|degree|100|121", combined_text))
-    is_nature = bool(re.search(r"leaf|leaves|autumn|tree|color|chlorophyll|carotenoid|sunlight|plant", combined_text))
+    is_algo = bool(re.search(r"\bbinary\s+search\b", combined_text) or visual_type in ("array_search", "binary_array"))
+    is_cooking = bool(re.search(r"\bpressure\s+cooker\b", combined_text))
+    is_nature = bool(re.search(r"\bautumn\s+leaves\b|\bchlorophyll\b", combined_text))
 
     # 1. ALGORITHM / ARRAY SEARCH DOMAIN (e.g. Binary Search)
     if is_algo:
@@ -330,6 +330,22 @@ def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str =
         """
 
     # 4. DEFAULT DYNAMIC PEDAGOGICAL CARDS (Context-derived, zero robotic buzzwords)
+    elif visual_type in ("hook", "problem"):
+        lead_word = accent_words[0].upper() if len(accent_words) > 0 else "THE QUESTION"
+        diagram_html = f"""
+        <div class="card-interior">
+            <div class="phase-badge badge-warning">
+                <span>⚠ THE CORE PUZZLE</span>
+            </div>
+            <div class="dynamic-focal-box">
+                <div class="focal-headline">{lead_word}</div>
+                <div class="focal-sub">{title}</div>
+            </div>
+            <div class="scene-summary-box">
+                <p class="scene-summary-text">{visual_label}</p>
+            </div>
+        </div>
+        """
     elif visual_type in ("comparison", "bars"):
         l_label = accent_words[0].upper() if len(accent_words) > 0 else "CONVENTIONAL METHOD"
         r_label = accent_words[1].upper() if len(accent_words) > 1 else "OPTIMIZED PRINCIPLE"
