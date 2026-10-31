@@ -521,6 +521,84 @@ export function StoryboardStudio({
         </div>
       )}
 
+      {/* Empty State when no storyboard exists yet */}
+      {scenes.length === 0 && (
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px dashed #CBD5E1",
+            borderRadius: "12px",
+            padding: "3.5rem 2rem",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1.25rem",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.02)",
+          }}
+        >
+          <div
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: "50%",
+              background: "#EEF2FF",
+              color: "#315CEB",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1.75rem",
+            }}
+          >
+            📋
+          </div>
+          <div>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#17191F", margin: 0 }}>
+              No Storyboard Generated Yet
+            </h2>
+            <p style={{ fontSize: "0.875rem", color: "#64748B", maxWidth: "480px", margin: "0.5rem auto 0" }}>
+              Generate a 5-scene educational script and motion graphic storyboard for:{" "}
+              <strong style={{ color: "#0F172A" }}>&ldquo;{project.topic}&rdquo;</strong>
+            </p>
+          </div>
+          <button
+            onClick={handleGenerateStoryboard}
+            disabled={generating}
+            className="button"
+            style={{
+              padding: "0.75rem 1.75rem",
+              fontSize: "0.9375rem",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              cursor: generating ? "not-allowed" : "pointer",
+            }}
+          >
+            {generating ? (
+              <>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 14,
+                    height: 14,
+                    border: "2px solid #fff",
+                    borderTopColor: "transparent",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+                <span>Generating Storyboard...</span>
+              </>
+            ) : (
+              <>
+                <span>Generate Storyboard ✨</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
       {/* Storyboard Scenes Grid */}
       {scenes.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>

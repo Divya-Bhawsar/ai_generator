@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { getProjectById } from "@/lib/db/projects";
+import { getProjectById, saveStoryboard } from "@/lib/db/projects";
+import { generateStoryboardAI } from "@/lib/ai/storyboard";
 import { StoryboardStudio } from "@/components/storyboard-studio";
 import Link from "next/link";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -17,10 +18,27 @@ export default async function ProjectPage({
   }
 
   const { id } = await params;
-  const { project, storyboard } = await getProjectById(session.userId, id);
+  let { project, storyboard } = await getProjectById(session.userId, id);
 
   if (!project) {
     notFound();
+  }
+
+  // Self-heal: If project has no storyboard yet (e.g. from an interrupted initial generation),
+  // immediately synthesize one so the creator always lands in an active studio!
+  if (!storyboard) {
+    try {
+      const aiOutput = await generateStoryboardAI(project.topic);
+      storyboard = await saveStoryboard({
+        projectId: project._id,
+        ownerId: session.userId,
+        title: aiOutput.title,
+        scenes: aiOutput.scenes,
+        revisionPrompt: "Auto-healed initial generation",
+      });
+    } catch (err) {
+      console.warn("Self-healing storyboard generation failed:", err);
+    }
   }
 
   const isConnectedToMongo = isMongoConfigured();

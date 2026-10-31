@@ -173,9 +173,13 @@ export async function getProjectById(
           updatedAt: projectDoc.updatedAt,
         };
 
+        const projectIdQuery = ObjectId.isValid(project._id)
+          ? { $in: [project._id, new ObjectId(project._id)] }
+          : project._id;
+
         const sbDoc = await db
           .collection("storyboards")
-          .find({ projectId: project._id, ownerId })
+          .find({ projectId: projectIdQuery, ownerId })
           .sort({ version: -1 })
           .limit(1)
           .toArray();
@@ -185,7 +189,7 @@ export async function getProjectById(
           const s = sbDoc[0];
           storyboard = {
             _id: s._id.toString(),
-            projectId: s.projectId,
+            projectId: s.projectId?.toString?.() || s.projectId,
             ownerId: s.ownerId,
             version: s.version,
             title: s.title,
@@ -246,8 +250,8 @@ export async function saveStoryboard(data: {
         const nextVersion = (project?.currentVersion || 0) + 1;
 
         const sbDoc = {
-          projectId: data.projectId,
-          ownerId: data.ownerId,
+          projectId: data.projectId.toString(),
+          ownerId: data.ownerId.toString(),
           version: nextVersion,
           title: data.title,
           targetSeconds: data.targetSeconds || 75,
