@@ -40,7 +40,19 @@ export interface TimedScene {
   title: string;
   kicker: string;
   narration: string;
-  type: "binary-search" | "comparison" | "flow" | "science" | "concept" | "overview";
+  type:
+    | "binary-search"
+    | "comparison"
+    | "flow"
+    | "science"
+    | "concept"
+    | "overview"
+    | "bars"
+    | "process_steps"
+    | "gauge"
+    | "aerodynamics"
+    | "chart"
+    | "cycle";
   labels: string[];
   cue: string;
   occurrence: number;

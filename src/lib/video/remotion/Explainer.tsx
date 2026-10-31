@@ -4,6 +4,10 @@ import type { Timeline, TimedScene } from "./contracts";
 import { SearchDiagram } from "./SearchDiagram";
 import { ConceptDiagram } from "./ConceptDiagram";
 import { ScienceDiagram } from "./ScienceDiagram";
+import { GaugeDiagram } from "./GaugeDiagram";
+import { AeroDiagram } from "./AeroDiagram";
+import { ChartDiagram } from "./ChartDiagram";
+import { CycleDiagram } from "./CycleDiagram";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/500.css";
 import "@fontsource/dm-sans/600.css";
@@ -19,7 +23,10 @@ const fade = (f: number, start = 0, duration = 16) =>
   });
 
 function Diagram({ scene }: { scene: TimedScene }) {
-  if (scene.type === "binary-search" || scene.search) {
+  const textContext = `${scene.type} ${scene.title} ${scene.narration} ${scene.labels.join(" ")}`.toLowerCase();
+
+  // 1. Algorithms & Data Structures (Binary Search, Arrays)
+  if (scene.type === "binary-search" || scene.search || /binary|search|array|sort|index/i.test(textContext)) {
     return (
       <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
         <SearchDiagram scene={scene} />
@@ -27,7 +34,44 @@ function Diagram({ scene }: { scene: TimedScene }) {
     );
   }
 
-  if (scene.type === "comparison" || scene.type === "flow" || scene.comparison) {
+  // 2. Flight & Aerodynamics (Wings, Lift, Airplanes, Upside-down Flight)
+  if (/wing|airplane|plane|fly|flight|aerodynamic|airfoil|lift|drag|thrust|yoke/i.test(textContext)) {
+    return (
+      <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
+        <AeroDiagram scene={scene} />
+      </svg>
+    );
+  }
+
+  // 3. Thermal & Pressure Metrics (Pressure Cooker, Boiling, Heat, Gauges)
+  if (/gauge|cook|pressure|boil|heat|temp|100°|121°|atm|steam|vessel/i.test(textContext)) {
+    return (
+      <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
+        <GaugeDiagram scene={scene} />
+      </svg>
+    );
+  }
+
+  // 4. Growth, Scaling Curves, Complexity & Charts
+  if (scene.type === "bars" || /chart|curve|growth|exponential|scaling|o\(n\)|o\(log|graph|metric|billion/i.test(textContext)) {
+    return (
+      <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
+        <ChartDiagram scene={scene} />
+      </svg>
+    );
+  }
+
+  // 5. Orbital & Biological Cycles (Water Cycle, Photosynthesis, Closed Loops)
+  if (/cycle|loop|orbit|water cycle|photosynthesis|recirculat|ecosystem/i.test(textContext)) {
+    return (
+      <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
+        <CycleDiagram scene={scene} />
+      </svg>
+    );
+  }
+
+  // 6. Paired Comparison Cards
+  if (scene.type === "comparison" || scene.comparison) {
     return (
       <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
         <ConceptDiagram scene={scene} />
@@ -35,6 +79,16 @@ function Diagram({ scene }: { scene: TimedScene }) {
     );
   }
 
+  // 7. Sequential Step-by-Step Flow
+  if (scene.type === "flow" || scene.type === "process_steps") {
+    return (
+      <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
+        <ConceptDiagram scene={scene} />
+      </svg>
+    );
+  }
+
+  // 8. General Physical Principle / Vector Hub Engine
   return (
     <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
       <ScienceDiagram scene={scene} />
