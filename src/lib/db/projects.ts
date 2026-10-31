@@ -34,6 +34,24 @@ export interface SceneRecord {
   visualType: string;
   accentWords: string[];
   estimatedSeconds: number;
+  cue?: string;
+  search?: {
+    values: number[];
+    target: number;
+    step: number;
+    mode: "setup" | "compare" | "result";
+    decisionCue?: string;
+  };
+  comparison?: {
+    left: { heading: string; points: string[] };
+    right: { heading: string; points: string[] };
+  };
+  science?: {
+    badge?: string;
+    headline?: string;
+    vectorLabel?: string;
+    points?: string[];
+  };
 }
 
 export interface StoryboardRecord {

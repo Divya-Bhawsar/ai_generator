@@ -13,6 +13,8 @@ const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: str
   comparison: { bg: "#FFF7ED", text: "#EA580C", border: "#FED7AA" },
   metric_callout: { bg: "#ECFEFF", text: "#0891B2", border: "#A5F3FC" },
   process_steps: { bg: "#F5F3FF", text: "#7C3AED", border: "#DDD6FE" },
+  "binary-search": { bg: "#ECFDF5", text: "#059669", border: "#A7F3D0" },
+  science: { bg: "#F0F9FF", text: "#0284C7", border: "#BAE6FD" },
 };
 
 const VOICES = [
@@ -784,9 +786,36 @@ export function StoryboardStudio({
                         <option value="concept">Concept Core</option>
                         <option value="process_steps">Process Flow</option>
                         <option value="comparison">Comparison Grid</option>
+                        <option value="binary-search">Binary Search Array</option>
+                        <option value="science">Science / Physics Vector</option>
                         <option value="takeaway">Key Takeaway</option>
                       </select>
                     </div>
+
+                    {videoUrl && (
+                      <div
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                          height: "150px",
+                          borderRadius: "6px",
+                          overflow: "hidden",
+                          background: "#153C3A",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <img
+                          src={`/renders/${project._id}/previews/${scene.sceneId || `scene-${String(index + 1).padStart(2, "0")}`}.png`}
+                          alt={scene.title}
+                          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                          onError={(e) => {
+                            (e.currentTarget.parentElement as HTMLElement).style.display = "none";
+                          }}
+                        />
+                      </div>
+                    )}
 
                     <textarea
                       value={scene.visualLabel}

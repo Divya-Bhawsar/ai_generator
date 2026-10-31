@@ -15,6 +15,8 @@ const SCENE_TYPES = [
   "comparison",
   "metric_callout",
   "process_steps",
+  "binary-search",
+  "science",
 ];
 
 export const AUDIENCE_PROFILES: Record<
@@ -70,6 +72,7 @@ const STORYBOARD_SCHEMA = {
           narration: { type: "STRING" },
           visual_label: { type: "STRING" },
           visual_type: { type: "STRING", enum: SCENE_TYPES },
+          cue: { type: "STRING" },
           accent_words: {
             type: "ARRAY",
             items: { type: "STRING" },
@@ -219,9 +222,16 @@ export function synthesizeFallbackStoryboard(
           title: "The Sorted Array & Target 52",
           narration: "Suppose we have a sorted array of numbers: 3, 8, 14, 27, 39, 52, 68, and 91. We want to find the number 52 without scanning one-by-one.",
           visualLabel: "A sleek horizontal array showing [3, 8, 14, 27, 39, 52, 68, 91] with a glowing Target = 52 badge.",
-          visualType: "hook",
+          visualType: "binary-search",
           accentWords: ["sorted array", "target 52", "scanning"],
           estimatedSeconds: 12.5,
+          cue: "sorted array",
+          search: {
+            values: [3, 8, 14, 27, 39, 52, 68, 91],
+            target: 52,
+            step: 0,
+            mode: "setup",
+          },
         },
         {
           sceneId: "scene-02",
@@ -229,9 +239,17 @@ export function synthesizeFallbackStoryboard(
           title: "Check the Middle Element",
           narration: "Instead of starting at index zero, we inspect the middle element: 27. We compare our target 52 against 27. Since 52 is greater, our answer cannot be on the left.",
           visualLabel: "Pointers Low at index 0, High at index 7, and Mid at index 3 (value 27). Comparison badge: 52 > 27.",
-          visualType: "concept",
+          visualType: "binary-search",
           accentWords: ["middle element", "27", "greater"],
           estimatedSeconds: 13.5,
+          cue: "middle element",
+          search: {
+            values: [3, 8, 14, 27, 39, 52, 68, 91],
+            target: 52,
+            step: 0,
+            mode: "compare",
+            decisionCue: "greater",
+          },
         },
         {
           sceneId: "scene-03",
@@ -239,9 +257,17 @@ export function synthesizeFallbackStoryboard(
           title: "Eliminating Half the Search Space",
           narration: "In one single comparison, we eliminate indices 0 through 3 completely. Half the array is discarded, narrowing the search space to 39, 52, 68, and 91.",
           visualLabel: "Left half [3, 8, 14, 27] dims with a red strikethrough. The active window zooms in on [39, 52, 68, 91].",
-          visualType: "process_steps",
+          visualType: "binary-search",
           accentWords: ["eliminate", "half", "narrowing"],
           estimatedSeconds: 13.0,
+          cue: "eliminate",
+          search: {
+            values: [3, 8, 14, 27, 39, 52, 68, 91],
+            target: 52,
+            step: 1,
+            mode: "compare",
+            decisionCue: "discarded",
+          },
         },
         {
           sceneId: "scene-04",
@@ -249,9 +275,17 @@ export function synthesizeFallbackStoryboard(
           title: "Match Found in Two Operations",
           narration: "We check the new middle element: 52. It matches our target exactly! We found the element in just two comparisons instead of six linear checks.",
           visualLabel: "Target element 52 pulses with an emerald green glow and a 'Match Found in 2 Checks' badge.",
-          visualType: "comparison",
-          accentWords: ["matches", "two comparisons", "found"],
-          estimatedSeconds: 12.5,
+          visualType: "binary-search",
+          accentWords: ["middle element", "52", "matches"],
+          estimatedSeconds: 12.0,
+          cue: "middle element",
+          search: {
+            values: [3, 8, 14, 27, 39, 52, 68, 91],
+            target: 52,
+            step: 1,
+            mode: "result",
+            decisionCue: "found",
+          },
         },
         {
           sceneId: "scene-05",
@@ -259,9 +293,20 @@ export function synthesizeFallbackStoryboard(
           title: "The Logarithmic Advantage",
           narration: "While linear search takes N operations, binary search runs in O(log N) time. For one million records, that is 20 checks instead of one million.",
           visualLabel: "A dramatic scale comparison: Linear O(N) taking 1,000,000 checks vs Binary O(log N) taking just 20 checks.",
-          visualType: "takeaway",
+          visualType: "comparison",
           accentWords: ["O(log N)", "one million", "20 checks"],
           estimatedSeconds: 11.5,
+          cue: "linear search",
+          comparison: {
+            left: {
+              heading: "Linear Search O(N)",
+              points: ["Scans item by item", "1,000,000 operations", "Slow on large databases"],
+            },
+            right: {
+              heading: "Binary Search O(log N)",
+              points: ["Halves space every step", "Only 20 operations", "Lightning query speeds"],
+            },
+          },
         },
       ],
     };
@@ -496,6 +541,7 @@ Return JSON matching the schema.`;
           visualLabel: s.visual_label,
           visualType: s.visual_type || "concept",
           accentWords: s.accent_words || [],
+          cue: (s as { cue?: string }).cue || s.accent_words?.[0] || "",
           estimatedSeconds: estSeconds,
         };
       });
@@ -580,6 +626,7 @@ PEDAGOGICAL DIRECTIVES:
           visualLabel: s.visual_label,
           visualType: s.visual_type || (s as { visualType?: string }).visualType || "concept",
           accentWords: s.accent_words || [],
+          cue: (s as { cue?: string }).cue || s.accent_words?.[0] || "",
           estimatedSeconds: estSeconds,
         };
       });

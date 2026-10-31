@@ -8,18 +8,23 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fontsource/dm-sans": "^5.2.6",
+    "@remotion/bundler": "^4.0.529",
+    "@remotion/renderer": "^4.0.529",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.14",
     "mongodb": "^7.8.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "remotion": "^4.0.529"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "tsx": "^4.23.15",
     "typescript": "latest"
   }
 }

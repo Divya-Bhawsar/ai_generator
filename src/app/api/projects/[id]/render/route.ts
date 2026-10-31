@@ -87,22 +87,40 @@ export async function POST(
     }
   }
 
-  // Spawn render worker detached in background
-  const workerScript = path.join(process.cwd(), "src", "lib", "video", "render_worker.py");
+  // Spawn Remotion render worker detached in background
+  const tsxBin = path.join(process.cwd(), "node_modules", ".bin", "tsx");
+  const workerScript = path.join(process.cwd(), "src", "lib", "video", "run_render.ts");
+  const binToRun = fs.existsSync(tsxBin) ? tsxBin : "npx";
+  const runArgs = fs.existsSync(tsxBin)
+    ? [
+        workerScript,
+        "--project-id", id,
+        "--voice-id", voiceId,
+        "--voice-name", voiceName,
+        "--storyboard-file", storyboardPath,
+        "--output-mp4", outputMp4Path,
+        "--status-file", statusPath,
+      ]
+    : [
+        "tsx",
+        workerScript,
+        "--project-id", id,
+        "--voice-id", voiceId,
+        "--voice-name", voiceName,
+        "--storyboard-file", storyboardPath,
+        "--output-mp4", outputMp4Path,
+        "--status-file", statusPath,
+      ];
+
+  const logFile = path.join(rendersDir, `${id}_render.log`);
+  const logFd = fs.openSync(logFile, "a");
+
   const child = spawn(
-    "python3",
-    [
-      workerScript,
-      "--project-id", id,
-      "--voice-id", voiceId,
-      "--voice-name", voiceName,
-      "--storyboard-file", storyboardPath,
-      "--output-mp4", outputMp4Path,
-      "--status-file", statusPath,
-    ],
+    binToRun,
+    runArgs,
     {
       detached: true,
-      stdio: "ignore",
+      stdio: ["ignore", logFd, logFd],
       env: {
         ...process.env,
         PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ""}`,
