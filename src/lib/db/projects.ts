@@ -1,5 +1,7 @@
 import { getDatabase, isMongoConfigured } from "../mongodb";
 import { ObjectId } from "mongodb";
+import fs from "fs";
+import path from "path";
 
 export type ProjectStatus =
   | "draft"
@@ -386,5 +388,66 @@ export async function updateProjectAudience(
     project.updatedAt = new Date();
     return true;
   }
+  return false;
+}
+
+export async function deleteProject(
+  ownerId: string,
+  projectId: string
+): Promise<boolean> {
+  // 1. Clean up file system artifacts (videos, audio, previews, logs)
+  try {
+    const videoFile = path.join(process.cwd(), "public", "videos", `${projectId}.mp4`);
+    if (fs.existsSync(videoFile)) {
+      fs.unlinkSync(videoFile);
+    }
+
+    const rendersDir = path.join(process.cwd(), "public", "renders");
+    const projRenderDir = path.join(rendersDir, projectId);
+    if (fs.existsSync(projRenderDir)) {
+      fs.rmSync(projRenderDir, { recursive: true, force: true });
+    }
+
+    for (const suffix of ["_status.json", "_storyboard.json", "_render.log"]) {
+      const f = path.join(rendersDir, `${projectId}${suffix}`);
+      if (fs.existsSync(f)) {
+        fs.unlinkSync(f);
+      }
+    }
+  } catch (fsErr) {
+    console.warn("Error cleaning up project files during deletion:", fsErr);
+  }
+
+  // 2. Database deletion (MongoDB)
+  if (isMongoConfigured()) {
+    try {
+      const db = await getDatabase();
+      if (db) {
+        let q: Record<string, unknown> = { ownerId };
+        if (ObjectId.isValid(projectId)) q._id = new ObjectId(projectId);
+        else q._id = projectId;
+
+        const res = await db.collection("projects").deleteOne(q);
+
+        const projectIdQuery = ObjectId.isValid(projectId)
+          ? { $in: [projectId, new ObjectId(projectId)] }
+          : projectId;
+        await db.collection("storyboards").deleteMany({ projectId: projectIdQuery, ownerId });
+
+        return (res.deletedCount || 0) > 0;
+      }
+    } catch (err) {
+      console.warn("MongoDB deleteProject error:", err);
+    }
+  }
+
+  // 3. Memory fallback deletion
+  const p = memoryProjects.get(projectId);
+  if (p && p.ownerId === ownerId) {
+    memoryProjects.delete(projectId);
+    memoryStoryboards.delete(projectId);
+    return true;
+  }
+
   return false;
 }

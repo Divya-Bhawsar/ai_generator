@@ -58,6 +58,8 @@ export function StoryboardStudio({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [deletingProject, setDeletingProject] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Voice Selection State
   const initialVoice = VOICES.find((v) => v.id === initialProject.voiceId || v.name === initialProject.voiceName) || VOICES[0];
@@ -290,17 +292,108 @@ export function StoryboardStudio({
     }
   }
 
+  async function handleDeleteProject() {
+    setDeletingProject(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${project._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete project");
+      }
+      window.location.href = "/dashboard";
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error deleting project";
+      setError(msg);
+      setDeletingProject(false);
+      setConfirmDelete(false);
+    }
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", paddingBottom: "4rem" }}>
       {/* Top Navigation & Status Bar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
-        <div>
-          <Link
-            href="/dashboard"
-            style={{ fontSize: "0.8125rem", color: "#315CEB", fontWeight: 600, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.25rem", marginBottom: "0.5rem" }}
-          >
-            ← Back to All Projects
-          </Link>
+        <div style={{ flex: 1, minWidth: "300px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+            <Link
+              href="/dashboard"
+              style={{ fontSize: "0.8125rem", color: "#315CEB", fontWeight: 600, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+            >
+              ← Back to All Projects
+            </Link>
+
+            {!confirmDelete ? (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #FECACA",
+                  borderRadius: "6px",
+                  padding: "0.25rem 0.65rem",
+                  fontSize: "0.75rem",
+                  color: "#DC2626",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                  fontWeight: 600,
+                  transition: "all 0.15s ease",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "#FEE2E2";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                🗑️ Delete Project
+              </button>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", color: "#DC2626", fontWeight: 600 }}>
+                  Permanently delete?
+                </span>
+                <button
+                  type="button"
+                  disabled={deletingProject}
+                  onClick={handleDeleteProject}
+                  style={{
+                    background: "#DC2626",
+                    color: "#FFFFFF",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "0.25rem 0.65rem",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    cursor: deletingProject ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {deletingProject ? "Deleting..." : "Yes, Delete"}
+                </button>
+                <button
+                  type="button"
+                  disabled={deletingProject}
+                  onClick={() => setConfirmDelete(false)}
+                  style={{
+                    background: "#F3F4F6",
+                    color: "#475569",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "0.25rem 0.65rem",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
             <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#17191F", margin: 0 }}>
               {storyboard?.title || project.title}
