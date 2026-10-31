@@ -2,9 +2,10 @@
 """Asynchronous Video Render Worker for VidyaMotion.
 
 Renders high-retention 9:16 vertical MP4 explainer videos with:
-- Neural ElevenLabs voiceover
-- Phrase-level synchronized kinetic subtitles (ASS)
-- Procedural motion graphic scenes (charts, flow diagrams, cards)
+- Neural ElevenLabs voiceover (with smart local caching)
+- Kinetic word/phrase-synchronized ASS subtitles with neon keyword highlights
+- Modern glassmorphic motion graphic cards captured via headless Chrome
+- Smooth Ken Burns dynamic camera push-in
 - Broadcast-grade H.264/AAC encoding via FFmpeg
 """
 from __future__ import annotations
@@ -17,23 +18,25 @@ import re
 import shutil
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
 from typing import Any
 
 # Ensure FFmpeg is in PATH
 HOMEBREW_BIN = "/opt/homebrew/bin"
-if HOMEBREW_BIN not in os.environ.get("PATH", ""):
-    os.environ["PATH"] = f"{HOMEBREW_BIN}:{os.environ.get('PATH', '')}"
+LOCAL_BIN = "/usr/local/bin"
+current_path = os.environ.get("PATH", "")
+for b in (HOMEBREW_BIN, LOCAL_BIN):
+    if b not in current_path:
+        os.environ["PATH"] = f"{b}:{os.environ.get('PATH', '')}"
+
+# Add script directory to sys.path so template_generator can be imported
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from template_generator import generate_scene_html, render_html_to_png
 
 WIDTH, HEIGHT, FPS = 1080, 1920, 30
-BG = "0x0B1220"
-WHITE = "0xF8FAFC"
-MUTED = "0xCBD5E1"
-ACCENT = "0x45D6B5"
-GOLD = "0xF7C873"
-FONT = "/System/Library/Fonts/Supplemental/Arial.ttf"
-SPECTRUM = ["0xF43F5E", "0xFB923C", "0xFACC15", "0x4ADE80", "0x38BDF8", "0x6366F1", "0xC084FC"]
 
 def update_status(status_file: Path, status: str, progress: int, stage: str, video_url: str = "", duration: float = 0.0, error: str = "") -> None:
     data = {
@@ -67,12 +70,12 @@ def ass_time(seconds: float) -> str:
     whole, centis = divmod(rem, 100)
     return f"{hours}:{minutes:02d}:{whole:02d}.{centis:02d}"
 
-def split_phrases(text: str, max_words: int = 5) -> list[str]:
+def split_phrases(text: str, max_words: int = 4) -> list[str]:
     words = re.findall(r"\S+", text.strip())
     return [" ".join(words[i:i + max_words]) for i in range(0, len(words), max_words)]
 
 def caption_cues(text: str, alignment: dict[str, Any] | None, duration: float) -> list[dict[str, Any]]:
-    pieces = split_phrases(text)
+    pieces = split_phrases(text, max_words=4)
     if alignment:
         chars = alignment.get("characters", [])
         starts = alignment.get("character_start_times_seconds", [])
@@ -112,8 +115,19 @@ def caption_cues(text: str, alignment: dict[str, Any] | None, duration: float) -
 def make_ass(scene: dict, duration: float, index: int, work_dir: Path) -> Path:
     events = []
     cues = scene.get("caption_cues") or caption_cues(scene["narration"], None, duration)
+    accents = scene.get("accentWords") or scene.get("accent_words") or []
+
     for cue in cues:
-        phrase = str(cue.get("text", "")).replace("\\", r"\\").replace("{", r"\{").replace("}", r"\}")
+        raw_phrase = str(cue.get("text", "")).replace("\\", r"\\").replace("{", r"\{").replace("}", r"\}")
+
+        # Highlight accent keywords with neon yellow in ASS format
+        phrase = raw_phrase
+        for acc in accents:
+            acc_clean = str(acc).strip()
+            if acc_clean:
+                pattern = re.compile(rf"\b({re.escape(acc_clean)})\b", re.IGNORECASE)
+                phrase = pattern.sub(r"{\\c&H00FFFF&}\1{\\c&HFFFFFF&}", phrase)
+
         start = float(cue.get("start", 0))
         end = min(duration, float(cue.get("end", duration)))
         if phrase and end > start:
@@ -123,12 +137,12 @@ def make_ass(scene: dict, duration: float, index: int, work_dir: Path) -> Path:
 ScriptType: v4.00+
 PlayResX: {WIDTH}
 PlayResY: {HEIGHT}
-WrapStyle: 2
+WrapStyle: 0
 ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Caption,Arial,52,&H00FFFFFF,&H00B5D645,&HAA07111F,&H6607111F,1,0,0,0,100,100,0,0,1,3,1,2,90,90,300,1
+Style: Caption,Arial,58,&H00FFFFFF,&H0000FFFF,&H000B0E14,&H80000000,1,0,0,0,100,100,1,0,1,5,2,2,70,70,420,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -140,80 +154,32 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 def esc_path(p: Path) -> str:
     return str(p.resolve()).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
 
-def visual_filter(scene: dict, index: int, ass_path: Path, work_dir: Path) -> str:
-    title_path = work_dir / f"title-{index:02d}.txt"
-    title_path.write_text(scene.get("title", f"Scene {index}"), encoding="utf-8")
-    title_esc = esc_path(title_path)
+def render_scene(scene: dict, index: int, total_scenes: int, topic: str, audio: Path, duration: float, work_dir: Path) -> Path:
+    # 1. Generate Glassmorphic Frame HTML & capture to PNG via headless Chrome
+    html_content = generate_scene_html(scene, index, total_scenes, topic)
+    scene_png = work_dir / f"scene-{index:02d}.png"
+    render_html_to_png(html_content, scene_png)
 
-    body_text = scene.get("visualLabel") or scene.get("visual_label") or "Visual explanation"
-    body_lines = textwrap.wrap(body_text, width=26)
-    body_filters = []
-    for line_idx, line in enumerate(body_lines):
-        body_p = work_dir / f"body-{index:02d}-{line_idx:02d}.txt"
-        body_p.write_text(line, encoding="utf-8")
-        body_filters.append(
-            f"drawtext=fontfile='{FONT}':textfile='{esc_path(body_p)}':fontcolor={MUTED}:fontsize=54:x=(w-text_w)/2:y={650 + line_idx * 72}"
-        )
+    # 2. Build Subtitles
+    ass_path = make_ass(scene, duration, index, work_dir)
 
-    panel_h = max(105, 46 + len(body_lines) * 72)
-    f = (
-        f"drawbox=x=150:y=350:w='min(780,t*650)':h=14:color={ACCENT}:t=fill,"
-        f"drawtext=fontfile='{FONT}':textfile='{title_esc}':fontcolor={WHITE}:fontsize=82:x=(w-text_w)/2:y=440:line_spacing=18,"
-        f"drawbox=x=180:y=620:w=720:h={panel_h}:color=0x152238@1:t=fill,"
-        + ",".join(body_filters)
-    )
-
-    kind = scene.get("visualType") or scene.get("visual_type") or "concept"
-
-    if kind == "flow":
-        f += (
-            f",drawbox=x='170+mod(t*100,580)':y=1040:w=110:h=110:color={GOLD}:t=fill"
-            ",drawbox=x=485:y=1040:w=110:h=110:color=0x314158:t=fill"
-            ",drawbox=x=800:y=1040:w=110:h=110:color=0x314158:t=fill"
-            f",drawtext=fontfile='{FONT}':text='INPUT':fontcolor={BG}:fontsize=30:x=185:y=1078"
-            f",drawtext=fontfile='{FONT}':text='PROCESS':fontcolor={WHITE}:fontsize=26:x=495:y=1078"
-            f",drawtext=fontfile='{FONT}':text='OUTPUT':fontcolor={WHITE}:fontsize=28:x=810:y=1078"
-        )
-    elif kind in ("bars", "comparison"):
-        f += (
-            ",drawbox=x=260:y=1120:w=140:h=300:color=0x314158:t=fill"
-            f",drawbox=x=470:y='1120-min(400,t*70)':w=140:h='min(400,t*70)':color={ACCENT}:t=fill"
-            f",drawbox=x=680:y='1120-min(560,t*100)':w=140:h='min(560,t*100)':color={GOLD}:t=fill"
-            f",drawtext=fontfile='{FONT}':text='BASELINE':fontcolor={MUTED}:fontsize=28:x=260:y=1460"
-            f",drawtext=fontfile='{FONT}':text='IMPACT':fontcolor={WHITE}:fontsize=28:x=685:y=1460"
-        )
-    elif kind == "takeaway":
-        f += (
-            ",drawbox=x=180:y=1020:w=720:h=360:color=0x1E293B:t=fill"
-            f",drawbox=x=180:y=1020:w=720:h=360:color={GOLD}:t=6"
-            f",drawtext=fontfile='{FONT}':text='KEY TAKEAWAY':fontcolor={GOLD}:fontsize=36:x=(w-text_w)/2:y=1080"
-            f",drawtext=fontfile='{FONT}':text='✓  Core Concept Mastered':fontcolor={WHITE}:fontsize=32:x=230:y=1170"
-            f",drawtext=fontfile='{FONT}':text='✓  Ready to Apply & Share':fontcolor={ACCENT}:fontsize=32:x=230:y=1250"
-        )
-    else:
-        # Default concept motion
-        f += (
-            ",drawbox=x=220:y=1050:w=640:h=320:color=0x162032:t=fill"
-            f",drawbox=x=220:y=1050:w=640:h=320:color={ACCENT}:t=4"
-            f",drawtext=fontfile='{FONT}':text='●':fontcolor={GOLD}:fontsize=90:x='320+240*abs(sin(t*1.5))':y=1130"
-            f",drawtext=fontfile='{FONT}':text='EXPLAINER FOCUS':fontcolor={WHITE}:fontsize=30:x=(w-text_w)/2:y=1300"
-        )
-
-    f += f",subtitles='{esc_path(ass_path)}'"
-    return f
-
-def render_scene(scene: dict, index: int, audio: Path, duration: float, work_dir: Path) -> Path:
-    ass = make_ass(scene, duration, index, work_dir)
+    # 3. Render animated video clip with Ken Burns zoom & kinetic subtitles
     clip = work_dir / f"scene-{index:02d}.mp4"
-    vf = visual_filter(scene, index, ass, work_dir)
+    ass_esc = esc_path(ass_path)
+    vf = f"zoompan=z='min(zoom+0.0006,1.04)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={WIDTH}x{HEIGHT}:fps={FPS},subtitles='{ass_esc}'"
+
     run_cmd([
-        "ffmpeg", "-y", "-f", "lavfi", "-i",
-        f"color=c={BG}:s={WIDTH}x{HEIGHT}:r={FPS}:d={duration:.3f}",
-        "-i", str(audio), "-vf", vf,
-        "-t", f"{duration:.3f}", "-r", str(FPS),
-        "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
-        "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
-        "-ar", "48000", "-shortest", str(clip)
+        "ffmpeg", "-y",
+        "-loop", "1", "-t", f"{duration:.3f}",
+        "-i", str(scene_png),
+        "-i", str(audio),
+        "-vf", vf,
+        "-t", f"{duration:.3f}",
+        "-r", str(FPS),
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+        "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+        "-shortest", str(clip)
     ])
     return clip
 
@@ -244,6 +210,7 @@ def main() -> int:
         spec = json.loads(args.storyboard_file.read_text(encoding="utf-8"))
         scenes = spec.get("scenes", [])
         total_scenes = len(scenes)
+        topic = spec.get("title", "")
 
         if total_scenes == 0:
             raise ValueError("No scenes found in storyboard")
@@ -255,10 +222,20 @@ def main() -> int:
         import urllib.request
         for i, scene in enumerate(scenes):
             prog = 10 + int((i / total_scenes) * 35)
-            update_status(args.status_file, "rendering", prog, f"Generating voiceover for Scene {i+1} of {total_scenes}...")
+            update_status(args.status_file, "rendering", prog, f"Preparing voiceover for Scene {i+1} of {total_scenes}...")
 
             audio_dest = work_dir / f"scene-{i+1:02d}.mp3"
 
+            # Check if valid cached audio exists
+            if audio_dest.is_file() and audio_dest.stat().st_size > 1000:
+                dur = probe_duration(audio_dest)
+                if "caption_cues" not in scene:
+                    scene["caption_cues"] = caption_cues(scene["narration"], None, dur)
+                audio_files.append(audio_dest)
+                durations.append(dur)
+                continue
+
+            # Synthesize via ElevenLabs if key available
             if api_key and args.voice_id:
                 url = f"https://api.elevenlabs.io/v1/text-to-speech/{args.voice_id}/with-timestamps?output_format=mp3_44100_128"
                 payload = json.dumps({
@@ -296,7 +273,7 @@ def main() -> int:
         for i, (scene, audio, dur) in enumerate(zip(scenes, audio_files, durations)):
             prog = 45 + int((i / total_scenes) * 45)
             update_status(args.status_file, "rendering", prog, f"Rendering motion graphics for Scene {i+1} of {total_scenes}...")
-            clip = render_scene(scene, i + 1, audio, dur, work_dir)
+            clip = render_scene(scene, i + 1, total_scenes, topic, audio, dur, work_dir)
             clips.append(clip)
 
         # Step 3: Concat Video

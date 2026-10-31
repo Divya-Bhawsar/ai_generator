@@ -8,7 +8,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.9.22",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.14",
     "mongodb": "^7.8.0",
