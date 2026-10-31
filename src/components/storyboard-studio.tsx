@@ -299,9 +299,9 @@ export function StoryboardStudio({
       const res = await fetch(`/api/projects/${project._id}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || "Failed to delete project");
+        throw new Error(data.error || `Failed to delete project (HTTP ${res.status})`);
       }
       window.location.href = "/dashboard";
     } catch (err: unknown) {
