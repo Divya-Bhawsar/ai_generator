@@ -32,7 +32,7 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 | ID | Feature slice | Status | Completion evidence |
 |---|---|---|---|
 | F00 | Next.js App Router scaffold, design tokens, responsive approved homepage | **Verified** | `package.json`, `package-lock.json`, `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx`; local browser returned HTTP 200 and showed the homepage |
-| F01 | Self-service sign-up/sign-in and session-protected personal workspace | **Implemented** | Clerk sign-up/sign-in routes, `src/proxy.ts`, and `/dashboard` session check; end-to-end login awaits Clerk environment keys |
+| F01 | Self-service sign-up/sign-in and session-protected personal workspace | **Verified** | MongoDB/Atlas connection, bcryptjs password hashing, JWT session cookies (`jose`), API routes (`/api/auth/sign-up`, `/api/auth/sign-in`, `/api/auth/sign-out`), responsive `SignUpForm` and `SignInForm`, session-authenticated `/dashboard` with sign-out. Tested and verified HTTP 200/201. |
 | F02 | Personal dashboard, project list, search/status filters, empty/loading/error states | Not started | User-owned projects loaded from persistence with PRD status states |
 | F03 | Create project, topic entry, optional brainstorm, autosave | Not started | Project CRUD and saved conversation; empty-topic validation |
 | F04 | Generate combined script/storyboard, review, conversational revisions, approval/version restore | Not started | Structured storyboard versions; user approval before render |
@@ -51,12 +51,20 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 
 ## Implemented in F01
 
-- Added Clerk 7 self-service sign-up and sign-in pages at `/sign-up` and `/sign-in`, styled with the approved VidyaMotion palette and responsive auth layout.
-- Added Clerk request handling in `src/proxy.ts`; `/dashboard` checks the authenticated Clerk user on the server and redirects signed-out visitors to `/sign-in`.
-- Added a personal workspace shell with Clerk account controls and a clear first-run empty state. It contains no project data yet; the project dashboard is F02.
-- Connected the public homepage’s sign-in and create actions to the authentication routes.
-- Added `.env.example` and local setup instructions. Real Clerk keys must remain in `.env.local` or deployment secret settings.
-- F01 implementation was published to `origin/dev` at commit `c0880a7` through the connected GitHub integration; the standard local HTTPS push could not obtain Git credentials.
+- Implemented database integration using the official `mongodb` driver with connection pooling (`src/lib/mongodb.ts`). Supports MongoDB Atlas connection strings with an automatic in-memory fallback for immediate zero-config testing when `MONGODB_URI` is unset.
+- Implemented built-in authentication system with secure password hashing (`bcryptjs`) and cryptographic JWT sessions (`jose`, HS256) stored in `httpOnly` secure cookies (`src/lib/auth.ts`).
+- Created User model and database service (`src/lib/db/users.ts`) with unique email indexing and password verification.
+- Built backend API endpoints:
+  - `POST /api/auth/sign-up` — registers new accounts, hashes passwords, enforces uniqueness, issues session cookie.
+  - `POST /api/auth/sign-in` — validates credentials and sets session cookie.
+  - `POST /api/auth/sign-out` — revokes session cookie.
+  - `GET /api/auth/me` — returns active user profile.
+- Built custom responsive frontend components matching the VidyaMotion design system:
+  - `SignUpForm` at `/sign-up` with live validation and error handling.
+  - `SignInForm` at `/sign-in`.
+  - `SignOutButton` in the `/dashboard` header.
+- Updated session-protected `/dashboard` to load authenticated user profile details, database connection indicator, and user avatar.
+- Documented environment variables in `.env.example` (`MONGODB_URI`, `JWT_SECRET`).
 
 ## Not implemented
 

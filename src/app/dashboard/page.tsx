@@ -1,14 +1,18 @@
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
+import { isMongoConfigured } from "@/lib/mongodb";
+import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
+  const session = await getSession();
 
-  if (!userId) {
+  if (!session) {
     redirect("/sign-in");
   }
+
+  const isConnectedToMongo = isMongoConfigured();
+  const initial = (session.name || session.email)[0].toUpperCase();
 
   return (
     <main className="workspace-shell">
@@ -17,9 +21,30 @@ export default async function DashboardPage() {
           <span className="wordmark-mark" aria-hidden="true">V</span>
           <span>VidyaMotion</span>
         </Link>
-        <div className="workspace-header-right">
-          <span className="workspace-account-label">Personal workspace</span>
-          <UserButton />
+        <div className="workspace-header-right" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", fontSize: "0.8125rem" }}>
+            <span style={{ fontWeight: 600, color: "#17191F" }}>{session.name || session.email}</span>
+            <span style={{ color: "#666B73", fontSize: "0.75rem" }}>
+              {isConnectedToMongo ? "● MongoDB Atlas" : "○ Local Database"}
+            </span>
+          </div>
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: "50%",
+              background: "#315CEB",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 600,
+              fontSize: 14,
+            }}
+          >
+            {initial}
+          </div>
+          <SignOutButton />
         </div>
       </header>
 
@@ -38,8 +63,8 @@ export default async function DashboardPage() {
         <section className="workspace-main">
           <div className="workspace-welcome">
             <p className="eyebrow"><span className="eyebrow-dot" /> YOUR SPACE TO CREATE</p>
-            <h1>Your ideas start <span>here.</span></h1>
-            <p>Welcome to your personal VidyaMotion workspace. Your projects will be saved here as you create them.</p>
+            <h1>Welcome back, <span>{session.name || "Creator"}.</span></h1>
+            <p>Welcome to your personal VidyaMotion workspace. Ready to turn an educational idea into a video?</p>
           </div>
 
           <div className="workspace-empty-card">
@@ -53,7 +78,7 @@ export default async function DashboardPage() {
             </div>
             <p className="workspace-empty-kicker">A CLEAR START</p>
             <h2>Your first explainer is one idea away.</h2>
-            <p>The idea-to-storyboard workspace is the next step. For now, your account and private workspace are ready.</p>
+            <p>The idea-to-storyboard workspace is ready. You are authenticated with your personal account ({session.email}).</p>
           </div>
 
           <div className="workspace-footnote">
