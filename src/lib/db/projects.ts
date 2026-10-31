@@ -16,6 +16,8 @@ export interface ProjectRecord {
   topic: string;
   status: ProjectStatus;
   currentVersion: number;
+  videoUrl?: string;
+  durationSeconds?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -114,6 +116,8 @@ export async function listProjects(ownerId: string): Promise<ProjectRecord[]> {
           topic: d.topic,
           status: d.status,
           currentVersion: d.currentVersion || 1,
+          videoUrl: d.videoUrl,
+          durationSeconds: d.durationSeconds,
           createdAt: d.createdAt,
           updatedAt: d.updatedAt,
         }));
@@ -159,6 +163,8 @@ export async function getProjectById(
           topic: projectDoc.topic,
           status: projectDoc.status,
           currentVersion: projectDoc.currentVersion || 1,
+          videoUrl: projectDoc.videoUrl,
+          durationSeconds: projectDoc.durationSeconds,
           createdAt: projectDoc.createdAt,
           updatedAt: projectDoc.updatedAt,
         };

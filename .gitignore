@@ -15,3 +15,5 @@ out/
 coverage/
 *.tsbuildinfo
 .vercel/
+public/videos/
+public/renders/

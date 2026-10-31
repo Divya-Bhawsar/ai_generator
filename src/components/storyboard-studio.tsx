@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ProjectRecord, StoryboardRecord, SceneRecord } from "@/lib/db/projects";
 
@@ -14,6 +14,23 @@ const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: str
   metric_callout: { bg: "#ECFEFF", text: "#0891B2", border: "#A5F3FC" },
   process_steps: { bg: "#F5F3FF", text: "#7C3AED", border: "#DDD6FE" },
 };
+
+const VOICES = [
+  {
+    id: "Q1NHvGuV9SzxtiSnVDEH",
+    name: "viraj",
+    label: "Viraj",
+    description: "Indian English · Confident, Informative Male",
+    previewUrl: "/audio/voice-viraj.mp3",
+  },
+  {
+    id: "zuIkusKkwwtn2eFqk87f",
+    name: "monica",
+    label: "Monica",
+    description: "Indian English · Clear, Engaging Female",
+    previewUrl: "/audio/voice-monica.mp3",
+  },
+];
 
 export function StoryboardStudio({
   initialProject,
@@ -32,9 +49,121 @@ export function StoryboardStudio({
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  // Voice Selection State
+  const [selectedVoice, setSelectedVoice] = useState(VOICES[0]);
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Render State
+  const [isRenderModalOpen, setIsRenderModalOpen] = useState(false);
+  const [rendering, setRendering] = useState(false);
+  const [renderProgress, setRenderProgress] = useState(0);
+  const [renderStage, setRenderStage] = useState("");
+  const [videoUrl, setVideoUrl] = useState<string | null>(initialProject.videoUrl || null);
+  const [videoDuration, setVideoDuration] = useState<number | null>(initialProject.durationSeconds || null);
+
   // Total words & estimated duration
   const totalWords = scenes.reduce((acc, s) => acc + s.narration.trim().split(/\s+/).filter(Boolean).length, 0);
   const estimatedDuration = Math.round((totalWords / 2.5) * 10) / 10;
+
+  // Poll for existing video or render progress
+  useEffect(() => {
+    async function checkStatus() {
+      try {
+        const res = await fetch(`/api/projects/${project._id}/render-status`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "ready" && data.videoUrl) {
+            setVideoUrl(data.videoUrl);
+            setVideoDuration(data.duration);
+          } else if (data.status === "rendering") {
+            setRendering(true);
+            setRenderProgress(data.progress || 10);
+            setRenderStage(data.stage || "Rendering...");
+          }
+        }
+      } catch {
+        // silent check
+      }
+    }
+    checkStatus();
+  }, [project._id]);
+
+  // Poller during active rendering
+  useEffect(() => {
+    if (!rendering) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/projects/${project._id}/render-status`);
+        if (res.ok) {
+          const data = await res.json();
+          setRenderProgress(data.progress || 10);
+          setRenderStage(data.stage || "Processing...");
+
+          if (data.status === "ready" && data.videoUrl) {
+            setRendering(false);
+            setVideoUrl(data.videoUrl);
+            setVideoDuration(data.duration);
+            clearInterval(interval);
+          } else if (data.status === "failed") {
+            setRendering(false);
+            setError(data.error || "Rendering failed");
+            clearInterval(interval);
+          }
+        }
+      } catch {
+        // network retry
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [rendering, project._id]);
+
+  function playVoicePreview(voice: (typeof VOICES)[0]) {
+    if (playingVoice === voice.name && audioRef.current) {
+      audioRef.current.pause();
+      setPlayingVoice(null);
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+
+    const audio = new Audio(voice.previewUrl);
+    audioRef.current = audio;
+    setPlayingVoice(voice.name);
+    audio.play().catch(() => setPlayingVoice(null));
+    audio.onended = () => setPlayingVoice(null);
+  }
+
+  async function handleStartRender() {
+    setRendering(true);
+    setRenderProgress(5);
+    setRenderStage("Initializing video render worker...");
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/projects/${project._id}/render`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voiceId: selectedVoice.id,
+          voiceName: selectedVoice.name,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to start render");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error initiating render";
+      setError(msg);
+      setRendering(false);
+    }
+  }
 
   function updateSceneText(index: number, newNarration: string) {
     setScenes((prev) => {
@@ -134,6 +263,11 @@ export function StoryboardStudio({
             <span style={{ fontSize: "0.75rem", background: "#EEF2FF", color: "#315CEB", padding: "0.2rem 0.6rem", borderRadius: "4px", fontWeight: 600 }}>
               v{storyboard?.version || project.currentVersion}
             </span>
+            {videoUrl && (
+              <span style={{ fontSize: "0.75rem", background: "#D1FAE5", color: "#065F46", padding: "0.2rem 0.6rem", borderRadius: "4px", fontWeight: 600 }}>
+                ● Video Ready
+              </span>
+            )}
           </div>
           <p style={{ margin: "0.35rem 0 0", fontSize: "0.875rem", color: "#666B73" }}>
             Topic: <em>{project.topic}</em>
@@ -154,7 +288,7 @@ export function StoryboardStudio({
             <div style={{ fontSize: "0.7rem", color: "#666B73", fontWeight: 600, textTransform: "uppercase" }}>
               NARRATION PACING
             </div>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: estimatedDuration >= 60 && estimatedDuration <= 90 ? "#059669" : "#D97706" }}>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: estimatedDuration >= 50 && estimatedDuration <= 90 ? "#059669" : "#D97706" }}>
               ~{estimatedDuration}s ({totalWords} words)
             </div>
             <div style={{ fontSize: "0.7rem", color: "#666B73" }}>
@@ -172,23 +306,185 @@ export function StoryboardStudio({
 
       {saveSuccess && (
         <div style={{ padding: "0.75rem 1rem", background: "#D1FAE5", color: "#065F46", borderRadius: "6px", fontSize: "0.875rem", border: "1px solid #A7F3D0" }}>
-          ✓ Storyboard version saved successfully!
+          ✓ Storyboard updated successfully!
         </div>
       )}
 
-      {/* If no storyboard exists yet */}
-      {!storyboard && (
-        <div style={{ background: "#FFFFFF", border: "1px solid #E8E5DF", borderRadius: "10px", padding: "2.5rem", textAlign: "center" }}>
-          <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.25rem", color: "#17191F" }}>No storyboard generated yet</h3>
-          <p style={{ margin: "0 0 1.5rem", color: "#666B73" }}>Click below to let Gemini AI generate your 4–6 scene educational storyboard.</p>
-          <button
-            onClick={handleGenerateStoryboard}
-            disabled={generating}
-            className="button"
-            style={{ padding: "0.75rem 1.5rem" }}
+      {/* Render In-Progress Progress Bar */}
+      {rendering && (
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #315CEB",
+            borderRadius: "12px",
+            padding: "1.75rem",
+            boxShadow: "0 6px 20px rgba(49, 92, 235, 0.08)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span className="spinner" style={{ width: 18, height: 18, border: "2px solid #315CEB", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+              <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#17191F", fontWeight: 700 }}>
+                Rendering Your Explainer Video ({renderProgress}%)
+              </h3>
+            </div>
+            <span style={{ fontSize: "0.8125rem", color: "#315CEB", fontWeight: 600 }}>
+              Voice: {selectedVoice.label} · 1080x1920 MP4
+            </span>
+          </div>
+
+          <div style={{ width: "100%", height: "8px", background: "#E8E5DF", borderRadius: "4px", overflow: "hidden" }}>
+            <div
+              style={{
+                width: `${renderProgress}%`,
+                height: "100%",
+                background: "#315CEB",
+                borderRadius: "4px",
+                transition: "width 0.4s ease",
+              }}
+            />
+          </div>
+
+          <p style={{ margin: 0, fontSize: "0.875rem", color: "#666B73" }}>
+            {renderStage || "Processing video pipeline..."}
+          </p>
+        </div>
+      )}
+
+      {/* COMPLETED VIDEO PREVIEW PLAYER (Milestone F06) */}
+      {videoUrl && (
+        <div
+          style={{
+            background: "#17191F",
+            color: "#FFFFFF",
+            borderRadius: "12px",
+            padding: "2rem",
+            display: "grid",
+            gridTemplateColumns: "320px 1fr",
+            gap: "2.5rem",
+            alignItems: "center",
+          }}
+        >
+          {/* Vertical 9:16 Video Player Frame */}
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "320px",
+              aspectRatio: "9/16",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
+              border: "3px solid #314158",
+              background: "#000",
+            }}
           >
-            {generating ? "Generating with AI..." : "Generate Storyboard Now ✨"}
-          </button>
+            <video
+              src={videoUrl}
+              controls
+              playsInline
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </div>
+
+          {/* Video Metadata & Actions */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+            <div>
+              <span
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#45D6B5",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                ● 1080x1920 VERTICAL REEL READY
+              </span>
+              <h2 style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.35rem 0", color: "#FFFFFF" }}>
+                {storyboard?.title || project.title}
+              </h2>
+              <p style={{ fontSize: "0.9375rem", color: "#94A3B8", margin: 0, lineHeight: 1.5 }}>
+                Rendered with neural voiceover ({selectedVoice.label}), kinetic burned-in captions, and animated visual scenes ({videoDuration || estimatedDuration}s).
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+              <a
+                href={videoUrl}
+                download={`${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.mp4`}
+                className="button"
+                style={{
+                  padding: "0.85rem 1.75rem",
+                  background: "#45D6B5",
+                  color: "#0B1220",
+                  fontWeight: 700,
+                  fontSize: "0.9375rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  textDecoration: "none",
+                }}
+              >
+                Download 1080x1920 MP4 ⬇
+              </a>
+
+              <button
+                onClick={() => setIsRenderModalOpen(true)}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #475569",
+                  borderRadius: "8px",
+                  padding: "0.85rem 1.25rem",
+                  color: "#FFFFFF",
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                }}
+              >
+                Re-render with another voice ↻
+              </button>
+            </div>
+
+            <div
+              style={{
+                marginTop: "1rem",
+                padding: "1rem 1.25rem",
+                borderRadius: "8px",
+                background: "#1E293B",
+                border: "1px solid #334155",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#FFFFFF" }}>
+                  Instagram Reels Publishing (Milestone F07)
+                </div>
+                <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  Connect your Instagram Creator / Business account to post directly.
+                </div>
+              </div>
+              <button
+                onClick={() => alert("Ready for Milestone F07: Instagram Connect & Auto-Publishing!")}
+                style={{
+                  background: "#E1306C",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Post to Instagram ↗
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -197,7 +493,7 @@ export function StoryboardStudio({
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "#17191F", margin: 0 }}>
-              Scenes Timeline ({scenes.length} Scenes)
+              Scene-by-Scene Script & Motion Visuals ({scenes.length} Scenes)
             </h2>
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <button
@@ -371,7 +667,7 @@ export function StoryboardStudio({
               type="text"
               value={revisionPrompt}
               onChange={(e) => setRevisionPrompt(e.target.value)}
-              placeholder="e.g. 'Make the opening hook more dramatic', 'Simplify scene 2 for a high school student', 'Focus more on air pressure'..."
+              placeholder="e.g. 'Make the opening hook more dramatic', 'Simplify scene 2 for high schoolers', 'Change tone to energetic'..."
               disabled={revising}
               style={{
                 flex: 1,
@@ -400,47 +696,112 @@ export function StoryboardStudio({
         </div>
       )}
 
-      {/* Next Step Action Banner */}
-      {scenes.length > 0 && (
+      {/* VOICE SELECTION & RENDER TRIGGER MODAL / SECTION */}
+      {scenes.length > 0 && !rendering && (
         <div
           style={{
+            background: "#FFFFFF",
+            border: "1px solid #E8E5DF",
+            borderRadius: "12px",
+            padding: "1.75rem",
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            background: "#17191F",
-            color: "#FFFFFF",
-            padding: "1.25rem 1.75rem",
-            borderRadius: "10px",
-            marginTop: "1rem",
+            flexDirection: "column",
+            gap: "1.25rem",
           }}
         >
           <div>
-            <div style={{ fontSize: "0.75rem", color: "#E9AE45", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              READY FOR PRODUCTION
-            </div>
-            <div style={{ fontSize: "1.125rem", fontWeight: 700, margin: "0.2rem 0" }}>
-              Happy with this storyboard?
-            </div>
-            <div style={{ fontSize: "0.8125rem", color: "#A1A1AA" }}>
-              Next step: Synthesize voiceover, align word-level captions, and render your 1080x1920 MP4 explainer video.
-            </div>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", color: "#315CEB", letterSpacing: "0.05em" }}>
+              STAGE 3: VOICE & VIDEO SYNTHESIS
+            </span>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#17191F", margin: "0.25rem 0 0" }}>
+              Select Narration Voice
+            </h3>
+            <p style={{ fontSize: "0.875rem", color: "#666B73", margin: "0.25rem 0 0" }}>
+              Audition the neural voices below. Each voice delivers natural breathing pauses and Indian English pronunciation.
+            </p>
           </div>
-          <button
-            onClick={() => alert("Ready for Milestone F05: Asynchronous Video Render Engine!")}
-            className="button"
-            style={{
-              background: "#315CEB",
-              color: "#FFFFFF",
-              padding: "0.85rem 1.75rem",
-              fontSize: "0.9375rem",
-              fontWeight: 600,
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            Proceed to Video Render 🎬 →
-          </button>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            {VOICES.map((v) => {
+              const isSelected = selectedVoice.id === v.id;
+              const isPlaying = playingVoice === v.name;
+
+              return (
+                <div
+                  key={v.id}
+                  onClick={() => setSelectedVoice(v)}
+                  style={{
+                    border: `2px solid ${isSelected ? "#315CEB" : "#E8E5DF"}`,
+                    background: isSelected ? "#F8FAFF" : "#FFFFFF",
+                    borderRadius: "10px",
+                    padding: "1.25rem",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{ fontWeight: 700, color: "#17191F", fontSize: "1.0625rem" }}>{v.label}</span>
+                      {isSelected && (
+                        <span style={{ fontSize: "0.7rem", background: "#315CEB", color: "#FFF", padding: "0.1rem 0.4rem", borderRadius: "3px", fontWeight: 600 }}>
+                          Selected
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: "0.8125rem", color: "#666B73", marginTop: "0.25rem" }}>{v.description}</div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playVoicePreview(v);
+                    }}
+                    style={{
+                      background: isPlaying ? "#F25F4C" : "#FAF9F6",
+                      color: isPlaying ? "#FFFFFF" : "#17191F",
+                      border: "1px solid #E8E5DF",
+                      borderRadius: "20px",
+                      padding: "0.4rem 0.85rem",
+                      fontSize: "0.8125rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                    }}
+                  >
+                    <span>{isPlaying ? "⏹ Pause" : "▶ Preview"}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Render Action Button */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #E8E5DF", paddingTop: "1.25rem", marginTop: "0.5rem" }}>
+            <div style={{ fontSize: "0.8125rem", color: "#666B73" }}>
+              Outputs vertical 1080x1920 MP4 with synchronized captions & ducked audio.
+            </div>
+            <button
+              onClick={handleStartRender}
+              className="button"
+              style={{
+                padding: "0.85rem 2rem",
+                fontSize: "1rem",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <span>Generate Video with {selectedVoice.label} 🎬</span>
+              <span>→</span>
+            </button>
+          </div>
         </div>
       )}
     </div>
