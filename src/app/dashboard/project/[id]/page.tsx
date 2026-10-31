@@ -44,6 +44,9 @@ export default async function ProjectPage({
   const isConnectedToMongo = isMongoConfigured();
   const initial = (session.name || session.email)[0].toUpperCase();
 
+  const serializedProject = JSON.parse(JSON.stringify(project));
+  const serializedStoryboard = storyboard ? JSON.parse(JSON.stringify(storyboard)) : null;
+
   return (
     <main className="workspace-shell">
       <header className="workspace-header">
@@ -103,7 +106,7 @@ export default async function ProjectPage({
         </aside>
 
         <section className="workspace-main" style={{ padding: "2rem" }}>
-          <StoryboardStudio initialProject={project} initialStoryboard={storyboard} />
+          <StoryboardStudio initialProject={serializedProject} initialStoryboard={serializedStoryboard} />
         </section>
       </div>
     </main>
