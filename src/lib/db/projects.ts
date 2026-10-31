@@ -2,6 +2,7 @@ import { getDatabase, isMongoConfigured } from "../mongodb";
 import { ObjectId } from "mongodb";
 import fs from "fs";
 import path from "path";
+import type { DiagramConfig } from "../video/remotion/contracts";
 
 export type ProjectStatus =
   | "draft"
@@ -54,6 +55,7 @@ export interface SceneRecord {
     vectorLabel?: string;
     points?: string[];
   };
+  diagram?: DiagramConfig;
 }
 
 export interface StoryboardRecord {

@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import type { Timeline, TimedScene } from "./contracts";
+import { UniversalTopicDiagram } from "./UniversalTopicDiagram";
 import { SearchDiagram } from "./SearchDiagram";
 import { ConceptDiagram } from "./ConceptDiagram";
 import { ScienceDiagram } from "./ScienceDiagram";
@@ -23,6 +24,15 @@ const fade = (f: number, start = 0, duration = 16) =>
   });
 
 function Diagram({ scene }: { scene: TimedScene }) {
+  // 1. AI-Generated Dynamic Topic Blueprint (Universal AI-driven graphics)
+  if (scene.diagram) {
+    return (
+      <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
+        <UniversalTopicDiagram scene={scene} />
+      </svg>
+    );
+  }
+
   const textContext = `${scene.type} ${scene.title} ${scene.narration} ${scene.labels.join(" ")}`.toLowerCase();
 
   // 1. Algorithms & Data Structures (Binary Search, Arrays)

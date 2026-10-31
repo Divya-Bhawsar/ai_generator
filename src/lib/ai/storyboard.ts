@@ -1,8 +1,9 @@
 import { SceneRecord } from "../db/projects";
+import type { DiagramConfig } from "../video/remotion/contracts";
 
 const CANDIDATE_MODELS = [
-  "gemini-3.5-flash",
   "gemini-3.5-flash-lite",
+  "gemini-3.5-flash",
   "gemini-3.6-flash",
   "gemini-flash-lite-latest",
 ];
@@ -78,6 +79,61 @@ const STORYBOARD_SCHEMA = {
             type: "ARRAY",
             items: { type: "STRING" },
           },
+          diagram: {
+            type: "OBJECT",
+            properties: {
+              diagram_type: {
+                type: "STRING",
+                enum: [
+                  "metric_card",
+                  "flow_pipeline",
+                  "split_comparison",
+                  "vector_system",
+                  "orbital_cycle",
+                ],
+              },
+              headline: { type: "STRING" },
+              badge: { type: "STRING" },
+              metric: {
+                type: "OBJECT",
+                properties: {
+                  value: { type: "STRING" },
+                  unit: { type: "STRING" },
+                  label: { type: "STRING" },
+                  subtext: { type: "STRING" },
+                },
+              },
+              flow_steps: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    step_number: { type: "INTEGER" },
+                    title: { type: "STRING" },
+                    detail: { type: "STRING" },
+                  },
+                  required: ["step_number", "title"],
+                },
+              },
+              comparison: {
+                type: "OBJECT",
+                properties: {
+                  left_title: { type: "STRING" },
+                  left_points: { type: "ARRAY", items: { type: "STRING" } },
+                  right_title: { type: "STRING" },
+                  right_points: { type: "ARRAY", items: { type: "STRING" } },
+                },
+              },
+              vector_system: {
+                type: "OBJECT",
+                properties: {
+                  center_label: { type: "STRING" },
+                  force_label: { type: "STRING" },
+                },
+              },
+            },
+            required: ["diagram_type", "headline"],
+          },
         },
         required: ["title", "narration", "visual_label", "visual_type"],
       },
@@ -116,7 +172,7 @@ async function callGemini(prompt: string): Promise<Record<string, unknown>> {
             temperature: 0.7,
           },
         }),
-        signal: AbortSignal.timeout(15000), // 15s timeout per model for structured schema
+        signal: AbortSignal.timeout(25000), // 25s timeout per model for structured schema
       });
 
       const data = await res.json();
@@ -327,6 +383,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "hook",
           accentWords: ["open pot", "100°C", "steam escapes"],
           estimatedSeconds: 13.0,
+          cue: "100°C",
+          diagram: {
+            diagram_type: "metric_card",
+            headline: "Open Vessel Boiling Ceiling",
+            badge: "ATMOSPHERIC LIMIT",
+            metric: {
+              value: "100",
+              unit: "°C",
+              label: "Max Liquid Temp",
+              subtext: "Excess heat escapes as vapor",
+            },
+          },
         },
         {
           sceneId: "scene-02",
@@ -337,6 +405,16 @@ export function synthesizeFallbackStoryboard(
           visualType: "concept",
           accentWords: ["airtight gasket", "trapped steam", "2 atmospheres"],
           estimatedSeconds: 13.5,
+          cue: "2 atmospheres",
+          diagram: {
+            diagram_type: "vector_system",
+            headline: "Trapped Steam Chamber",
+            badge: "INTERNAL PRESSURE",
+            vector_system: {
+              center_label: "Steam Seal",
+              force_label: "2.0 Atmospheres",
+            },
+          },
         },
         {
           sceneId: "scene-03",
@@ -347,6 +425,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "process_steps",
           accentWords: ["intense pressure", "boiling point", "121°C"],
           estimatedSeconds: 12.5,
+          cue: "121°C",
+          diagram: {
+            diagram_type: "metric_card",
+            headline: "Superheated Boiling Point",
+            badge: "PHASE EQUILIBRIUM",
+            metric: {
+              value: "121",
+              unit: "°C",
+              label: "Pressurized Boiling Point",
+              subtext: "+21°C above open boiling",
+            },
+          },
         },
         {
           sceneId: "scene-04",
@@ -357,6 +447,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "comparison",
           accentWords: ["four times faster", "dense legumes", "minutes"],
           estimatedSeconds: 13.0,
+          cue: "four times faster",
+          diagram: {
+            diagram_type: "split_comparison",
+            headline: "Thermal Cooking Velocity",
+            badge: "HEAT TRANSFER SPEED",
+            comparison: {
+              left_title: "Open Pot (100°C)",
+              left_points: ["55 min cooking duration", "Slow thermal diffusion", "High water evaporation"],
+              right_title: "Pressure Cooker (121°C)",
+              right_points: ["14 min cooking duration", "4x kinetic penetration", "Pectin fibers dissolve"],
+            },
+          },
         },
         {
           sceneId: "scene-05",
@@ -367,6 +469,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "takeaway",
           accentWords: ["boiling point", "70% faster", "pure physics"],
           estimatedSeconds: 11.5,
+          cue: "70% faster",
+          diagram: {
+            diagram_type: "metric_card",
+            headline: "70% Faster & 50% Energy Saved",
+            badge: "THERMODYNAMIC WIN",
+            metric: {
+              value: "70%",
+              unit: "Faster",
+              label: "Time Efficiency",
+              subtext: "Half the gas / electricity consumed",
+            },
+          },
         },
       ],
     };
@@ -386,6 +500,16 @@ export function synthesizeFallbackStoryboard(
           visualType: "hook",
           accentWords: ["vibrant green", "chlorophyll", "sunlight"],
           estimatedSeconds: 12.0,
+          cue: "chlorophyll",
+          diagram: {
+            diagram_type: "vector_system",
+            headline: "Chlorophyll Dominance",
+            badge: "SUMMER PIGMENT",
+            vector_system: {
+              center_label: "Chlorophyll",
+              force_label: "Green Light Reflected",
+            },
+          },
         },
         {
           sceneId: "scene-02",
@@ -396,6 +520,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "concept",
           accentWords: ["yellow and orange", "carotenoids", "masked"],
           estimatedSeconds: 13.5,
+          cue: "carotenoids",
+          diagram: {
+            diagram_type: "split_comparison",
+            headline: "Dual Pigment Structure",
+            badge: "LEAF BIOCHEMISTRY",
+            comparison: {
+              left_title: "Active Chlorophyll",
+              left_points: ["Absorbs blue & red light", "Dominates leaf appearance", "Unstable molecule"],
+              right_title: "Hidden Carotenoids",
+              right_points: ["Yellow & orange pigments", "Masked during summer", "Resilient molecular bond"],
+            },
+          },
         },
         {
           sceneId: "scene-03",
@@ -406,6 +542,17 @@ export function synthesizeFallbackStoryboard(
           visualType: "process_steps",
           accentWords: ["shorter days", "stop making", "preserve"],
           estimatedSeconds: 12.5,
+          cue: "shorter days",
+          diagram: {
+            diagram_type: "flow_pipeline",
+            headline: "Autumn Shutdown Sequence",
+            badge: "SEASONAL TRIGGER",
+            flow_steps: [
+              { step_number: 1, title: "Photoperiod Drops", detail: "Daylight falls under 10 hours" },
+              { step_number: 2, title: "Chlorophyll Synthesis Halts", detail: "Enzymes stop producing green pigment" },
+              { step_number: 3, title: "Nutrient Seal Forms", detail: "Abscission layer cuts stem circulation" },
+            ],
+          },
         },
         {
           sceneId: "scene-04",
@@ -416,6 +563,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "comparison",
           accentWords: ["fades away", "hidden gold", "revealed"],
           estimatedSeconds: 12.5,
+          cue: "revealed",
+          diagram: {
+            diagram_type: "orbital_cycle",
+            headline: "Pigment Unmasking Sequence",
+            badge: "CAROTENOID REVEAL",
+            flow_steps: [
+              { step_number: 1, title: "Chlorophyll Breakdown" },
+              { step_number: 2, title: "Green Pigment Clearance" },
+              { step_number: 3, title: "Carotenoid Emergence" },
+              { step_number: 4, title: "Golden Leaf Display" },
+            ],
+          },
         },
         {
           sceneId: "scene-05",
@@ -426,6 +585,18 @@ export function synthesizeFallbackStoryboard(
           visualType: "takeaway",
           accentWords: ["always yellow", "removes", "green disguise"],
           estimatedSeconds: 10.5,
+          cue: "always yellow",
+          diagram: {
+            diagram_type: "split_comparison",
+            headline: "The Pigment Illusion",
+            badge: "NATURE TAKEAWAY",
+            comparison: {
+              left_title: "Common Myth",
+              left_points: ["Leaves produce yellow in fall", "Sudden temperature dye", "Chemical creation"],
+              right_title: "Biological Truth",
+              right_points: ["Yellow was present all summer", "Masked by green chlorophyll", "Autumn only unmasks it"],
+            },
+          },
         },
       ],
     };
@@ -433,6 +604,7 @@ export function synthesizeFallbackStoryboard(
 
   // 4. Default High-Quality Domain-Aware Fallback (Adapts to topic words realistically)
   const title = cleanTopic.length > 50 ? cleanTopic.split(/\s+/).slice(0, 6).join(" ") : cleanTopic;
+  const topicKeyword = cleanTopic.split(/\s+/)[0] || "System";
 
   return {
     title,
@@ -444,8 +616,18 @@ export function synthesizeFallbackStoryboard(
         narration: `Have you ever wondered what really happens during ${cleanTopic.toLowerCase()}? Most people assume it works one way, but the reality is surprisingly practical and direct.`,
         visualLabel: `An engaging opening split-screen introducing the central puzzle of ${cleanTopic.toLowerCase()} with a bold question marker.`,
         visualType: "hook",
-        accentWords: [cleanTopic.split(/\s+/)[0]?.toLowerCase() || "core", "reality", "practical"],
+        accentWords: [topicKeyword.toLowerCase(), "reality", "practical"],
         estimatedSeconds: 12.0,
+        cue: topicKeyword.toLowerCase(),
+        diagram: {
+          diagram_type: "vector_system",
+          headline: `Core Principle of ${title}`,
+          badge: "TOPIC MECHANISM",
+          vector_system: {
+            center_label: topicKeyword.slice(0, 14),
+            force_label: "PRIMARY ACTION",
+          },
+        },
       },
       {
         sceneId: "scene-02",
@@ -456,6 +638,17 @@ export function synthesizeFallbackStoryboard(
         visualType: "concept",
         accentWords: ["specific rule", "interact", "pattern"],
         estimatedSeconds: 13.0,
+        cue: "interact",
+        diagram: {
+          diagram_type: "flow_pipeline",
+          headline: "Underlying Reaction Sequence",
+          badge: "KEY INTERACTION",
+          flow_steps: [
+            { step_number: 1, title: "Initial Activation", detail: `Baseline conditions of ${cleanTopic.slice(0, 22)}` },
+            { step_number: 2, title: "Interacting Dynamics", detail: "Internal elements align and transform" },
+            { step_number: 3, title: "Observable Effect", detail: "Clear physical outcome is produced" },
+          ],
+        },
       },
       {
         sceneId: "scene-03",
@@ -466,6 +659,17 @@ export function synthesizeFallbackStoryboard(
         visualType: "process_steps",
         accentWords: ["starting condition", "core shift", "target state"],
         estimatedSeconds: 13.5,
+        cue: "core shift",
+        diagram: {
+          diagram_type: "flow_pipeline",
+          headline: "Three-Stage Process Chain",
+          badge: "STEP SEQUENCE",
+          flow_steps: [
+            { step_number: 1, title: "Trigger Event", detail: "Starting conditions met" },
+            { step_number: 2, title: "Core Shift", detail: "Transition occurs smoothly" },
+            { step_number: 3, title: "Target Equilibrium", detail: "Final outcome locked in" },
+          ],
+        },
       },
       {
         sceneId: "scene-04",
@@ -476,6 +680,18 @@ export function synthesizeFallbackStoryboard(
         visualType: "comparison",
         accentWords: ["standard approach", "wasted effort", "exact result"],
         estimatedSeconds: 12.5,
+        cue: "exact result",
+        diagram: {
+          diagram_type: "split_comparison",
+          headline: "Mechanism vs Standard Approach",
+          badge: "PERFORMANCE COMPARISON",
+          comparison: {
+            left_title: "Trial & Error",
+            left_points: ["Unclear operating rules", "Wasted time and energy", "Inconsistent results"],
+            right_title: "Targeted Mechanism",
+            right_points: ["Clear governing principle", "Immediate efficiency gain", "100% predictable output"],
+          },
+        },
       },
       {
         sceneId: "scene-05",
@@ -486,6 +702,18 @@ export function synthesizeFallbackStoryboard(
         visualType: "takeaway",
         accentWords: ["mastered", "predict", "effortlessly"],
         estimatedSeconds: 11.0,
+        cue: "effortlessly",
+        diagram: {
+          diagram_type: "metric_card",
+          headline: `Mastering ${title}`,
+          badge: "CORE PRINCIPLE",
+          metric: {
+            value: "100%",
+            unit: "Predictable",
+            label: "Governing Law",
+            subtext: "Consistent real-world outcome",
+          },
+        },
       },
     ],
   };
@@ -513,8 +741,19 @@ STRICT PEDAGOGICAL & VISUAL DIRECTIVES:
    - For algorithms (e.g. Binary Search): Pick an actual small sorted list of numbers (e.g., [3, 8, 14, 27, 39, 52, 68, 91]) and a target number (e.g., 52). Walk through checking the middle, throwing away the left half, and finding the match.
    - For science/cooking (e.g. Pressure Cooker): Give real temperatures (100°C vs 121°C) and real cooking times (45 min vs 12 min).
    - For nature/biology (e.g. Autumn Leaves): Name the real pigments (chlorophyll masking carotenoids) and show the seasonal transition.
+   - For any other topic (e.g. "Why onions make you cry", "How vaccines work", "Quantum entanglement"): Give the exact chemical names, biological cells, or physical quantities.
 3. VISUAL CONTINUITY: Each scene's visual_label must describe the next visual stage of that SAME example (e.g., Scene 1: Initial state; Scene 2: Middle check; Scene 3: Search space halved; Scene 4: Match found; Scene 5: Speed comparison).
 4. LENGTH & TIMING: Return 4 to 5 scenes. Narration must be 140 to 170 spoken words total so the reel plays in 60 to 80 seconds at a natural speaking pace.
+5. TOPIC-SPECIFIC DYNAMIC DIAGRAM BLUEPRINT: For EVERY scene, output a structured "diagram" object tailored precisely to this topic:
+   - "diagram_type": Choose one of:
+     * "flow_pipeline": Sequential reaction stages, code executions, or steps. Provide 3 "flow_steps" with "step_number", "title", and "detail".
+     * "metric_card": Measurable thresholds, temperatures, timings, multipliers, or complexities. Provide "metric" with "value", "unit", "label", and "subtext".
+     * "split_comparison": Mechanism vs standard, before vs after, or linear vs logarithmic. Provide "comparison" with "left_title", "left_points", "right_title", and "right_points".
+     * "vector_system": Dynamic directional forces, particle interactions, or focal hubs. Provide "vector_system" with "center_label" and "force_label".
+     * "orbital_cycle": Continuous repeating feedback loops, biological or physical cycles.
+   - "headline": High-impact, concise title for the diagram (under 35 chars).
+   - "badge": Category badge (e.g. "CHEMICAL REACTION", "ALGORITHMIC STEP", "FLUID MECHANICS").
+   - NEVER use static or generic placeholder text. All metrics, steps, labels, and comparisons MUST directly represent the exact scientific, technical, or practical reality of "${topic}".
 
 Return JSON matching the schema.`;
 
@@ -526,7 +765,9 @@ Return JSON matching the schema.`;
         narration: string;
         visual_label: string;
         visual_type: string;
+        cue?: string;
         accent_words?: string[];
+        diagram?: DiagramConfig;
       }>;
     };
 
@@ -542,8 +783,9 @@ Return JSON matching the schema.`;
           visualLabel: s.visual_label,
           visualType: s.visual_type || "concept",
           accentWords: s.accent_words || [],
-          cue: (s as { cue?: string }).cue || s.accent_words?.[0] || "",
+          cue: s.cue || s.accent_words?.[0] || "",
           estimatedSeconds: estSeconds,
+          diagram: s.diagram,
         };
       });
 
@@ -582,6 +824,7 @@ export async function reviseStoryboardAI(
         visual_label: s.visualLabel,
         visual_type: s.visualType,
         accent_words: s.accentWords,
+        diagram: s.diagram,
       })),
     },
     null,
@@ -600,6 +843,7 @@ User Revision Instruction:
 PEDAGOGICAL DIRECTIVES:
 - Apply the requested changes while keeping the script grounded in a concrete, realistic walkthrough example.
 - Adapt tone, vocabulary, and analogies to the target audience (${audience.label}).
+- Ensure every scene has a structured "diagram" object tailored to the topic with diagram_type, headline, badge, and appropriate metrics/flow_steps/comparison/vector_system.
 - Keep total narration length between 140 to 170 words (60 to 80 seconds total).
 - Return the full updated storyboard matching the schema.`;
 
@@ -611,7 +855,9 @@ PEDAGOGICAL DIRECTIVES:
         narration: string;
         visual_label: string;
         visual_type: string;
+        cue?: string;
         accent_words?: string[];
+        diagram?: DiagramConfig;
       }>;
     };
 
@@ -627,8 +873,9 @@ PEDAGOGICAL DIRECTIVES:
           visualLabel: s.visual_label,
           visualType: s.visual_type || (s as { visualType?: string }).visualType || "concept",
           accentWords: s.accent_words || [],
-          cue: (s as { cue?: string }).cue || s.accent_words?.[0] || "",
+          cue: s.cue || s.accent_words?.[0] || "",
           estimatedSeconds: estSeconds,
+          diagram: s.diagram || currentScenes[idx]?.diagram,
         };
       });
 

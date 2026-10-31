@@ -35,6 +35,47 @@ export interface ScienceConfig {
   points?: string[];
 }
 
+export interface DiagramConfig {
+  diagram_type:
+    | "metric_card"
+    | "flow_pipeline"
+    | "split_comparison"
+    | "vector_system"
+    | "orbital_cycle"
+    | "data_curve"
+    | "array_search";
+  headline: string;
+  badge?: string;
+  metric?: {
+    value: string;
+    unit?: string;
+    label: string;
+    subtext?: string;
+  };
+  flow_steps?: Array<{
+    step_number: number;
+    title: string;
+    detail?: string;
+  }>;
+  comparison?: {
+    left_title: string;
+    left_points: string[];
+    right_title: string;
+    right_points: string[];
+  };
+  vector_system?: {
+    center_label: string;
+    center_badge?: string;
+    force_label?: string;
+    secondary_label?: string;
+    vectors?: Array<{
+      name: string;
+      direction?: string;
+    }>;
+  };
+  key_takeaways?: string[];
+}
+
 export interface TimedScene {
   id: string;
   title: string;
@@ -62,6 +103,7 @@ export interface TimedScene {
   decisionFrame?: number; // frame relative to scene start where elimination/decision triggers
   captions: Caption[];
   audioFile?: string;  // absolute path or public-relative URL
+  diagram?: DiagramConfig;
   search?: SearchConfig;
   comparison?: ComparisonConfig;
   science?: ScienceConfig;
