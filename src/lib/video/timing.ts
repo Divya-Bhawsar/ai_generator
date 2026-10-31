@@ -143,6 +143,7 @@ export function compileTimeline(
       decisionFrame,
       captions,
       audioFile: speech.audioFile,
+      svgCode: scene.svgCode || scene.diagram?.svg_code,
       diagram: scene.diagram,
       search: scene.search,
       comparison: scene.comparison,

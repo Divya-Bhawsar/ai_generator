@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ProjectRecord, StoryboardRecord, SceneRecord } from "@/lib/db/projects";
+import { cleanSvg } from "@/lib/video/cleanSvg";
 
 const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   hook: { bg: "#FEF2F2", text: "#DC2626", border: "#FCA5A5" },
@@ -885,30 +886,56 @@ export function StoryboardStudio({
                       </select>
                     </div>
 
-                    {videoUrl && (
-                      <div
-                        style={{
-                          position: "relative",
-                          width: "100%",
-                          height: "150px",
-                          borderRadius: "6px",
-                          overflow: "hidden",
-                          background: "#153C3A",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
+                    {/* Visual Scene Diagram / Preview Illustration */}
+                    <div
+                      style={{
+                        position: "relative",
+                        width: "100%",
+                        height: "175px",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        background: "#153C3A",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: "0.5rem",
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      {videoUrl ? (
                         <img
                           src={`/renders/${project._id}/previews/${scene.sceneId || `scene-${String(index + 1).padStart(2, "0")}`}.png`}
                           alt={scene.title}
                           style={{ width: "100%", height: "100%", objectFit: "contain" }}
                           onError={(e) => {
-                            (e.currentTarget.parentElement as HTMLElement).style.display = "none";
+                            // If rendered PNG preview is not ready, display SVG vector graphic
+                            if (scene.svgCode || scene.diagram?.svg_code) {
+                              e.currentTarget.style.display = "none";
+                              const fallbackEl = e.currentTarget.parentElement?.querySelector(".svg-preview-wrapper") as HTMLElement;
+                              if (fallbackEl) fallbackEl.style.display = "flex";
+                            } else {
+                              (e.currentTarget.parentElement as HTMLElement).style.display = "none";
+                            }
                           }}
                         />
-                      </div>
-                    )}
+                      ) : null}
+
+                      {(scene.svgCode || scene.diagram?.svg_code) && (
+                        <div
+                          className="svg-preview-wrapper"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: videoUrl ? "none" : "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: cleanSvg(scene.svgCode || scene.diagram?.svg_code || ""),
+                          }}
+                        />
+                      )}
+                    </div>
 
                     <textarea
                       value={scene.visualLabel}

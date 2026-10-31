@@ -3,9 +3,9 @@ import type { DiagramConfig } from "../video/remotion/contracts";
 
 const CANDIDATE_MODELS = [
   "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
   "gemini-3.5-flash",
   "gemini-3.6-flash",
-  "gemini-flash-lite-latest",
 ];
 
 const SCENE_TYPES = [
@@ -75,6 +75,7 @@ const STORYBOARD_SCHEMA = {
           visual_label: { type: "STRING" },
           visual_type: { type: "STRING", enum: SCENE_TYPES },
           cue: { type: "STRING" },
+          svg_code: { type: "STRING" },
           accent_words: {
             type: "ARRAY",
             items: { type: "STRING" },
@@ -82,6 +83,7 @@ const STORYBOARD_SCHEMA = {
           diagram: {
             type: "OBJECT",
             properties: {
+              svg_code: { type: "STRING" },
               diagram_type: {
                 type: "STRING",
                 enum: [
@@ -619,6 +621,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: [topicKeyword.toLowerCase(), "reality", "practical"],
         estimatedSeconds: 12.0,
         cue: topicKeyword.toLowerCase(),
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="200" cy="130" r="55" fill="#168779"/><circle cx="200" cy="130" r="40" fill="#fcfbf8"/><text x="200" y="140" fill="#153c3a" font-size="32" font-weight="800" text-anchor="middle">?</text><text x="200" y="235" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">${title.slice(0, 24)}</text></svg>`,
         diagram: {
           diagram_type: "vector_system",
           headline: `Core Principle of ${title}`,
@@ -639,6 +642,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["specific rule", "interact", "pattern"],
         estimatedSeconds: 13.0,
         cue: "interact",
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="90" cy="145" r="32" fill="#168779"/><line x1="122" y1="145" x2="168" y2="145" stroke="#e9a64d" stroke-width="4"/><circle cx="200" cy="145" r="32" fill="#e9a64d"/><line x1="232" y1="145" x2="278" y2="145" stroke="#168779" stroke-width="4"/><circle cx="310" cy="145" r="32" fill="#168779"/><text x="200" y="235" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Progressive Mechanism</text></svg>`,
         diagram: {
           diagram_type: "flow_pipeline",
           headline: "Underlying Reaction Sequence",
@@ -660,6 +664,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["starting condition", "core shift", "target state"],
         estimatedSeconds: 13.5,
         cue: "core shift",
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><rect x="70" y="95" width="105" height="95" rx="14" fill="#168779"/><text x="122" y="150" fill="#fff" font-size="18" font-weight="700" text-anchor="middle">Input</text><line x1="185" y1="142" x2="225" y2="142" stroke="#e9a64d" stroke-width="4"/><rect x="235" y="95" width="105" height="95" rx="14" fill="#e9a64d"/><text x="287" y="150" fill="#153c3a" font-size="18" font-weight="700" text-anchor="middle">Output</text><text x="200" y="240" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Step Transformation</text></svg>`,
         diagram: {
           diagram_type: "flow_pipeline",
           headline: "Three-Stage Process Chain",
@@ -681,6 +686,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["standard approach", "wasted effort", "exact result"],
         estimatedSeconds: 12.5,
         cue: "exact result",
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><rect x="50" y="85" width="135" height="120" rx="12" fill="#ffffff" stroke="#e9a64d" stroke-width="3"/><text x="117" y="150" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">Trial & Error</text><rect x="215" y="85" width="135" height="120" rx="12" fill="#ffffff" stroke="#168779" stroke-width="3"/><text x="282" y="150" fill="#168779" font-size="16" font-weight="700" text-anchor="middle">Targeted Law</text><text x="200" y="240" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Efficiency Contrast</text></svg>`,
         diagram: {
           diagram_type: "split_comparison",
           headline: "Mechanism vs Standard Approach",
@@ -703,6 +709,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["mastered", "predict", "effortlessly"],
         estimatedSeconds: 11.0,
         cue: "effortlessly",
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="200" cy="135" r="50" fill="#168779"/><polygon points="200,105 212,128 238,130 218,148 224,172 200,158 176,172 182,148 162,130 188,128" fill="#e9a64d"/><text x="200" y="235" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">Mastered Principle</text></svg>`,
         diagram: {
           diagram_type: "metric_card",
           headline: `Mastering ${title}`,
@@ -744,13 +751,15 @@ STRICT PEDAGOGICAL & VISUAL DIRECTIVES:
    - For any other topic (e.g. "Why onions make you cry", "How vaccines work", "Quantum entanglement"): Give the exact chemical names, biological cells, or physical quantities.
 3. VISUAL CONTINUITY: Each scene's visual_label must describe the next visual stage of that SAME example (e.g., Scene 1: Initial state; Scene 2: Middle check; Scene 3: Search space halved; Scene 4: Match found; Scene 5: Speed comparison).
 4. LENGTH & TIMING: Return 4 to 5 scenes. Narration must be 140 to 170 spoken words total so the reel plays in 60 to 80 seconds at a natural speaking pace.
-5. TOPIC-SPECIFIC DYNAMIC DIAGRAM BLUEPRINT: For EVERY scene, output a structured "diagram" object tailored precisely to this topic:
-   - "diagram_type": Choose one of:
-     * "flow_pipeline": Sequential reaction stages, code executions, or steps. Provide 3 "flow_steps" with "step_number", "title", and "detail".
-     * "metric_card": Measurable thresholds, temperatures, timings, multipliers, or complexities. Provide "metric" with "value", "unit", "label", and "subtext".
-     * "split_comparison": Mechanism vs standard, before vs after, or linear vs logarithmic. Provide "comparison" with "left_title", "left_points", "right_title", and "right_points".
-     * "vector_system": Dynamic directional forces, particle interactions, or focal hubs. Provide "vector_system" with "center_label" and "force_label".
-     * "orbital_cycle": Continuous repeating feedback loops, biological or physical cycles.
+5. TOPIC-SPECIFIC CUSTOM SVG VECTOR ILLUSTRATION: For EVERY scene, you MUST generate a clean, modern SVG vector illustration in "svg_code" with viewBox="0 0 400 300" that visually portrays the concrete objects of that scene:
+   - For food/cooking (e.g. Besan Ladoo): Draw the actual kadai/pan, roasting flour, rising heat/steam waves, and shaped golden sweet spheres on a plate.
+   - For data structures/algorithms (e.g. Binary Search Tree): Draw the actual tree nodes (e.g. root 50 branching left to 30, right to 70), connecting branches, comparison markers.
+   - For biology/medical (e.g. Vaccines): Draw the virus with spikes, white blood cells, and Y-shaped antibodies locking in.
+   - For software/systems (e.g. Git): Draw commit circles, branch pointers, code files.
+   - For science/physics (e.g. Pressure Cooker, Airplanes): Draw the sealed steam pot with pressure valves, or aerodynamic wings with airflow streamlines.
+   - Use clean modern colors: #168779 (teal), #e9a64d (gold/orange), #153c3a (dark ink), #ffffff, #619ab4 (soft blue). Return ONLY standard SVG tags like <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">...</svg>.
+6. STRUCTURED DIAGRAM BLUEPRINT: Also populate the "diagram" object with matching "diagram_type", "headline", "badge", and appropriate metrics/flow_steps/comparison.
+   - "diagram_type": Choose one of "flow_pipeline", "metric_card", "split_comparison", "vector_system", or "orbital_cycle".
    - "headline": High-impact, concise title for the diagram (under 35 chars).
    - "badge": Category badge (e.g. "CHEMICAL REACTION", "ALGORITHMIC STEP", "FLUID MECHANICS").
    - NEVER use static or generic placeholder text. All metrics, steps, labels, and comparisons MUST directly represent the exact scientific, technical, or practical reality of "${topic}".
@@ -766,6 +775,7 @@ Return JSON matching the schema.`;
         visual_label: string;
         visual_type: string;
         cue?: string;
+        svg_code?: string;
         accent_words?: string[];
         diagram?: DiagramConfig;
       }>;
@@ -775,6 +785,7 @@ Return JSON matching the schema.`;
       const scenes: SceneRecord[] = parsed.scenes.map((s, idx) => {
         const wordCount = s.narration.trim().split(/\s+/).length;
         const estSeconds = Math.round((wordCount / 2.5) * 10) / 10;
+        const svgCode = s.svg_code || s.diagram?.svg_code;
         return {
           sceneId: `scene-${String(idx + 1).padStart(2, "0")}`,
           sequence: idx + 1,
@@ -785,7 +796,8 @@ Return JSON matching the schema.`;
           accentWords: s.accent_words || [],
           cue: s.cue || s.accent_words?.[0] || "",
           estimatedSeconds: estSeconds,
-          diagram: s.diagram,
+          svgCode,
+          diagram: s.diagram ? { ...s.diagram, svg_code: svgCode } : undefined,
         };
       });
 
@@ -824,6 +836,7 @@ export async function reviseStoryboardAI(
         visual_label: s.visualLabel,
         visual_type: s.visualType,
         accent_words: s.accentWords,
+        svg_code: s.svgCode || s.diagram?.svg_code,
         diagram: s.diagram,
       })),
     },
@@ -843,6 +856,7 @@ User Revision Instruction:
 PEDAGOGICAL DIRECTIVES:
 - Apply the requested changes while keeping the script grounded in a concrete, realistic walkthrough example.
 - Adapt tone, vocabulary, and analogies to the target audience (${audience.label}).
+- Ensure every scene has a clean, modern SVG vector illustration in "svg_code" with viewBox="0 0 400 300" showing the actual objects, nodes, or physical entities.
 - Ensure every scene has a structured "diagram" object tailored to the topic with diagram_type, headline, badge, and appropriate metrics/flow_steps/comparison/vector_system.
 - Keep total narration length between 140 to 170 words (60 to 80 seconds total).
 - Return the full updated storyboard matching the schema.`;
@@ -856,6 +870,7 @@ PEDAGOGICAL DIRECTIVES:
         visual_label: string;
         visual_type: string;
         cue?: string;
+        svg_code?: string;
         accent_words?: string[];
         diagram?: DiagramConfig;
       }>;
@@ -865,6 +880,7 @@ PEDAGOGICAL DIRECTIVES:
       const scenes: SceneRecord[] = parsed.scenes.map((s, idx) => {
         const wordCount = s.narration.trim().split(/\s+/).length;
         const estSeconds = Math.round((wordCount / 2.5) * 10) / 10;
+        const svgCode = s.svg_code || s.diagram?.svg_code || currentScenes[idx]?.svgCode;
         return {
           sceneId: `scene-${String(idx + 1).padStart(2, "0")}`,
           sequence: idx + 1,
@@ -875,7 +891,10 @@ PEDAGOGICAL DIRECTIVES:
           accentWords: s.accent_words || [],
           cue: s.cue || s.accent_words?.[0] || "",
           estimatedSeconds: estSeconds,
-          diagram: s.diagram || currentScenes[idx]?.diagram,
+          svgCode,
+          diagram: s.diagram
+            ? { ...s.diagram, svg_code: svgCode }
+            : currentScenes[idx]?.diagram,
         };
       });
 

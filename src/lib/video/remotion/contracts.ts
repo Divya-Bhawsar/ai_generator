@@ -74,6 +74,7 @@ export interface DiagramConfig {
     }>;
   };
   key_takeaways?: string[];
+  svg_code?: string;
 }
 
 export interface TimedScene {
@@ -103,6 +104,7 @@ export interface TimedScene {
   decisionFrame?: number; // frame relative to scene start where elimination/decision triggers
   captions: Caption[];
   audioFile?: string;  // absolute path or public-relative URL
+  svgCode?: string;
   diagram?: DiagramConfig;
   search?: SearchConfig;
   comparison?: ComparisonConfig;

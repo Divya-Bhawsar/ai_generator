@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import type { Timeline, TimedScene } from "./contracts";
+import { cleanSvg } from "../cleanSvg";
 import { UniversalTopicDiagram } from "./UniversalTopicDiagram";
 import { SearchDiagram } from "./SearchDiagram";
 import { ConceptDiagram } from "./ConceptDiagram";
@@ -24,7 +25,95 @@ const fade = (f: number, start = 0, duration = 16) =>
   });
 
 function Diagram({ scene }: { scene: TimedScene }) {
-  // 1. AI-Generated Dynamic Topic Blueprint (Universal AI-driven graphics)
+  const f = useCurrentFrame();
+  const cuePassed = f >= scene.cueFrame;
+  const svgArt = scene.svgCode || scene.diagram?.svg_code;
+
+  // 1. Topic-Specific Custom SVG Artwork Illustration
+  if (svgArt) {
+    const d = scene.diagram;
+    const headline = d?.headline || scene.title;
+    const badge = d?.badge || "CONCEPT ILLUSTRATION";
+    const subtext =
+      d?.metric?.subtext ||
+      (d?.flow_steps?.[0]?.title ? `Phase: ${d.flow_steps[0].title}` : undefined) ||
+      (scene.labels?.[0] ? `Key Concept: ${scene.labels[0]}` : "Interactive conceptual diagram");
+
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: 700,
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* Top category pill */}
+        <div
+          style={{
+            padding: "8px 24px",
+            borderRadius: 22,
+            background: "#dbe9e6",
+            border: "1.5px solid #b6d5ce",
+            color: teal,
+            fontSize: 16,
+            fontWeight: 700,
+            letterSpacing: 3,
+            marginBottom: 14,
+            textTransform: "uppercase",
+          }}
+        >
+          {badge}
+        </div>
+
+        {/* Central Illustrated SVG Artwork Card */}
+        <div
+          style={{
+            width: 760,
+            height: 460,
+            borderRadius: 26,
+            background: "#ffffff",
+            border: "2px solid #ced9d1",
+            boxShadow: "0 16px 40px rgba(21, 60, 58, 0.08)",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            boxSizing: "border-box",
+            opacity: interpolate(f, [4, 18], [0, 1], { extrapolateRight: "clamp" }),
+            transform: `scale(${interpolate(f, [4, 24], [0.94, 1], { extrapolateRight: "clamp" })})`,
+          }}
+          dangerouslySetInnerHTML={{ __html: cleanSvg(svgArt) }}
+        />
+
+        {/* Bottom Headline & Metric Ribbon */}
+        <div
+          style={{
+            marginTop: 18,
+            width: 760,
+            padding: "16px 28px",
+            borderRadius: 22,
+            background: cuePassed ? "#cfe4db" : "#ffffff90",
+            border: `2px solid ${cuePassed ? teal : "#ced9d1"}`,
+            textAlign: "center",
+            boxSizing: "border-box",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <div style={{ fontSize: 26, fontWeight: 700, color: ink }}>{headline}</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: teal, marginTop: 4 }}>
+            {subtext}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. AI-Generated Dynamic Topic Blueprint (Universal AI-driven graphics)
   if (scene.diagram) {
     return (
       <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>

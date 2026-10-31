@@ -55,6 +55,7 @@ export interface SceneRecord {
     vectorLabel?: string;
     points?: string[];
   };
+  svgCode?: string;
   diagram?: DiagramConfig;
 }
 
