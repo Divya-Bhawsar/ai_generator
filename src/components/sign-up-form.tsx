@@ -16,7 +16,8 @@ export function SignUpForm() {
     e.preventDefault();
     setError(null);
 
-    if (!email || !email.includes("@")) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes("@")) {
       setError("Please enter a valid email address.");
       return;
     }
@@ -36,7 +37,7 @@ export function SignUpForm() {
       const res = await fetch("/api/auth/sign-up", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name: name.trim(), email: trimmedEmail, password }),
       });
 
       const data = await res.json();

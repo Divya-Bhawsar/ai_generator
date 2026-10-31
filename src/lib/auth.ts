@@ -2,9 +2,17 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 
-const JWT_SECRET_STRING =
-  process.env.JWT_SECRET || "vidyamotion_super_secure_secret_key_change_in_production_32chars!";
-const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STRING);
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "JWT_SECRET environment variable is missing. Set a strong secret key for production."
+    );
+  }
+  return new TextEncoder().encode(
+    secret || "vidyamotion_super_secure_secret_key_change_in_production_32chars!"
+  );
+}
 
 export const AUTH_COOKIE_NAME = "vidyamotion_session";
 
@@ -22,6 +30,22 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
+export async function verifyToken(token: string): Promise<SessionPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, getJwtSecret());
+    if (!payload.userId || !payload.email) {
+      return null;
+    }
+    return {
+      userId: payload.userId as string,
+      email: payload.email as string,
+      name: (payload.name as string) || undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function createSession(payload: SessionPayload): Promise<string> {
   const token = await new SignJWT({
     userId: payload.userId,
@@ -31,7 +55,7 @@ export async function createSession(payload: SessionPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   const cookieStore = await cookies();
   cookieStore.set(AUTH_COOKIE_NAME, token, {
@@ -47,7 +71,13 @@ export async function createSession(payload: SessionPayload): Promise<string> {
 
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(AUTH_COOKIE_NAME);
+  cookieStore.set(AUTH_COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
@@ -55,13 +85,7 @@ export async function getSession(): Promise<SessionPayload | null> {
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
     if (!token) return null;
-
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return {
-      userId: payload.userId as string,
-      email: payload.email as string,
-      name: (payload.name as string) || undefined,
-    };
+    return verifyToken(token);
   } catch {
     return null;
   }

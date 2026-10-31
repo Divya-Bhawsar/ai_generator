@@ -4,17 +4,31 @@ import { createSession } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { email, password } = body;
-
-    if (!email || !password) {
+    let body;
+    try {
+      body = await req.json();
+    } catch {
       return NextResponse.json(
-        { error: "Email and password are required." },
+        { error: "Invalid JSON request body." },
         { status: 400 }
       );
     }
 
-    const user = await authenticateUser(email, password);
+    const { email, password } = body || {};
+
+    if (
+      !email ||
+      typeof email !== "string" ||
+      !password ||
+      typeof password !== "string"
+    ) {
+      return NextResponse.json(
+        { error: "Valid email and password are required." },
+        { status: 400 }
+      );
+    }
+
+    const user = await authenticateUser(email.trim(), password);
     if (!user) {
       return NextResponse.json(
         { error: "Invalid email or password." },

@@ -14,7 +14,8 @@ export function SignInForm() {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
       setError("Please enter both email and password.");
       return;
     }
@@ -24,7 +25,7 @@ export function SignInForm() {
       const res = await fetch("/api/auth/sign-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: trimmedEmail, password }),
       });
 
       const data = await res.json();

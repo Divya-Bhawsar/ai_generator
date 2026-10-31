@@ -1,9 +1,24 @@
 import { MongoClient, Db } from "mongodb";
 
-const uri = process.env.MONGODB_URI || "";
-const dbName = process.env.MONGODB_DB || "vidyamotion";
+export function getNormalizedUri(): string {
+  let raw = (process.env.MONGODB_URI || "").trim();
+  // Strip outer quotes if present (e.g. "mongodb+srv://..." or 'mongodb+srv://...')
+  if (
+    (raw.startsWith('"') && raw.endsWith('"')) ||
+    (raw.startsWith("'") && raw.endsWith("'"))
+  ) {
+    raw = raw.slice(1, -1).trim();
+  }
+  if (raw.startsWith("mongodb+srv:/") && !raw.startsWith("mongodb+srv://")) {
+    raw = raw.replace("mongodb+srv:/", "mongodb+srv://");
+  } else if (raw.startsWith("mongodb:/") && !raw.startsWith("mongodb://")) {
+    raw = raw.replace("mongodb:/", "mongodb://");
+  }
+  return raw;
+}
 
-let client: MongoClient | null = null;
+const defaultDbName = process.env.MONGODB_DB || "vidyamotion";
+
 let clientPromise: Promise<MongoClient> | null = null;
 
 declare global {
@@ -12,33 +27,41 @@ declare global {
 }
 
 export function isMongoConfigured(): boolean {
-  return Boolean(process.env.MONGODB_URI && process.env.MONGODB_URI.trim() !== "");
+  return Boolean(getNormalizedUri());
 }
 
 export async function getMongoClient(): Promise<MongoClient | null> {
-  if (!isMongoConfigured()) {
+  const uri = getNormalizedUri();
+  if (!uri) {
     return null;
   }
 
   if (process.env.NODE_ENV === "development") {
     if (!global._mongoClientPromise) {
-      client = new MongoClient(uri);
-      global._mongoClientPromise = client.connect();
+      const client = new MongoClient(uri);
+      global._mongoClientPromise = client.connect().catch((err) => {
+        global._mongoClientPromise = undefined;
+        throw err;
+      });
     }
     return global._mongoClientPromise;
   } else {
     if (!clientPromise) {
-      client = new MongoClient(uri);
-      clientPromise = client.connect();
+      const client = new MongoClient(uri);
+      clientPromise = client.connect().catch((err) => {
+        clientPromise = null;
+        throw err;
+      });
     }
     return clientPromise;
   }
 }
 
-export async function getDatabase(): Promise<Db | null> {
+export async function getDatabase(customDbName?: string): Promise<Db | null> {
   const connectedClient = await getMongoClient();
   if (!connectedClient) {
     return null;
   }
-  return connectedClient.db(dbName);
+  const targetDb = customDbName || defaultDbName;
+  return connectedClient.db(targetDb);
 }

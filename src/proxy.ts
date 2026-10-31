@@ -1,27 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken, AUTH_COOKIE_NAME } from "@/lib/auth";
 
-export default function proxy(req: NextRequest) {
-  const sessionCookie = req.cookies.get("vidyamotion_session");
+export async function proxy(req: NextRequest) {
+  const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
+  const session = token ? await verifyToken(token) : null;
+  const { pathname } = req.nextUrl;
 
-  // Protect dashboard route
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    if (!sessionCookie) {
-      return NextResponse.redirect(new URL("/sign-in", req.url));
+  // Protect dashboard routes
+  if (pathname.startsWith("/dashboard")) {
+    if (!session) {
+      const response = NextResponse.redirect(new URL("/sign-in", req.url));
+      if (token) {
+        response.cookies.delete(AUTH_COOKIE_NAME);
+      }
+      return response;
     }
   }
 
   // Redirect authenticated users away from sign-in/sign-up to dashboard
-  if (
-    req.nextUrl.pathname.startsWith("/sign-in") ||
-    req.nextUrl.pathname.startsWith("/sign-up")
-  ) {
-    if (sessionCookie) {
+  if (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up")) {
+    if (session) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 
   return NextResponse.next();
 }
+
+export default proxy;
 
 export const config = {
   matcher: [

@@ -1,7 +1,7 @@
 # VidyaMotion — Project Status
 
 **Status:** Active development  
-**Updated:** 2026-10-29  
+**Updated:** 2026-10-31  
 **Source of truth:** This file tracks implementation only. Product scope is defined by [PRD.md](PRD.md); architecture and contracts by [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md), [API_DESIGN.md](API_DESIGN.md), [DATABASE_DESIGN.md](DATABASE_DESIGN.md), and [PIPELINE_DESIGN.md](PIPELINE_DESIGN.md).
 
 ## Repository workflow
@@ -33,9 +33,9 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 |---|---|---|---|
 | F00 | Next.js App Router scaffold, design tokens, responsive approved homepage | **Verified** | `package.json`, `package-lock.json`, `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx`; local browser returned HTTP 200 and showed the homepage |
 | F01 | Self-service sign-up/sign-in and session-protected personal workspace | **Verified** | MongoDB/Atlas connection, bcryptjs password hashing, JWT session cookies (`jose`), API routes (`/api/auth/sign-up`, `/api/auth/sign-in`, `/api/auth/sign-out`), responsive `SignUpForm` and `SignInForm`, session-authenticated `/dashboard` with sign-out. Tested and verified HTTP 200/201. |
-| F02 | Personal dashboard, project list, search/status filters, empty/loading/error states | Not started | User-owned projects loaded from persistence with PRD status states |
-| F03 | Create project, topic entry, optional brainstorm, autosave | Not started | Project CRUD and saved conversation; empty-topic validation |
-| F04 | Generate combined script/storyboard, review, conversational revisions, approval/version restore | Not started | Structured storyboard versions; user approval before render |
+| F02 | Personal dashboard, project list, search/status filters, empty/loading/error states | **Verified** | Project records loaded from MongoDB Atlas, responsive `ProjectCard` grid, empty-state suggestions, and account-isolated queries. |
+| F03 | Create project, topic entry, optional brainstorm, autosave | **Verified** | `CreateProjectCard` with quick suggestions, autosave in MongoDB `projects`, validation of topic inputs, automatic title generation. |
+| F04 | Generate combined script/storyboard, review, conversational revisions, approval/version restore | **Verified** | Gemini AI storyboard generator with automatic model fallback (`gemini-3.1-flash-lite`, `gemini-3.8-flash`), structured 4–6 scenes (narration, visual cues, kinetic accent words, 60–90s pacing), `StoryboardStudio` with inline script editing, conversational AI revision co-pilot, and versioning. |
 | F05 | Voice selection/previews and asynchronous video generation with synchronized narration/captions | Not started | Render job and worker; progress, retry, and validation states |
 | F06 | Video preview, aspect-ratio variants, MP4 download | Not started | Owner-checked artifact preview/download and re-render flow |
 | F07 | Personal Instagram connection and publish-now flow | Not started | Meta authorization, connection state, publish confirmation/result/retry |
@@ -87,6 +87,7 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 | 2026-10-29 | TypeScript validation after F01 | `npx tsc --noEmit` passed. |
 | 2026-10-29 | Clerk sign-up/sign-in runtime flow | Not exercised; requires the developer’s Clerk publishable and secret keys in `.env.local`. |
 | 2026-10-29 | Production build | Not run. |
+| 2026-10-31 | F01 auth & database hardening | Removed unused `@clerk/nextjs`, resolved proxy infinite redirect loop with cryptographic JWT validation, eliminated silent in-memory fallback on MongoDB failure, cached DB indexes, normalized URI handling, hardened production secrets, added dedicated `GET /api/auth/me`. `npx tsc --noEmit` and `npm run build` passed with 0 errors. |
 
 ## Development rules
 

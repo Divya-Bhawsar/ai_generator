@@ -6,42 +6,39 @@ import { useState } from "react";
 export function SignOutButton() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSignOut() {
     setLoading(true);
+    setError(null);
     try {
-      await fetch("/api/auth/sign-out", { method: "POST" });
+      const res = await fetch("/api/auth/sign-out", { method: "POST" });
+      if (!res.ok) {
+        throw new Error("Failed to sign out");
+      }
       router.push("/sign-in");
       router.refresh();
     } catch {
+      setError("Sign out failed. Try again.");
       setLoading(false);
     }
   }
 
   return (
-    <button
-      onClick={handleSignOut}
-      disabled={loading}
-      style={{
-        background: "transparent",
-        border: "1px solid #E8E5DF",
-        borderRadius: "6px",
-        padding: "0.4rem 0.75rem",
-        fontSize: "0.8125rem",
-        color: "#666B73",
-        cursor: "pointer",
-        transition: "all 0.15s ease",
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.borderColor = "#F25F4C";
-        e.currentTarget.style.color = "#F25F4C";
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.borderColor = "#E8E5DF";
-        e.currentTarget.style.color = "#666B73";
-      }}
-    >
-      {loading ? "Signing out..." : "Sign out"}
-    </button>
+    <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end" }}>
+      <button
+        onClick={handleSignOut}
+        disabled={loading}
+        className="sign-out-btn"
+        aria-label="Sign out of your account"
+      >
+        {loading ? "Signing out..." : "Sign out"}
+      </button>
+      {error && (
+        <span style={{ fontSize: "0.6875rem", color: "#F25F4C", marginTop: "2px" }}>
+          {error}
+        </span>
+      )}
+    </div>
   );
 }
