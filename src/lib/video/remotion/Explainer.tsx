@@ -26,7 +26,7 @@ function Diagram({ scene }: { scene: TimedScene }) {
   const textContext = `${scene.type} ${scene.title} ${scene.narration} ${scene.labels.join(" ")}`.toLowerCase();
 
   // 1. Algorithms & Data Structures (Binary Search, Arrays)
-  if (scene.type === "binary-search" || scene.search || /binary|search|array|sort|index/i.test(textContext)) {
+  if (scene.type === "binary-search" || Boolean(scene.search) || /\bbinary\s+search\b|\bsorted\s+array\b/i.test(textContext)) {
     return (
       <svg viewBox="0 0 860 700" style={{ width: "100%", height: 700, overflow: "visible" }}>
         <SearchDiagram scene={scene} />

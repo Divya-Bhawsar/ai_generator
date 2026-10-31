@@ -1,9 +1,10 @@
 import { SceneRecord } from "../db/projects";
 
 const CANDIDATE_MODELS = [
-  "gemini-3.1-flash-lite",
-  "gemini-3.8-flash",
-  "gemini-flash-latest",
+  "gemini-3.5-flash",
+  "gemini-3.5-flash-lite",
+  "gemini-3.6-flash",
+  "gemini-flash-lite-latest",
 ];
 
 const SCENE_TYPES = [
@@ -115,7 +116,7 @@ async function callGemini(prompt: string): Promise<Record<string, unknown>> {
             temperature: 0.7,
           },
         }),
-        signal: AbortSignal.timeout(7000), // 7s timeout per model to prevent hanging
+        signal: AbortSignal.timeout(15000), // 15s timeout per model for structured schema
       });
 
       const data = await res.json();
@@ -153,7 +154,7 @@ export function synthesizeFallbackStoryboard(
   const lower = cleanTopic.toLowerCase();
 
   // 1. Algorithm / Computer Science Domain (Binary Search, Sorting, Data Structures)
-  if (/binary|search|sort|algorithm|code|array|tree|graph|hash/i.test(lower)) {
+  if (/\bbinary\s+search\b|\bbubble\s*sort\b|\bquick\s*sort\b|\bdata\s+structure\b|\bsorted\s+array\b/i.test(lower)) {
     if (targetAudience === "beginners") {
       return {
         title: "How to Find Any Secret Number Super Fast",
