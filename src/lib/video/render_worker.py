@@ -224,22 +224,28 @@ def render_scene(scene: dict, index: int, total_scenes: int, topic: str, audio: 
     ass_path = make_ass(scene, duration, index, work_dir)
 
     # 3. Render animated video clip with Ken Burns zoom & kinetic subtitles
+    # Add a 0.35s breathing pause at the end of each scene so narrator's sentence completes naturally
+    pause = 0.35
+    total_dur = duration + pause
+    total_frames = int(round(total_dur * FPS))
+
     clip = work_dir / f"clip-{index:02d}.mp4"
     ass_esc = esc_path(ass_path)
-    vf = f"zoompan=z='min(zoom+0.0006,1.04)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={WIDTH}x{HEIGHT}:fps={FPS},subtitles='{ass_esc}'"
+    vf = f"zoompan=z='min(zoom+0.0006,1.04)':d={total_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={WIDTH}x{HEIGHT}:fps={FPS},subtitles='{ass_esc}'"
 
     run_cmd([
         "ffmpeg", "-y",
-        "-loop", "1", "-t", f"{duration:.3f}",
+        "-loop", "1", "-framerate", str(FPS), "-t", f"{total_dur + 0.3:.3f}",
         "-i", str(scene_png),
         "-i", str(audio),
         "-vf", vf,
-        "-t", f"{duration:.3f}",
+        "-af", f"apad=pad_dur={pause:.2f}",
+        "-t", f"{total_dur:.3f}",
         "-r", str(FPS),
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
-        "-shortest", str(clip)
+        str(clip)
     ])
     return clip
 

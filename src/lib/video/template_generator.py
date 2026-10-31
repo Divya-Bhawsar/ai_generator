@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """HTML5/CSS3/SVG Frame Generator for VidyaMotion Explainer Videos.
 
-Generates high-resolution (1080x1920) modern glassmorphic motion graphic frames:
-- Cinematic dark gradient background with ambient glowing orbs
+Generates high-resolution (1080x1920) modern glassmorphic motion graphic frames with:
+- Unified visual identity and continuous narrative stepper across all scenes
+- Fully dynamic, context-aware diagrams powered by the actual scene data
+- Deep midnight backdrop with ambient glowing orbs
 - Frosted glass cards with glowing borders
-- Modern typography and anti-aliased hierarchy
-- Procedural SVG diagrams (comparison, process flows, metrics, hook cards)
 - Captured via headless Google Chrome into pixel-perfect PNGs
 """
 from __future__ import annotations
 
+import html as html_lib
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -19,133 +21,185 @@ from pathlib import Path
 
 CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
-def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str = "") -> str:
-    title = scene.get("title", f"Scene {index}")
-    visual_type = str(scene.get("visualType") or scene.get("visual_type") or "concept").lower()
-    visual_label = scene.get("visualLabel") or scene.get("visual_label") or ""
-    accent_words = scene.get("accentWords") or scene.get("accent_words") or []
+def clean_text(s: str) -> str:
+    return html_lib.escape(str(s).strip())
 
-    # Choose color palette based on visual type
-    theme_colors = {
-        "hook": ("#F43F5E", "#FB7185", "rgba(244, 63, 94, 0.3)"),
-        "problem": ("#F43F5E", "#FB7185", "rgba(244, 63, 94, 0.3)"),
-        "flow": ("#06B6D4", "#38BDF8", "rgba(6, 182, 212, 0.3)"),
-        "process_steps": ("#06B6D4", "#38BDF8", "rgba(6, 182, 212, 0.3)"),
-        "bars": ("#F59E0B", "#FBBF24", "rgba(245, 158, 11, 0.3)"),
-        "comparison": ("#10B981", "#34D399", "rgba(16, 185, 129, 0.3)"),
-        "concept": ("#6366F1", "#818CF8", "rgba(99, 102, 241, 0.3)"),
-        "takeaway": ("#8B5CF6", "#C084FC", "rgba(139, 92, 246, 0.3)"),
-    }
-    primary_color, secondary_color, glow_color = theme_colors.get(visual_type, ("#6366F1", "#818CF8", "rgba(99, 102, 241, 0.3)"))
+def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str = "") -> str:
+    title = clean_text(scene.get("title", f"Scene {index}"))
+    visual_type = str(scene.get("visualType") or scene.get("visual_type") or "concept").lower()
+    visual_label = clean_text(scene.get("visualLabel") or scene.get("visual_label") or "")
+    accent_words = [clean_text(w) for w in (scene.get("accentWords") or scene.get("accent_words") or [])]
+    topic_clean = clean_text(topic or "Explainer Deep Dive")
+    narration = str(scene.get("narration", "")).strip()
+
+    # Unified brand color scheme across entire video for visual continuity
+    primary_color = "#38BDF8"      # Electric Cyan
+    secondary_color = "#60A5FA"    # Neon Sky Blue
+    accent_gold = "#FBBF24"        # Highlight Amber
+    glow_color = "rgba(56, 189, 248, 0.22)"
+
+    # Scene phase name for narrative cohesion
+    phase_names = [
+        "Phase 1: The Bottleneck",
+        "Phase 2: Core Architecture",
+        "Phase 3: System Workflow",
+        "Phase 4: Key Comparison",
+        "Phase 5: Mastered Takeaway",
+        "Phase 6: Conclusion",
+    ]
+    phase_label = phase_names[min(index - 1, len(phase_names) - 1)]
+
+    # Segmented Narrative Stepper HTML (shows progress across scenes)
+    stepper_html = ""
+    for s_idx in range(1, total_scenes + 1):
+        if s_idx < index:
+            stepper_html += '<div class="step-segment step-done"></div>'
+        elif s_idx == index:
+            stepper_html += f'<div class="step-segment step-active"><span class="step-dot"></span></div>'
+        else:
+            stepper_html += '<div class="step-segment step-todo"></div>'
 
     # Accent tags HTML
     accent_tags_html = "".join(
         f'<span class="accent-tag">#{w}</span>' for w in accent_words
     )
 
-    # Dynamic Diagram Centerpiece
+    # Dynamic, context-driven diagrams based on actual scene content
     if visual_type in ("hook", "problem"):
+        lead_stat = "KEY DILEMMA"
+        metric_highlight = accent_words[0].upper() if accent_words else "BOTTLENECK"
         diagram_html = f"""
-        <div class="hook-card">
-            <div class="alert-pill">
-                <span class="pulse-dot" style="background: {primary_color};"></span>
-                <span>CRITICAL FRICTION DETECTED</span>
+        <div class="card-interior hook-style">
+            <div class="phase-badge badge-warning">
+                <span class="warning-icon">⚠</span>
+                <span>{lead_stat}: THE CORE FRICTION</span>
             </div>
-            <div class="hook-metric-box">
-                <div class="metric-big" style="color: {primary_color};">70%</div>
-                <div class="metric-label">Developer Time Lost to Cognitive Drag</div>
+            <div class="dynamic-focal-box">
+                <div class="focal-headline">{metric_highlight}</div>
+                <div class="focal-sub">Critical drag limiting velocity & team throughput</div>
             </div>
-            <div class="meter-bar">
-                <div class="meter-fill" style="width: 72%; background: linear-gradient(90deg, {primary_color}, {secondary_color});"></div>
+            <div class="meter-track">
+                <div class="meter-bar" style="width: 78%;"></div>
             </div>
-            <div class="meter-caption">Endless Boilerplate • Grueling Debugging • Context Switching</div>
+            <div class="scene-summary-box">
+                <p class="scene-summary-text">{visual_label}</p>
+            </div>
         </div>
         """
     elif visual_type in ("comparison", "bars"):
+        left_label = accent_words[0].upper() if len(accent_words) > 0 else "CONVENTIONAL"
+        right_label = accent_words[1].upper() if len(accent_words) > 1 else "OPTIMIZED"
         diagram_html = f"""
-        <div class="comparison-grid">
-            <div class="card-half">
-                <span class="half-badge">TRADITIONAL ASSISTANTS</span>
-                <div class="metric-val" style="color: #94A3B8;">Single-Line</div>
-                <div class="bar-track">
-                    <div class="bar-fill" style="width: 35%; background: #64748B;"></div>
-                </div>
-                <p class="half-desc">Surface predictions leaving system orchestration on you</p>
+        <div class="card-interior">
+            <div class="phase-badge badge-compare">
+                <span>⚖️ ARCHITECTURAL COMPARISON</span>
             </div>
-            <div class="card-half active-half" style="border-color: {primary_color}; box-shadow: 0 0 35px {glow_color};">
-                <span class="half-badge" style="background: {primary_color}; color: #FFF;">ANTIGRAVITY AI</span>
-                <div class="metric-val" style="color: {secondary_color};">End-to-End</div>
-                <div class="bar-track">
-                    <div class="bar-fill" style="width: 95%; background: linear-gradient(90deg, {primary_color}, {secondary_color});"></div>
+            <div class="comparison-grid">
+                <div class="compare-col col-left">
+                    <span class="col-badge">CONVENTIONAL</span>
+                    <div class="col-title">{left_label}</div>
+                    <div class="stat-bar-dim">
+                        <div class="stat-fill-dim" style="width: 38%;"></div>
+                    </div>
+                    <p class="col-desc">Surface-level manual glue code & high friction</p>
                 </div>
-                <p class="half-desc">Autonomous multi-file architecture & validated shipping</p>
+                <div class="compare-col col-right">
+                    <span class="col-badge active-col-badge">NEXT-GENERATION</span>
+                    <div class="col-title" style="color: {primary_color};">{right_label}</div>
+                    <div class="stat-bar-bright">
+                        <div class="stat-fill-bright" style="width: 95%;"></div>
+                    </div>
+                    <p class="col-desc">Autonomous multi-step execution & zero friction</p>
+                </div>
+            </div>
+            <div class="scene-summary-box">
+                <p class="scene-summary-text">{visual_label}</p>
             </div>
         </div>
         """
     elif visual_type in ("flow", "process_steps"):
+        # Derive 3 steps from accent words or scene data
+        s1 = accent_words[0].upper() if len(accent_words) > 0 else "INGESTION"
+        s2 = accent_words[1].upper() if len(accent_words) > 1 else "REASONING"
+        s3 = accent_words[2].upper() if len(accent_words) > 2 else "EXECUTION"
         diagram_html = f"""
-        <div class="flow-container">
-            <div class="flow-step">
-                <div class="step-num">01</div>
-                <div class="step-title">INGESTION</div>
-                <div class="step-desc">Parse Dependencies</div>
+        <div class="card-interior">
+            <div class="phase-badge badge-process">
+                <span>⚡ EXECUTION PIPELINE</span>
             </div>
-            <div class="flow-arrow">➔</div>
-            <div class="flow-step step-active" style="border-color: {primary_color}; box-shadow: 0 0 25px {glow_color};">
-                <div class="step-num" style="background: {primary_color};">02</div>
-                <div class="step-title" style="color: {secondary_color};">REASONING</div>
-                <div class="step-desc">Draft Code & Tests</div>
+            <div class="flow-row">
+                <div class="flow-card">
+                    <div class="flow-num">01</div>
+                    <div class="flow-title">{s1}</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-card flow-active">
+                    <div class="flow-num active-num">02</div>
+                    <div class="flow-title" style="color: {primary_color};">{s2}</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-card">
+                    <div class="flow-num">03</div>
+                    <div class="flow-title">{s3}</div>
+                </div>
             </div>
-            <div class="flow-arrow">➔</div>
-            <div class="flow-step">
-                <div class="step-num">03</div>
-                <div class="step-title">EXECUTION</div>
-                <div class="step-desc">Deploy Workflows</div>
+            <div class="scene-summary-box">
+                <p class="scene-summary-text">{visual_label}</p>
             </div>
         </div>
         """
     elif visual_type == "takeaway":
+        # Extract sentence takeaways
+        sentences = [s.strip() for s in re.split(r"[.!?]", narration) if len(s.strip()) > 10]
+        b1 = clean_text(sentences[0]) if len(sentences) > 0 else "Lifts developer friction into effortless flow"
+        b2 = clean_text(sentences[1]) if len(sentences) > 1 else "Autonomous end-to-end task delegation"
+        b3 = clean_text(sentences[2]) if len(sentences) > 2 else "10x shipping velocity without cognitive drag"
         diagram_html = f"""
-        <div class="takeaway-box">
-            <div class="takeaway-header">
-                <div class="check-icon" style="background: {primary_color}; box-shadow: 0 0 25px {primary_color};">✓</div>
-                <div class="takeaway-title">VELOCITY WITHOUT RESISTANCE</div>
+        <div class="card-interior takeaway-style">
+            <div class="phase-badge badge-takeaway">
+                <span class="check-mark">✓</span>
+                <span>CORE LESSON MASTERED</span>
             </div>
-            <div class="takeaway-bullets">
-                <div class="bullet-item">
-                    <span class="bullet-check" style="color: {secondary_color};">✓</span>
-                    <span>Turns engineering friction into seamless autonomous flow</span>
+            <div class="takeaway-list">
+                <div class="takeaway-item">
+                    <span class="item-check">✓</span>
+                    <span>{b1}</span>
                 </div>
-                <div class="bullet-item">
-                    <span class="bullet-check" style="color: {secondary_color};">✓</span>
-                    <span>Full-codebase semantic understanding & validation</span>
+                <div class="takeaway-item">
+                    <span class="item-check">✓</span>
+                    <span>{b2}</span>
                 </div>
-                <div class="bullet-item">
-                    <span class="bullet-check" style="color: {secondary_color};">✓</span>
-                    <span>10x shipping speed with near-zero operational drag</span>
+                <div class="takeaway-item">
+                    <span class="item-check">✓</span>
+                    <span>{b3}</span>
                 </div>
             </div>
         </div>
         """
     else:
-        # Modern concept HUD centerpiece
+        # Default concept HUD centerpiece
+        node_1 = accent_words[0] if len(accent_words) > 0 else "Core Engine"
+        node_2 = accent_words[1] if len(accent_words) > 1 else "Semantic Graph"
+        node_3 = accent_words[2] if len(accent_words) > 2 else "Agent Logic"
         diagram_html = f"""
-        <div class="concept-hud">
-            <div class="orbital-system">
-                <div class="outer-ring" style="border-color: rgba(99, 102, 241, 0.25);">
-                    <div class="orbit-planet planet-1" style="background: {primary_color};"></div>
-                    <div class="orbit-planet planet-2" style="background: {secondary_color};"></div>
-                </div>
-                <div class="inner-ring" style="border-color: {primary_color}; box-shadow: 0 0 40px {glow_color};">
-                    <div class="core-glow" style="background: radial-gradient(circle, {secondary_color} 0%, {primary_color} 70%);">
+        <div class="card-interior">
+            <div class="phase-badge badge-concept">
+                <span>💡 ARCHITECTURE OVERVIEW</span>
+            </div>
+            <div class="concept-center">
+                <div class="radar-outer">
+                    <div class="radar-core">
                         <span>AI</span>
                     </div>
                 </div>
+                <div class="satellite-tags">
+                    <span class="sat-node">● {node_1}</span>
+                    <span class="sat-node active-node">● {node_2}</span>
+                    <span class="sat-node">● {node_3}</span>
+                </div>
             </div>
-            <div class="hud-nodes-row">
-                <span class="hud-node" style="border-color: {primary_color}; color: {secondary_color};">● Full Codebase</span>
-                <span class="hud-node" style="border-color: {primary_color}; color: {secondary_color};">● Semantic Memory</span>
-                <span class="hud-node" style="border-color: {primary_color}; color: {secondary_color};">● Agent Reasoning</span>
+            <div class="scene-summary-box">
+                <p class="scene-summary-text">{visual_label}</p>
             </div>
         </div>
         """
@@ -170,37 +224,37 @@ def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str =
         position: relative;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justifyContent: flex-start;
         padding: 130px 70px 0;
     }}
 
-    /* Ambient Glowing Orbs Background */
-    .orb-1 {{
+    /* Ambient Cinematic Glowing Lights (Consistent across all scenes) */
+    .ambient-orb-1 {{
         position: absolute;
-        top: 220px;
+        top: 200px;
         left: -120px;
         width: 550px;
         height: 550px;
         background: {primary_color};
-        filter: blur(150px);
-        opacity: 0.22;
-        border-radius: 50%;
-        z-index: 1;
-    }}
-    .orb-2 {{
-        position: absolute;
-        top: 600px;
-        right: -140px;
-        width: 620px;
-        height: 620px;
-        background: {secondary_color};
         filter: blur(160px);
         opacity: 0.18;
         border-radius: 50%;
         z-index: 1;
     }}
+    .ambient-orb-2 {{
+        position: absolute;
+        top: 550px;
+        right: -130px;
+        width: 600px;
+        height: 600px;
+        background: {secondary_color};
+        filter: blur(170px);
+        opacity: 0.14;
+        border-radius: 50%;
+        z-index: 1;
+    }}
 
-    /* Subtle Grid Overlay */
+    /* Subtle Grid Background */
     .bg-grid {{
         position: absolute;
         inset: 0;
@@ -211,378 +265,376 @@ def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str =
         z-index: 2;
     }}
 
-    /* Main Content Container */
+    /* Content Box */
     .content-box {{
         position: relative;
         z-index: 10;
         display: flex;
         flex-direction: column;
-        gap: 32px;
+        gap: 28px;
     }}
 
-    /* Top Badges Row */
-    .top-badge-row {{
+    /* Top Series & Topic Banner */
+    .top-series-bar {{
         display: flex;
         justifyContent: space-between;
         align-items: center;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }}
-    .scene-pill {{
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 24px;
-        border-radius: 40px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        backdrop-filter: blur(20px);
-        font-size: 22px;
+    .series-title {{
+        font-size: 20px;
         font-weight: 800;
+        color: #94A3B8;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: {secondary_color};
     }}
-    .pulse-dot {{
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: {primary_color};
-        box-shadow: 0 0 14px {primary_color};
-    }}
-    .topic-pill {{
-        font-size: 20px;
+    .phase-indicator {{
+        font-size: 19px;
         font-weight: 700;
+        color: {primary_color};
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        padding: 10px 22px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.05);
-        color: #94A3B8;
-        border: 1px solid rgba(255, 255, 255, 0.08);
     }}
 
-    /* Scene Title */
-    .scene-title {{
-        font-size: 60px;
+    /* Segmented Narrative Stepper (Keeps context unified across scenes) */
+    .stepper-container {{
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        align-items: center;
+    }}
+    .step-segment {{
+        flex: 1;
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        position: relative;
+    }}
+    .step-done {{
+        background: rgba(56, 189, 248, 0.45);
+    }}
+    .step-active {{
+        background: {primary_color};
+        box-shadow: 0 0 16px {primary_color};
+    }}
+    .step-dot {{
+        position: absolute;
+        right: 0;
+        top: -4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #FFFFFF;
+        box-shadow: 0 0 10px #FFFFFF;
+    }}
+
+    /* Scene Headline */
+    .scene-headline-box {{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }}
+    .scene-number-tag {{
+        font-size: 18px;
         font-weight: 800;
-        line-height: 1.18;
+        letter-spacing: 0.1em;
+        color: {secondary_color};
+        text-transform: uppercase;
+    }}
+    .scene-title {{
+        font-size: 58px;
+        font-weight: 800;
+        line-height: 1.16;
         color: #FFFFFF;
         letter-spacing: -0.02em;
-        text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
     }}
 
     /* Frosted Glass Centerpiece Card */
     .glass-card {{
         background: rgba(15, 23, 42, 0.75);
         border: 2px solid rgba(255, 255, 255, 0.12);
-        border-radius: 36px;
-        padding: 44px;
+        border-radius: 32px;
+        padding: 40px;
         backdrop-filter: blur(35px);
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         display: flex;
         flex-direction: column;
-        gap: 32px;
+        gap: 28px;
     }}
 
-    /* Diagram Wrap */
-    .diagram-wrap {{
-        display: flex;
-        justifyContent: center;
-        align-items: center;
-        min-height: 360px;
-        width: 100%;
-    }}
-
-    /* Hook Alert Card */
-    .hook-card {{
-        width: 100%;
+    /* Card Interior Base */
+    .card-interior {{
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 24px;
+        width: 100%;
         text-align: center;
     }}
-    .alert-pill {{
+
+    /* Phase Badge */
+    .phase-badge {{
         display: inline-flex;
         align-items: center;
-        gap: 12px;
-        background: rgba(244, 63, 94, 0.15);
-        border: 1px solid rgba(244, 63, 94, 0.4);
-        padding: 10px 24px;
-        border-radius: 30px;
-        font-size: 20px;
+        gap: 10px;
+        padding: 8px 22px;
+        border-radius: 20px;
+        font-size: 18px;
         font-weight: 800;
-        color: #FB7185;
         letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(56, 189, 248, 0.12);
+        color: {primary_color};
+        border: 1px solid rgba(56, 189, 248, 0.35);
     }}
-    .hook-metric-box {{
+    .badge-warning {{
+        background: rgba(244, 63, 94, 0.12);
+        color: #FB7185;
+        border-color: rgba(244, 63, 94, 0.35);
+    }}
+    .badge-compare {{
+        background: rgba(56, 189, 248, 0.12);
+        color: {primary_color};
+        border-color: rgba(56, 189, 248, 0.35);
+    }}
+
+    /* Dynamic Focal Box (Hook) */
+    .dynamic-focal-box {{
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 6px;
     }}
-    .metric-big {{
-        font-size: 110px;
+    .focal-headline {{
+        font-size: 82px;
         font-weight: 900;
-        line-height: 1;
-        letter-spacing: -0.03em;
-        text-shadow: 0 0 35px {glow_color};
+        letter-spacing: -0.02em;
+        color: #FB7185;
+        text-shadow: 0 0 40px rgba(244, 63, 94, 0.35);
     }}
-    .metric-label {{
-        font-size: 24px;
+    .focal-sub {{
+        font-size: 22px;
         font-weight: 600;
-        color: #E2E8F0;
+        color: #CBD5E1;
     }}
-    .meter-bar {{
+    .meter-track {{
         width: 100%;
-        height: 18px;
+        height: 16px;
         background: rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
+        border-radius: 8px;
         overflow: hidden;
     }}
-    .meter-fill {{
+    .meter-bar {{
         height: 100%;
-        border-radius: 12px;
-    }}
-    .meter-caption {{
-        font-size: 18px;
-        color: #94A3B8;
-        font-weight: 500;
-        letter-spacing: 0.02em;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #F43F5E, #FB7185);
     }}
 
     /* Comparison Grid */
     .comparison-grid {{
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
+        gap: 22px;
         width: 100%;
+        text-align: left;
     }}
-    .card-half {{
+    .compare-col {{
         background: rgba(30, 41, 59, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 24px;
-        padding: 32px 24px;
+        border-radius: 20px;
+        padding: 28px 22px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
     }}
-    .active-half {{
-        background: rgba(30, 41, 59, 0.9);
-        border: 2px solid;
+    .col-right {{
+        background: rgba(30, 41, 59, 0.95);
+        border: 2px solid {primary_color};
+        box-shadow: 0 0 30px {glow_color};
     }}
-    .half-badge {{
-        font-size: 17px;
+    .col-badge {{
+        font-size: 16px;
         font-weight: 800;
         letter-spacing: 0.06em;
-        text-transform: uppercase;
         padding: 6px 14px;
-        border-radius: 8px;
+        border-radius: 6px;
         background: rgba(255, 255, 255, 0.08);
         color: #94A3B8;
         align-self: flex-start;
     }}
-    .metric-val {{
-        font-size: 38px;
-        font-weight: 800;
+    .active-col-badge {{
+        background: {primary_color};
+        color: #080C16;
     }}
-    .bar-track {{
+    .col-title {{
+        font-size: 32px;
+        font-weight: 800;
+        color: #F8FAFC;
+    }}
+    .stat-bar-dim, .stat-bar-bright {{
         width: 100%;
-        height: 14px;
+        height: 12px;
+        border-radius: 6px;
         background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
         overflow: hidden;
     }}
-    .bar-fill {{
+    .stat-fill-dim {{
         height: 100%;
-        border-radius: 8px;
+        background: #64748B;
     }}
-    .half-desc {{
-        font-size: 20px;
+    .stat-fill-bright {{
+        height: 100%;
+        background: linear-gradient(90deg, {primary_color}, {secondary_color});
+    }}
+    .col-desc {{
+        font-size: 18px;
         color: #CBD5E1;
         line-height: 1.4;
     }}
 
-    /* Flow Steps */
-    .flow-container {{
+    /* Flow Row */
+    .flow-row {{
         display: flex;
         align-items: center;
         justifyContent: space-between;
         width: 100%;
         gap: 14px;
     }}
-    .flow-step {{
+    .flow-card {{
         flex: 1;
         background: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 26px 14px;
-        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 24px 14px;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 10px;
     }}
-    .step-active {{
+    .flow-active {{
         background: rgba(30, 41, 59, 0.95);
-        border: 2px solid;
+        border: 2px solid {primary_color};
+        box-shadow: 0 0 25px {glow_color};
     }}
-    .step-num {{
-        width: 44px;
-        height: 44px;
+    .flow-num {{
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        color: #FFF;
-        font-weight: 800;
-        font-size: 20px;
+        background: rgba(255, 255, 255, 0.08);
         display: flex;
         align-items: center;
         justify-content: center;
-    }}
-    .step-title {{
-        font-size: 20px;
         font-weight: 800;
-        color: #FFF;
-        letter-spacing: 0.04em;
+        font-size: 18px;
+        color: #CBD5E1;
     }}
-    .step-desc {{
-        font-size: 16px;
-        color: #94A3B8;
+    .active-num {{
+        background: {primary_color};
+        color: #080C16;
+    }}
+    .flow-title {{
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #F8FAFC;
     }}
     .flow-arrow {{
-        font-size: 28px;
+        font-size: 26px;
         color: #64748B;
     }}
 
-    /* Takeaway Box */
-    .takeaway-box {{
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
-    }}
-    .takeaway-header {{
-        display: flex;
-        align-items: center;
-        gap: 18px;
-    }}
-    .check-icon {{
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        color: #FFF;
-        font-size: 28px;
-        font-weight: 900;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }}
-    .takeaway-title {{
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        color: #FFF;
-    }}
-    .takeaway-bullets {{
+    /* Takeaway List */
+    .takeaway-list {{
         display: flex;
         flex-direction: column;
         gap: 16px;
+        width: 100%;
+        text-align: left;
     }}
-    .bullet-item {{
+    .takeaway-item {{
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 16px;
         font-size: 24px;
+        line-height: 1.4;
         color: #E2E8F0;
         background: rgba(255, 255, 255, 0.04);
         padding: 16px 20px;
         border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.08);
     }}
-    .bullet-check {{
-        font-weight: 900;
+    .item-check {{
+        color: {primary_color};
         font-size: 26px;
+        font-weight: 900;
     }}
 
-    /* Concept HUD */
-    .concept-hud {{
+    /* Concept Centerpiece */
+    .concept-center {{
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 28px;
+        gap: 24px;
     }}
-    .orbital-system {{
-        position: relative;
-        width: 250px;
-        height: 250px;
+    .radar-outer {{
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        border: 2px dashed rgba(56, 189, 248, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
     }}
-    .outer-ring {{
-        position: absolute;
-        inset: 0;
+    .radar-core {{
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        border: 2px dashed;
-    }}
-    .orbit-planet {{
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-    }}
-    .planet-1 {{
-        top: 20px;
-        left: 30px;
-    }}
-    .planet-2 {{
-        bottom: 30px;
-        right: 25px;
-    }}
-    .inner-ring {{
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 3px solid;
+        background: radial-gradient(circle, {secondary_color} 0%, {primary_color} 80%);
         display: flex;
         align-items: center;
         justify-content: center;
-    }}
-    .core-glow {{
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-size: 28px;
         font-weight: 900;
-        font-size: 32px;
-        color: #FFF;
-        letter-spacing: 0.06em;
+        color: #080C16;
+        box-shadow: 0 0 35px {glow_color};
     }}
-    .hud-nodes-row {{
+    .satellite-tags {{
         display: flex;
-        gap: 14px;
+        gap: 12px;
     }}
-    .hud-node {{
-        border: 1px solid;
+    .sat-node {{
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
         border-radius: 20px;
         padding: 8px 18px;
         font-size: 18px;
         font-weight: 700;
-        background: rgba(255, 255, 255, 0.03);
+        color: #CBD5E1;
+    }}
+    .active-node {{
+        border-color: {primary_color};
+        color: {primary_color};
+        background: rgba(56, 189, 248, 0.1);
     }}
 
-    /* Explanation Text */
-    .explanation-text {{
-        font-size: 28px;
+    /* Scene Summary Box */
+    .scene-summary-box {{
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 16px 20px;
+    }}
+    .scene-summary-text {{
+        font-size: 24px;
         line-height: 1.45;
         color: #CBD5E1;
         font-weight: 500;
-        text-align: center;
-        padding: 0 12px;
     }}
 
-    /* Accents Row */
+    /* Accent Keywords Row */
     .accents-row {{
         display: flex;
         justifyContent: center;
@@ -596,32 +648,35 @@ def generate_scene_html(scene: dict, index: int, total_scenes: int, topic: str =
         border-radius: 20px;
         font-size: 19px;
         font-weight: 700;
-        color: {secondary_color};
+        color: {primary_color};
     }}
 </style>
 </head>
 <body>
     <div class="bg-grid"></div>
-    <div class="orb-1"></div>
-    <div class="orb-2"></div>
+    <div class="ambient-orb-1"></div>
+    <div class="ambient-orb-2"></div>
 
     <div class="content-box">
-        <div class="top-badge-row">
-            <div class="scene-pill">
-                <span class="pulse-dot"></span>
-                <span>SCENE {index:02d} / {total_scenes:02d}</span>
-            </div>
-            <div class="topic-pill">{visual_type.replace('_', ' ')}</div>
+        <!-- Top Series & Narrative Stepper (Unifies entire video into one coherent story) -->
+        <div class="top-series-bar">
+            <span class="series-title">VIDYAMOTION • {topic_clean}</span>
+            <span class="phase-indicator">{phase_label}</span>
         </div>
 
-        <h1 class="scene-title">{title}</h1>
+        <div class="stepper-container">
+            {stepper_html}
+        </div>
 
+        <!-- Scene Title -->
+        <div class="scene-headline-box">
+            <div class="scene-number-tag">SCENE {index:02d} / {total_scenes:02d}</div>
+            <h1 class="scene-title">{title}</h1>
+        </div>
+
+        <!-- Glassmorphic Context Card -->
         <div class="glass-card">
-            <div class="diagram-wrap">
-                {diagram_html}
-            </div>
-
-            <p class="explanation-text">{visual_label}</p>
+            {diagram_html}
 
             {f'<div class="accents-row">{accent_tags_html}</div>' if accent_tags_html else ''}
         </div>
