@@ -2,7 +2,8 @@
 """Asynchronous Video Render Worker for VidyaMotion.
 
 Renders high-retention 9:16 vertical MP4 explainer videos with:
-- Neural ElevenLabs voiceover (with smart local caching)
+- Neural ElevenLabs voiceover (with system neural TTS fallback on quota limits)
+- Voice- & text-keyed smart caching
 - Kinetic word/phrase-synchronized ASS subtitles with neon keyword highlights
 - Modern glassmorphic motion graphic cards captured via headless Chrome
 - Smooth Ken Burns dynamic camera push-in
@@ -12,12 +13,16 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import time
+import urllib.request
+import urllib.error
 from pathlib import Path
 from typing import Any
 
@@ -37,6 +42,10 @@ if str(SCRIPT_DIR) not in sys.path:
 from template_generator import generate_scene_html, render_html_to_png
 
 WIDTH, HEIGHT, FPS = 1080, 1920, 30
+
+def get_audio_cache_key(voice_id: str, narration: str) -> str:
+    content = f"{voice_id}:::{narration.strip()}"
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
 
 def update_status(status_file: Path, status: str, progress: int, stage: str, video_url: str = "", duration: float = 0.0, error: str = "") -> None:
     data = {
@@ -112,6 +121,57 @@ def caption_cues(text: str, alignment: dict[str, Any] | None, duration: float) -
         cursor = end
     return result
 
+def synthesize_voice(voice_name: str, voice_id: str, text: str, dest_path: Path, api_key: str, work_dir: Path) -> tuple[float, list[dict[str, Any]]]:
+    # 1. Try ElevenLabs API if key configured
+    if api_key and voice_id:
+        try:
+            url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps?output_format=mp3_44100_128"
+            payload = json.dumps({
+                "text": text,
+                "model_id": "eleven_v4",
+                "language_code": "en",
+            }).encode("utf-8")
+            req = urllib.request.Request(url, data=payload, headers={
+                "xi-api-key": api_key,
+                "Content-Type": "application/json",
+                "User-Agent": "VidyaMotion/1.0",
+            })
+            with urllib.request.urlopen(req, timeout=40) as resp:
+                resp_data = json.loads(resp.read().decode("utf-8"))
+                dest_path.write_bytes(base64.b64decode(resp_data.get("audio_base64", "")))
+                dur = probe_duration(dest_path)
+                cues = caption_cues(text, resp_data.get("alignment"), dur)
+                return dur, cues
+        except Exception as e:
+            print(f"ElevenLabs API unavailable ({e}), using system neural voice fallback...", file=sys.stderr)
+
+    # 2. System neural voice fallback (Tara for female / Monica, Aman for male / Viraj)
+    sys_voice = "Tara" if "monica" in voice_name.lower() else "Aman"
+    temp_aiff = dest_path.with_suffix(".aiff")
+    try:
+        subprocess.run(["/usr/bin/say", "-v", sys_voice, "-o", str(temp_aiff), text], check=True, capture_output=True)
+        run_cmd([
+            "ffmpeg", "-y", "-i", str(temp_aiff),
+            "-c:a", "libmp3lame", "-b:a", "192k", str(dest_path)
+        ])
+        temp_aiff.unlink(missing_ok=True)
+        dur = probe_duration(dest_path)
+        cues = caption_cues(text, None, dur)
+        return dur, cues
+    except Exception as e:
+        print(f"System TTS error ({e}), using audio generator fallback...", file=sys.stderr)
+
+    # 3. Final audio generator fallback
+    est = max(1.5, len(text.split()) / 2.5)
+    run_cmd([
+        "ffmpeg", "-y", "-f", "lavfi", "-i",
+        f"anullsrc=r=48000:cl=stereo:d={est:.3f}",
+        "-c:a", "libmp3lame", str(dest_path)
+    ])
+    dur = probe_duration(dest_path)
+    cues = caption_cues(text, None, dur)
+    return dur, cues
+
 def make_ass(scene: dict, duration: float, index: int, work_dir: Path) -> Path:
     events = []
     cues = scene.get("caption_cues") or caption_cues(scene["narration"], None, duration)
@@ -164,7 +224,7 @@ def render_scene(scene: dict, index: int, total_scenes: int, topic: str, audio: 
     ass_path = make_ass(scene, duration, index, work_dir)
 
     # 3. Render animated video clip with Ken Burns zoom & kinetic subtitles
-    clip = work_dir / f"scene-{index:02d}.mp4"
+    clip = work_dir / f"clip-{index:02d}.mp4"
     ass_esc = esc_path(ass_path)
     vf = f"zoompan=z='min(zoom+0.0006,1.04)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={WIDTH}x{HEIGHT}:fps={FPS},subtitles='{ass_esc}'"
 
@@ -195,8 +255,8 @@ def main() -> int:
 
     # Load API keys from .env.local
     env_file = Path(".env.local")
-    api_key = ""
-    if env_file.is_file():
+    api_key = os.environ.get("ELEVENLABS_API_KEY", "")
+    if not api_key and env_file.is_file():
         for line in env_file.read_text().splitlines():
             if line.startswith("ELEVENLABS_API_KEY="):
                 api_key = line.split("=", 1)[1].strip().strip("\"'")
@@ -215,60 +275,55 @@ def main() -> int:
         if total_scenes == 0:
             raise ValueError("No scenes found in storyboard")
 
-        # Step 1: Synthesize Audio
+        # Step 1: Synthesize Audio (keyed by voice_id + narration hash)
         audio_files = []
         durations = []
 
-        import urllib.request
         for i, scene in enumerate(scenes):
             prog = 10 + int((i / total_scenes) * 35)
-            update_status(args.status_file, "rendering", prog, f"Preparing voiceover for Scene {i+1} of {total_scenes}...")
+            update_status(args.status_file, "rendering", prog, f"Generating voiceover for Scene {i+1} of {total_scenes} ({args.voice_name})...")
 
-            audio_dest = work_dir / f"scene-{i+1:02d}.mp3"
+            cache_key = get_audio_cache_key(args.voice_id, scene["narration"])
+            audio_dest = work_dir / f"audio_s{i+1:02d}_{cache_key}.mp3"
+            align_dest = work_dir / f"audio_s{i+1:02d}_{cache_key}.json"
 
-            # Check if valid cached audio exists
+            # Check if valid cached audio for THIS exact voice and text already exists
             if audio_dest.is_file() and audio_dest.stat().st_size > 1000:
                 dur = probe_duration(audio_dest)
-                if "caption_cues" not in scene:
+                if align_dest.is_file():
+                    try:
+                        scene["caption_cues"] = json.loads(align_dest.read_text(encoding="utf-8"))
+                    except Exception:
+                        scene["caption_cues"] = caption_cues(scene["narration"], None, dur)
+                else:
                     scene["caption_cues"] = caption_cues(scene["narration"], None, dur)
                 audio_files.append(audio_dest)
                 durations.append(dur)
                 continue
 
-            # Synthesize via ElevenLabs if key available
-            if api_key and args.voice_id:
-                url = f"https://api.elevenlabs.io/v1/text-to-speech/{args.voice_id}/with-timestamps?output_format=mp3_44100_128"
-                payload = json.dumps({
-                    "text": scene["narration"],
-                    "model_id": "eleven_v4",
-                    "language_code": "en",
-                }).encode("utf-8")
-                req = urllib.request.Request(url, data=payload, headers={
-                    "xi-api-key": api_key,
-                    "Content-Type": "application/json",
-                })
-                with urllib.request.urlopen(req, timeout=60) as resp:
-                    resp_data = json.loads(resp.read().decode("utf-8"))
-                    audio_dest.write_bytes(base64.b64decode(resp_data.get("audio_base64", "")))
-                    scene["caption_cues"] = caption_cues(
-                        scene["narration"],
-                        resp_data.get("alignment"),
-                        probe_duration(audio_dest),
-                    )
-            else:
-                # Offline fallback with silent track
-                est = max(1.5, len(scene["narration"].split()) / 2.5)
-                run_cmd([
-                    "ffmpeg", "-y", "-f", "lavfi", "-i",
-                    f"anullsrc=r=48000:cl=stereo:d={est:.3f}",
-                    "-c:a", "libmp3lame", str(audio_dest)
-                ])
+            # Synthesize fresh audio
+            dur, cues = synthesize_voice(
+                args.voice_name,
+                args.voice_id,
+                scene["narration"],
+                audio_dest,
+                api_key,
+                work_dir,
+            )
+            scene["caption_cues"] = cues
+            try:
+                align_dest.write_text(json.dumps(cues), encoding="utf-8")
+            except Exception:
+                pass
 
-            dur = probe_duration(audio_dest)
             audio_files.append(audio_dest)
             durations.append(dur)
 
-        # Step 2: Render Each Scene
+        # Step 2: Render Each Scene Fresh
+        # Clean previous clip MP4s to prevent stale concatenation
+        for old_clip in work_dir.glob("clip-*.mp4"):
+            old_clip.unlink(missing_ok=True)
+
         clips = []
         for i, (scene, audio, dur) in enumerate(zip(scenes, audio_files, durations)):
             prog = 45 + int((i / total_scenes) * 45)
@@ -287,7 +342,8 @@ def main() -> int:
         ])
 
         total_dur = probe_duration(args.output_mp4)
-        video_web_path = f"/videos/{args.output_mp4.name}"
+        cache_buster = int(time.time())
+        video_web_path = f"/videos/{args.output_mp4.name}?v={cache_buster}"
 
         update_status(
             args.status_file,

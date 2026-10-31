@@ -89,6 +89,7 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 | 2026-10-29 | Clerk sign-up/sign-in runtime flow | Not exercised; requires the developer’s Clerk publishable and secret keys in `.env.local`. |
 | 2026-10-29 | Production build | Not run. |
 | 2026-10-31 | F01 auth & database hardening | Removed unused `@clerk/nextjs`, resolved proxy infinite redirect loop with cryptographic JWT validation, eliminated silent in-memory fallback on MongoDB failure, cached DB indexes, normalized URI handling, hardened production secrets, added dedicated `GET /api/auth/me`. `npx tsc --noEmit` and `npm run build` passed with 0 errors. |
+| 2026-10-31 | F05 & F06 Scene & Voice Dynamic Re-rendering | Fixed video update staleness: 1) Client now transmits modified scenes in render payload; 2) `POST /api/projects/[id]/render` auto-persists scenes before worker starts; 3) Audio cache keyed by SHA256 of `voiceId` + `narration` text; 4) Graceful neural voice fallback (`Tara`/`Aman`) when ElevenLabs free quota is exhausted; 5) Dynamic cache-busting timestamp (`?v=...`) on output MP4 and `key={videoUrl}` on React player; 6) Added full inline scene title and visual cue editing in `StoryboardStudio`. |
 
 ## Development rules
 

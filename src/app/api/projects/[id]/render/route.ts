@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getProjectById } from "@/lib/db/projects";
+import { getProjectById, updateStoryboardScenes } from "@/lib/db/projects";
 import { getDatabase, isMongoConfigured } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { spawn } from "child_process";
@@ -27,8 +27,19 @@ export async function POST(
   }
 
   const body = await req.json().catch(() => ({}));
-  const voiceId = body.voiceId || "Q1NHvGuV9SzxtiSnVDEH";
-  const voiceName = body.voiceName || "viraj";
+  const voiceId = body.voiceId || project.voiceId || "Q1NHvGuV9SzxtiSnVDEH";
+  const voiceName = body.voiceName || project.voiceName || "viraj";
+
+  let activeStoryboard = storyboard;
+
+  // If the user modified scenes on the client and sent them in body.scenes,
+  // save them immediately as the newest storyboard version!
+  if (Array.isArray(body.scenes) && body.scenes.length > 0) {
+    const updated = await updateStoryboardScenes(session.userId, id, body.scenes);
+    if (updated) {
+      activeStoryboard = updated;
+    }
+  }
 
   const rendersDir = path.join(process.cwd(), "public", "renders");
   const videosDir = path.join(process.cwd(), "public", "videos");
@@ -39,14 +50,14 @@ export async function POST(
   const statusPath = path.join(rendersDir, `${id}_status.json`);
   const outputMp4Path = path.join(videosDir, `${id}.mp4`);
 
-  // Write storyboard to disk for worker
-  fs.writeFileSync(storyboardPath, JSON.stringify(storyboard, null, 2), "utf-8");
+  // Write active storyboard to disk for worker
+  fs.writeFileSync(storyboardPath, JSON.stringify(activeStoryboard, null, 2), "utf-8");
 
-  // Initial status
+  // Initial status for the new render job
   const initialStatus = {
     status: "rendering",
     progress: 5,
-    stage: "Starting video render worker...",
+    stage: `Starting render with ${voiceName}...`,
     videoUrl: "",
     duration: 0,
     error: "",
@@ -105,5 +116,6 @@ export async function POST(
     success: true,
     status: "rendering",
     message: "Video rendering started",
+    storyboard: activeStoryboard,
   });
 }

@@ -50,12 +50,13 @@ export function StoryboardStudio({
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Voice Selection State
-  const [selectedVoice, setSelectedVoice] = useState(VOICES[0]);
+  const initialVoice = VOICES.find((v) => v.id === initialProject.voiceId || v.name === initialProject.voiceName) || VOICES[0];
+  const [selectedVoice, setSelectedVoice] = useState(initialVoice);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Render State
-  const [isRenderModalOpen, setIsRenderModalOpen] = useState(false);
   const [rendering, setRendering] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
   const [renderStage, setRenderStage] = useState("");
@@ -141,8 +142,9 @@ export function StoryboardStudio({
   async function handleStartRender() {
     setRendering(true);
     setRenderProgress(5);
-    setRenderStage("Initializing video render worker...");
+    setRenderStage(`Preparing video render with ${selectedVoice.label}...`);
     setError(null);
+    setVideoUrl(null); // Hide old video during render to show fresh progress
 
     try {
       const res = await fetch(`/api/projects/${project._id}/render`, {
@@ -151,12 +153,16 @@ export function StoryboardStudio({
         body: JSON.stringify({
           voiceId: selectedVoice.id,
           voiceName: selectedVoice.name,
+          scenes: scenes, // ALWAYS pass current in-memory scenes!
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Failed to start render");
+      }
+      if (data.storyboard) {
+        setStoryboard(data.storyboard);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error initiating render";
@@ -173,6 +179,30 @@ export function StoryboardStudio({
         narration: newNarration,
         estimatedSeconds: Math.round((newNarration.trim().split(/\s+/).filter(Boolean).length / 2.5) * 10) / 10,
       };
+      return copy;
+    });
+  }
+
+  function updateSceneTitle(index: number, newTitle: string) {
+    setScenes((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], title: newTitle };
+      return copy;
+    });
+  }
+
+  function updateSceneVisualLabel(index: number, newLabel: string) {
+    setScenes((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], visualLabel: newLabel };
+      return copy;
+    });
+  }
+
+  function updateSceneVisualType(index: number, newType: string) {
+    setScenes((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], visualType: newType };
       return copy;
     });
   }
@@ -382,6 +412,7 @@ export function StoryboardStudio({
             }}
           >
             <video
+              key={videoUrl}
               src={videoUrl}
               controls
               playsInline
@@ -432,7 +463,9 @@ export function StoryboardStudio({
               </a>
 
               <button
-                onClick={() => setIsRenderModalOpen(true)}
+                onClick={() => {
+                  voiceSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
                 style={{
                   background: "transparent",
                   border: "1px solid #475569",
@@ -444,7 +477,7 @@ export function StoryboardStudio({
                   cursor: "pointer",
                 }}
               >
-                Re-render with another voice ↻
+                Re-render with another voice or scene updates ↻
               </button>
             </div>
 
@@ -549,11 +582,27 @@ export function StoryboardStudio({
                   {/* Left Column: Spoken Narration */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#17191F" }}>
-                          Scene {index + 1}
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1 }}>
+                        <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#17191F", whiteSpace: "nowrap" }}>
+                          Scene {index + 1}:
                         </span>
-                        <span style={{ fontSize: "0.8125rem", color: "#666B73" }}>• {scene.title}</span>
+                        <input
+                          type="text"
+                          value={scene.title}
+                          onChange={(e) => updateSceneTitle(index, e.target.value)}
+                          placeholder="Scene title"
+                          style={{
+                            fontSize: "0.8125rem",
+                            fontWeight: 600,
+                            color: "#17191F",
+                            background: "#FAF9F6",
+                            border: "1px solid #E8E5DF",
+                            borderRadius: "4px",
+                            padding: "0.2rem 0.5rem",
+                            flex: 1,
+                            maxWidth: "260px",
+                          }}
+                        />
                       </div>
                       <span style={{ fontSize: "0.75rem", color: "#666B73" }}>
                         ~{scene.estimatedSeconds}s
@@ -587,27 +636,48 @@ export function StoryboardStudio({
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", background: "#FAF9F6", padding: "1rem", borderRadius: "8px", border: "1px solid #E8E5DF" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#666B73", textTransform: "uppercase" }}>
-                        🎨 Visual Motion Graphic Cue
+                        🎨 Visual Cue & Theme
                       </span>
-                      <span
+                      <select
+                        value={scene.visualType}
+                        onChange={(e) => updateSceneVisualType(index, e.target.value)}
                         style={{
-                          fontSize: "0.7rem",
+                          fontSize: "0.75rem",
                           fontWeight: 700,
-                          textTransform: "uppercase",
                           padding: "0.2rem 0.5rem",
                           borderRadius: "4px",
                           background: visualMeta.bg,
                           color: visualMeta.text,
                           border: `1px solid ${visualMeta.border}`,
+                          cursor: "pointer",
                         }}
                       >
-                        {scene.visualType.replace("_", " ")}
-                      </span>
+                        <option value="hook">Hook / Problem</option>
+                        <option value="concept">Concept Core</option>
+                        <option value="process_steps">Process Flow</option>
+                        <option value="comparison">Comparison Grid</option>
+                        <option value="takeaway">Key Takeaway</option>
+                      </select>
                     </div>
 
-                    <p style={{ margin: 0, fontSize: "0.875rem", color: "#17191F", lineHeight: 1.45 }}>
-                      {scene.visualLabel}
-                    </p>
+                    <textarea
+                      value={scene.visualLabel}
+                      onChange={(e) => updateSceneVisualLabel(index, e.target.value)}
+                      rows={3}
+                      placeholder="Visual motion cue..."
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem",
+                        borderRadius: "6px",
+                        border: "1px solid #E8E5DF",
+                        background: "#FFFFFF",
+                        fontSize: "0.875rem",
+                        color: "#17191F",
+                        lineHeight: 1.45,
+                        resize: "vertical",
+                        fontFamily: "inherit",
+                      }}
+                    />
 
                     {scene.accentWords && scene.accentWords.length > 0 && (
                       <div>
@@ -699,6 +769,8 @@ export function StoryboardStudio({
       {/* VOICE SELECTION & RENDER TRIGGER MODAL / SECTION */}
       {scenes.length > 0 && !rendering && (
         <div
+          ref={voiceSectionRef}
+          id="voice-selection"
           style={{
             background: "#FFFFFF",
             border: "1px solid #E8E5DF",

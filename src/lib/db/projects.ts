@@ -16,6 +16,8 @@ export interface ProjectRecord {
   topic: string;
   status: ProjectStatus;
   currentVersion: number;
+  voiceId?: string;
+  voiceName?: string;
   videoUrl?: string;
   durationSeconds?: number;
   createdAt: Date;
@@ -163,6 +165,8 @@ export async function getProjectById(
           topic: projectDoc.topic,
           status: projectDoc.status,
           currentVersion: projectDoc.currentVersion || 1,
+          voiceId: projectDoc.voiceId,
+          voiceName: projectDoc.voiceName,
           videoUrl: projectDoc.videoUrl,
           durationSeconds: projectDoc.durationSeconds,
           createdAt: projectDoc.createdAt,
