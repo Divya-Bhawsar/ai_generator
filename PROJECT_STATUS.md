@@ -17,6 +17,7 @@ The source repository is the public GitHub repository `Divya-Bhawsar/ai_generato
 ## Initial GitHub publication
 
 - Remote: `https://github.com/Divya-Bhawsar/ai_generator.git` (`origin`)
+- Latest confirmed `dev` head: `74a0bac8c8f5f4b5030e2f59fa943eec34b5c1f0` (`feat(video): upgrade render engine with glassmorphic cards, Ken Burns motion, and kinetic captions`)
 - The initial source and documentation commits were pushed to `main` after GitHub access became available.
 - Previous confirmed `main` head before this status refresh: `0fb28909d5633a10d6d8d0a59d05f50091e8e2e4` (`docs: record initial GitHub publication`), confirmed through the connected GitHub integration.
 - The local `main` branch tracks `origin/main`. Further milestones should continue to follow the commit-and-push rule below.
