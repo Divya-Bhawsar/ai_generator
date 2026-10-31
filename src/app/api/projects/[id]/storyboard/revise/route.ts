@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getProjectById, saveStoryboard } from "@/lib/db/projects";
+import { getProjectById, saveStoryboard, updateProjectAudience } from "@/lib/db/projects";
 import { reviseStoryboardAI } from "@/lib/ai/storyboard";
 
 export async function POST(
@@ -23,7 +23,7 @@ export async function POST(
 
   try {
     const body = await req.json();
-    const { revisionPrompt } = body;
+    const { revisionPrompt, targetAudience } = body;
 
     if (!revisionPrompt || typeof revisionPrompt !== "string") {
       return NextResponse.json(
@@ -32,10 +32,16 @@ export async function POST(
       );
     }
 
+    const audience = targetAudience || project.targetAudience || "general";
+    if (targetAudience && targetAudience !== project.targetAudience) {
+      await updateProjectAudience(session.userId, id, targetAudience);
+    }
+
     const aiOutput = await reviseStoryboardAI(
       storyboard.title,
       storyboard.scenes,
-      revisionPrompt.trim()
+      revisionPrompt.trim(),
+      audience
     );
 
     const updatedStoryboard = await saveStoryboard({
@@ -46,7 +52,7 @@ export async function POST(
       revisionPrompt: revisionPrompt.trim(),
     });
 
-    return NextResponse.json({ success: true, storyboard: updatedStoryboard });
+    return NextResponse.json({ success: true, storyboard: updatedStoryboard, targetAudience: audience });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Failed to apply revision";
     return NextResponse.json({ error: msg }, { status: 500 });

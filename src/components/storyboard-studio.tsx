@@ -32,6 +32,13 @@ const VOICES = [
   },
 ];
 
+const TARGET_AUDIENCES = [
+  { id: "general", label: "Curious Public", icon: "🌟" },
+  { id: "students", label: "Students & Exams", icon: "🎓" },
+  { id: "beginners", label: "Kids & Beginners", icon: "🧒" },
+  { id: "professionals", label: "Developers & Pros", icon: "💼" },
+];
+
 export function StoryboardStudio({
   initialProject,
   initialStoryboard,
@@ -40,6 +47,7 @@ export function StoryboardStudio({
   initialStoryboard: StoryboardRecord | null;
 }) {
   const [project] = useState(initialProject);
+  const [audience, setAudience] = useState(initialProject.targetAudience || "general");
   const [storyboard, setStoryboard] = useState<StoryboardRecord | null>(initialStoryboard);
   const [scenes, setScenes] = useState<SceneRecord[]>(initialStoryboard?.scenes || []);
   const [revisionPrompt, setRevisionPrompt] = useState("");
@@ -229,17 +237,21 @@ export function StoryboardStudio({
     }
   }
 
-  async function handleGenerateStoryboard() {
+  async function handleGenerateStoryboard(audienceToUse?: string) {
+    const finalAudience = audienceToUse || audience;
     setGenerating(true);
     setError(null);
     try {
       const res = await fetch(`/api/projects/${project._id}/storyboard`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetAudience: finalAudience }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate storyboard");
       setStoryboard(data.storyboard);
       setScenes(data.storyboard.scenes);
+      if (data.targetAudience) setAudience(data.targetAudience);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error generating";
       setError(msg);
@@ -248,9 +260,10 @@ export function StoryboardStudio({
     }
   }
 
-  async function handleApplyRevision(e: React.FormEvent) {
-    e.preventDefault();
-    if (!revisionPrompt.trim()) return;
+  async function handleApplyRevision(e?: React.FormEvent, promptOverride?: string) {
+    if (e) e.preventDefault();
+    const finalPrompt = (promptOverride || revisionPrompt).trim();
+    if (!finalPrompt) return;
 
     setRevising(true);
     setError(null);
@@ -258,7 +271,7 @@ export function StoryboardStudio({
       const res = await fetch(`/api/projects/${project._id}/storyboard/revise`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ revisionPrompt: revisionPrompt.trim() }),
+        body: JSON.stringify({ revisionPrompt: finalPrompt, targetAudience: audience }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to apply revision");
@@ -302,6 +315,43 @@ export function StoryboardStudio({
           <p style={{ margin: "0.35rem 0 0", fontSize: "0.875rem", color: "#666B73" }}>
             Topic: <em>{project.topic}</em>
           </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.6rem", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              🎯 Target Audience:
+            </span>
+            {TARGET_AUDIENCES.map((a) => {
+              const isSelected = audience === a.id;
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => {
+                    setAudience(a.id);
+                    handleGenerateStoryboard(a.id);
+                  }}
+                  disabled={generating || revising}
+                  title={`Switch to ${a.label} and re-adapt storyboard`}
+                  style={{
+                    fontSize: "0.75rem",
+                    padding: "0.22rem 0.65rem",
+                    borderRadius: "14px",
+                    border: isSelected ? "1.5px solid #315CEB" : "1px solid #E2E8F0",
+                    background: isSelected ? "#EEF2FF" : "#FAF9F6",
+                    color: isSelected ? "#315CEB" : "#475569",
+                    fontWeight: isSelected ? 700 : 500,
+                    cursor: generating || revising ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span>{a.icon}</span>
+                  <span>{a.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Pacing Badge */}
@@ -562,7 +612,7 @@ export function StoryboardStudio({
             </p>
           </div>
           <button
-            onClick={handleGenerateStoryboard}
+            onClick={() => handleGenerateStoryboard()}
             disabled={generating}
             className="button"
             style={{
@@ -623,7 +673,7 @@ export function StoryboardStudio({
                 {saving ? "Saving..." : "Save Manual Edits"}
               </button>
               <button
-                onClick={handleGenerateStoryboard}
+                onClick={() => handleGenerateStoryboard()}
                 disabled={generating}
                 style={{
                   background: "#FAF9F6",
@@ -841,6 +891,52 @@ export function StoryboardStudio({
               {revising ? "Revising Storyboard..." : "Apply AI Revision →"}
             </button>
           </form>
+
+          {/* Audience & Style Quick Revision Chips */}
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.85rem", alignItems: "center" }}>
+            <span style={{ fontSize: "0.72rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>
+              💡 Quick Adapters:
+            </span>
+            {[
+              { label: "🧒 Simplify for Kids", prompt: "Explain this using fun, playful visual metaphors for kids and beginners with zero jargon." },
+              { label: "🎓 Add Step-by-Step Numbers", prompt: "Walk through concrete step-by-step numbers and clear cause-and-effect for students." },
+              { label: "🌟 Punchy Real-Life Analogy", prompt: "Ground this in a dramatic, relatable everyday real-world analogy." },
+              { label: "💼 Technical Depth & Metrics", prompt: "Make this concise, technical, and data-dense for software engineers and practitioners." },
+            ].map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                disabled={revising}
+                onClick={() => {
+                  setRevisionPrompt(chip.prompt);
+                  handleApplyRevision(undefined, chip.prompt);
+                }}
+                style={{
+                  background: "#FAF9F6",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: "14px",
+                  padding: "0.25rem 0.65rem",
+                  fontSize: "0.75rem",
+                  color: "#1E293B",
+                  cursor: revising ? "not-allowed" : "pointer",
+                  transition: "all 0.15s ease",
+                  fontWeight: 500,
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.borderColor = "#315CEB";
+                  e.currentTarget.style.color = "#315CEB";
+                  e.currentTarget.style.background = "#EEF2FF";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.borderColor = "#CBD5E1";
+                  e.currentTarget.style.color = "#1E293B";
+                  e.currentTarget.style.background = "#FAF9F6";
+                }}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

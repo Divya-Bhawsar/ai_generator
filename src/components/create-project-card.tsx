@@ -10,9 +10,37 @@ const QUICK_TOPICS = [
   "Why do we procrastinate and how does the brain choose distractions?",
 ];
 
+const TARGET_AUDIENCES = [
+  {
+    id: "general",
+    label: "Curious Public",
+    icon: "🌟",
+    desc: "Viral reel, relatable analogies & everyday puzzles",
+  },
+  {
+    id: "students",
+    label: "Students & Exams",
+    icon: "🎓",
+    desc: "Step-by-step logic, worked numerical examples & diagrams",
+  },
+  {
+    id: "beginners",
+    label: "Kids & Beginners",
+    icon: "🧒",
+    desc: "Playful metaphors, super simple words & fun visuals",
+  },
+  {
+    id: "professionals",
+    label: "Developers & Pros",
+    icon: "💼",
+    desc: "Fast-paced, technical depth & real metrics",
+  },
+];
+
 export function CreateProjectCard() {
   const router = useRouter();
   const [topic, setTopic] = useState("");
+  const [audience, setAudience] = useState("general");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,13 +58,17 @@ export function CreateProjectCard() {
 
     try {
       setTimeout(() => {
-        setLoadingStep("2. Calling AI to generate 60–90s script & storyboard...");
+        setLoadingStep(`2. Synthesizing realistic script for ${TARGET_AUDIENCES.find(a => a.id === audience)?.label || "your audience"}...`);
       }, 900);
 
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic: finalTopic.trim(), generateImmediately: true }),
+        body: JSON.stringify({
+          topic: finalTopic.trim(),
+          targetAudience: audience,
+          generateImmediately: true,
+        }),
       });
 
       const data = await res.json();
@@ -90,7 +122,7 @@ export function CreateProjectCard() {
               fontWeight: 600,
             }}
           >
-            AI Paced (60–90s)
+            Audience Tailored (60–90s)
           </span>
         </div>
         <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#17191F", margin: 0 }}>
@@ -116,6 +148,76 @@ export function CreateProjectCard() {
           {error}
         </div>
       )}
+
+      {/* Target Audience Selector */}
+      <div>
+        <span
+          style={{
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            color: "#666B73",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            display: "block",
+            marginBottom: "0.5rem",
+          }}
+        >
+          🎯 WHO IS YOUR TARGET AUDIENCE?
+        </span>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "0.6rem",
+          }}
+        >
+          {TARGET_AUDIENCES.map((a) => {
+            const isSelected = audience === a.id;
+            return (
+              <button
+                key={a.id}
+                type="button"
+                disabled={loading}
+                onClick={() => setAudience(a.id)}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  textAlign: "left",
+                  padding: "0.65rem 0.85rem",
+                  borderRadius: "8px",
+                  border: isSelected ? "2px solid #315CEB" : "1px solid #E8E5DF",
+                  background: isSelected ? "#EEF2FF" : "#FAF9F6",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.15rem" }}>
+                  <span>{a.icon}</span>
+                  <span
+                    style={{
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      color: isSelected ? "#315CEB" : "#17191F",
+                    }}
+                  >
+                    {a.label}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    color: isSelected ? "#2548B8" : "#64748B",
+                    lineHeight: "1.25",
+                  }}
+                >
+                  {a.desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
         <input
@@ -157,7 +259,18 @@ export function CreateProjectCard() {
         >
           {loading ? (
             <>
-              <span className="spinner" style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+              <span
+                className="spinner"
+                style={{
+                  display: "inline-block",
+                  width: 14,
+                  height: 14,
+                  border: "2px solid #fff",
+                  borderTopColor: "transparent",
+                  borderRadius: "50%",
+                  animation: "spin 0.8s linear infinite",
+                }}
+              />
               <span>Generating...</span>
             </>
           ) : (

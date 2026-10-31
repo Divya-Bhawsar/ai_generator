@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { topic, title, generateImmediately } = body;
+    const { topic, title, targetAudience, generateImmediately } = body;
 
     if (!topic || typeof topic !== "string" || topic.trim().length === 0) {
       return NextResponse.json(
@@ -30,11 +30,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const audience = (targetAudience as string)?.trim() || "general";
+
     // Create the project in draft state
     const project = await createProject({
       ownerId: session.userId,
       topic: topic.trim(),
       title: title?.trim(),
+      targetAudience: audience,
     });
 
     let storyboard = null;
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
     // If requested, generate the initial storyboard immediately
     if (generateImmediately !== false) {
       try {
-        const aiOutput = await generateStoryboardAI(topic.trim());
+        const aiOutput = await generateStoryboardAI(topic.trim(), audience);
         storyboard = await saveStoryboard({
           projectId: project._id,
           ownerId: session.userId,

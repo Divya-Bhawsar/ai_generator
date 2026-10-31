@@ -28,7 +28,7 @@ export default async function ProjectPage({
   // immediately synthesize one so the creator always lands in an active studio!
   if (!storyboard) {
     try {
-      const aiOutput = await generateStoryboardAI(project.topic);
+      const aiOutput = await generateStoryboardAI(project.topic, project.targetAudience || "general");
       storyboard = await saveStoryboard({
         projectId: project._id,
         ownerId: session.userId,

@@ -14,6 +14,7 @@ export interface ProjectRecord {
   ownerId: string;
   title: string;
   topic: string;
+  targetAudience?: string;
   status: ProjectStatus;
   currentVersion: number;
   voiceId?: string;
@@ -56,11 +57,13 @@ export async function createProject(data: {
   ownerId: string;
   topic: string;
   title?: string;
+  targetAudience?: string;
 }): Promise<ProjectRecord> {
   const now = new Date();
   const title =
     data.title?.trim() ||
     data.topic.slice(0, 50).trim() + (data.topic.length > 50 ? "..." : "");
+  const targetAudience = data.targetAudience?.trim() || "general";
 
   if (isMongoConfigured()) {
     try {
@@ -70,6 +73,7 @@ export async function createProject(data: {
           ownerId: data.ownerId,
           topic: data.topic.trim(),
           title,
+          targetAudience,
           status: "draft" as ProjectStatus,
           currentVersion: 1,
           createdAt: now,
@@ -92,6 +96,7 @@ export async function createProject(data: {
     ownerId: data.ownerId,
     topic: data.topic.trim(),
     title,
+    targetAudience,
     status: "draft",
     currentVersion: 1,
     createdAt: now,
@@ -116,6 +121,7 @@ export async function listProjects(ownerId: string): Promise<ProjectRecord[]> {
           ownerId: d.ownerId,
           title: d.title,
           topic: d.topic,
+          targetAudience: d.targetAudience || "general",
           status: d.status,
           currentVersion: d.currentVersion || 1,
           videoUrl: d.videoUrl,
@@ -163,6 +169,7 @@ export async function getProjectById(
           ownerId: projectDoc.ownerId,
           title: projectDoc.title,
           topic: projectDoc.topic,
+          targetAudience: projectDoc.targetAudience || "general",
           status: projectDoc.status,
           currentVersion: projectDoc.currentVersion || 1,
           voiceId: projectDoc.voiceId,
@@ -329,4 +336,37 @@ export async function updateStoryboardScenes(
     scenes,
     revisionPrompt: "Manual scene edits",
   });
+}
+
+export async function updateProjectAudience(
+  ownerId: string,
+  projectId: string,
+  targetAudience: string
+): Promise<boolean> {
+  const cleanAudience = targetAudience.trim() || "general";
+  if (isMongoConfigured()) {
+    try {
+      const db = await getDatabase();
+      if (db) {
+        let q: Record<string, unknown> = { ownerId };
+        if (ObjectId.isValid(projectId)) q._id = new ObjectId(projectId);
+        else q._id = projectId;
+
+        await db.collection("projects").updateOne(q, {
+          $set: { targetAudience: cleanAudience, updatedAt: new Date() },
+        });
+        return true;
+      }
+    } catch (err) {
+      console.warn("MongoDB updateProjectAudience error:", err);
+    }
+  }
+
+  const project = memoryProjects.get(projectId);
+  if (project && project.ownerId === ownerId) {
+    project.targetAudience = cleanAudience;
+    project.updatedAt = new Date();
+    return true;
+  }
+  return false;
 }

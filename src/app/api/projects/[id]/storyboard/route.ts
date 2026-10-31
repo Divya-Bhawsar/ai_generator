@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getProjectById, saveStoryboard, updateStoryboardScenes } from "@/lib/db/projects";
+import { getProjectById, saveStoryboard, updateStoryboardScenes, updateProjectAudience } from "@/lib/db/projects";
 import { generateStoryboardAI } from "@/lib/ai/storyboard";
 
 export async function POST(
@@ -19,16 +19,22 @@ export async function POST(
   }
 
   try {
-    const aiOutput = await generateStoryboardAI(project.topic);
+    const body = await req.json().catch(() => ({}));
+    const targetAudience = body.targetAudience || project.targetAudience || "general";
+    if (body.targetAudience) {
+      await updateProjectAudience(session.userId, id, targetAudience);
+    }
+
+    const aiOutput = await generateStoryboardAI(project.topic, targetAudience);
     const storyboard = await saveStoryboard({
       projectId: project._id,
       ownerId: session.userId,
       title: aiOutput.title,
       scenes: aiOutput.scenes,
-      revisionPrompt: "Initial generation",
+      revisionPrompt: `Regenerated for audience: ${targetAudience}`,
     });
 
-    return NextResponse.json({ success: true, storyboard });
+    return NextResponse.json({ success: true, storyboard, targetAudience });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Failed to generate storyboard";
     return NextResponse.json({ error: msg }, { status: 500 });
