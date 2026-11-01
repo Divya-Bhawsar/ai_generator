@@ -4,13 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { ProjectRecord } from "@/lib/db/projects";
 
-const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  draft: { label: "Draft", color: "#666B73", bg: "#F3F4F6" },
-  generating_storyboard: { label: "Generating...", color: "#E9AE45", bg: "#FEF3C7" },
-  storyboard_ready: { label: "Storyboard Ready", color: "#315CEB", bg: "#EEF2FF" },
-  rendering: { label: "Rendering Video...", color: "#F25F4C", bg: "#FEE2E2" },
-  ready: { label: "Video Ready", color: "#059669", bg: "#D1FAE5" },
-  failed: { label: "Needs Attention", color: "#DC2626", bg: "#FEE2E2" },
+const STATUS_LABELS: Record<string, { label: string; color: string; bg: string; dotColor: string; isPulsing?: boolean }> = {
+  draft: { label: "Draft", color: "#64748B", bg: "#F1F5F9", dotColor: "#94A3B8" },
+  generating_storyboard: { label: "Generating...", color: "#D97706", bg: "#FEF3C7", dotColor: "#F59E0B", isPulsing: true },
+  storyboard_ready: { label: "Storyboard Ready", color: "#2563EB", bg: "#EEF2FF", dotColor: "#3B82F6" },
+  rendering: { label: "Rendering 1080p...", color: "#EA580C", bg: "#FFEDD5", dotColor: "#F97316", isPulsing: true },
+  ready: { label: "Reel Ready", color: "#059669", bg: "#D1FAE5", dotColor: "#10B981" },
+  failed: { label: "Needs Attention", color: "#DC2626", bg: "#FEE2E2", dotColor: "#EF4444" },
 };
 
 export function ProjectCard({ project }: { project: ProjectRecord }) {
@@ -48,56 +48,100 @@ export function ProjectCard({ project }: { project: ProjectRecord }) {
   }
 
   if (deleted) {
-    return null; // Card removes itself from the list immediately upon deletion
+    return null;
   }
 
   return (
     <article
+      className="interactive-card"
       style={{
         background: "#FFFFFF",
         border: "1px solid #E8E5DF",
-        borderRadius: "10px",
-        padding: "1.25rem",
+        borderRadius: "14px",
+        padding: "1.35rem",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        gap: "1rem",
-        transition: "transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease",
+        gap: "1.15rem",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
         opacity: deleting ? 0.6 : 1,
+        position: "relative",
       }}
     >
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
+        {/* Status Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
           <span
             style={{
-              fontSize: "0.75rem",
-              fontWeight: 600,
-              padding: "0.2rem 0.6rem",
-              borderRadius: "4px",
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              padding: "0.25rem 0.65rem",
+              borderRadius: "20px",
               color: statusMeta.color,
               background: statusMeta.bg,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
             }}
           >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: statusMeta.dotColor,
+                display: "inline-block",
+                boxShadow: statusMeta.isPulsing ? `0 0 0 3px ${statusMeta.color}30` : "none",
+                animation: statusMeta.isPulsing ? "pulse-subtle 1.5s infinite" : "none",
+              }}
+            />
             {statusMeta.label}
           </span>
-          <span style={{ fontSize: "0.75rem", color: "#666B73" }}>v{project.currentVersion}</span>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+            {project.targetAudience && (
+              <span style={{ fontSize: "0.7rem", color: "#64748B", background: "#F8FAFC", padding: "0.15rem 0.45rem", borderRadius: "4px", border: "1px solid #E2E8F0" }}>
+                {project.targetAudience}
+              </span>
+            )}
+            <span style={{ fontSize: "0.72rem", color: "#94A3B8", fontWeight: 600 }}>v{project.currentVersion}</span>
+          </div>
         </div>
 
+        {/* Project Title */}
         <h3
           style={{
-            fontSize: "1.0625rem",
+            fontSize: "1.1rem",
             fontWeight: 700,
-            color: "#17191F",
-            margin: "0.75rem 0 0.35rem",
+            color: "#0F172A",
+            margin: "0.85rem 0 0.35rem",
             lineHeight: 1.35,
+            letterSpacing: "-0.015em",
           }}
         >
-          {project.title}
+          <Link
+            href={`/dashboard/project/${project._id}`}
+            style={{
+              color: "inherit",
+              textDecoration: "none",
+              transition: "color 0.15s ease",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = "#315CEB";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "#0F172A";
+            }}
+          >
+            {project.title}
+          </Link>
         </h3>
+
+        {/* Topic Prompt */}
         <p
           style={{
             fontSize: "0.8125rem",
-            color: "#666B73",
+            color: "#64748B",
             margin: 0,
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -122,12 +166,12 @@ export function ProjectCard({ project }: { project: ProjectRecord }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderTop: "1px solid #F3F4F6",
+          borderTop: "1px solid #F1F5F9",
           paddingTop: "0.75rem",
           marginTop: "0.25rem",
         }}
       >
-        <span style={{ fontSize: "0.75rem", color: "#666B73" }}>{timeFormatted}</span>
+        <span style={{ fontSize: "0.72rem", color: "#94A3B8" }}>{timeFormatted}</span>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           {!confirming ? (
@@ -141,7 +185,7 @@ export function ProjectCard({ project }: { project: ProjectRecord }) {
                   border: "none",
                   cursor: "pointer",
                   color: "#94A3B8",
-                  padding: "0.2rem",
+                  padding: "0.25rem",
                   fontSize: "0.875rem",
                   display: "flex",
                   alignItems: "center",
@@ -161,20 +205,25 @@ export function ProjectCard({ project }: { project: ProjectRecord }) {
                 href={`/dashboard/project/${project._id}`}
                 style={{
                   fontSize: "0.8125rem",
-                  fontWeight: 600,
-                  color: "#315CEB",
+                  fontWeight: 700,
+                  color: project.status === "ready" ? "#059669" : "#315CEB",
+                  background: project.status === "ready" ? "#ECFDF5" : "#EEF2FF",
+                  padding: "0.35rem 0.75rem",
+                  borderRadius: "6px",
                   textDecoration: "none",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.25rem",
+                  gap: "0.35rem",
+                  transition: "all 0.15s ease",
                 }}
               >
-                Open Studio ↗
+                <span>{project.status === "ready" ? "▶ Watch Reel" : "Studio"}</span>
+                <span style={{ fontSize: "0.9rem" }}>→</span>
               </Link>
             </>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#DC2626", fontWeight: 600 }}>
+              <span style={{ fontSize: "0.75rem", color: "#DC2626", fontWeight: 700 }}>
                 Delete?
               </span>
               <button
@@ -188,18 +237,18 @@ export function ProjectCard({ project }: { project: ProjectRecord }) {
                   borderRadius: "4px",
                   padding: "0.25rem 0.5rem",
                   fontSize: "0.75rem",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: deleting ? "not-allowed" : "pointer",
                 }}
               >
-                {deleting ? "..." : "Yes, Delete"}
+                {deleting ? "..." : "Yes"}
               </button>
               <button
                 type="button"
                 disabled={deleting}
                 onClick={() => setConfirming(false)}
                 style={{
-                  background: "#F3F4F6",
+                  background: "#F1F5F9",
                   color: "#64748B",
                   border: "none",
                   borderRadius: "4px",
@@ -209,7 +258,7 @@ export function ProjectCard({ project }: { project: ProjectRecord }) {
                   cursor: "pointer",
                 }}
               >
-                Cancel
+                No
               </button>
             </div>
           )}

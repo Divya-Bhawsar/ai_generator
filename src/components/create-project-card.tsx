@@ -3,11 +3,58 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const QUICK_TOPICS = [
-  "Why does a pressure cooker cook rajma and chana faster?",
-  "How does binary search find a target number in milliseconds?",
-  "How do commercial airplanes fly upside down?",
-  "Why do we procrastinate and how does the brain choose distractions?",
+interface CategoryPrompts {
+  id: string;
+  name: string;
+  icon: string;
+  prompts: string[];
+}
+
+const TOPIC_CATEGORIES: CategoryPrompts[] = [
+  {
+    id: "trending",
+    name: "Trending & Everyday",
+    icon: "🔥",
+    prompts: [
+      "Why do onions make your eyes cry and how does chemistry trigger it?",
+      "How do active noise-cancelling headphones cancel sound waves?",
+      "Why does salt melt ice on cold winter roads?",
+      "Why do we procrastinate and how does dopamine hijack our focus?",
+    ],
+  },
+  {
+    id: "tech",
+    name: "Coding & Systems",
+    icon: "💻",
+    prompts: [
+      "How does a Binary Search Tree search millions in O(log N)?",
+      "How does Git actually store commits, trees, and blobs on disk?",
+      "How does Redis achieve sub-millisecond in-memory speeds?",
+      "How does HTTPS public-key encryption prevent eavesdropping?",
+    ],
+  },
+  {
+    id: "cooking",
+    name: "Kitchen Chemistry",
+    icon: "🍳",
+    prompts: [
+      "Why does a pressure cooker cook rajma 70% faster?",
+      "The exact food science behind making soft melting Besan Ladoos",
+      "Why does sourdough bread rise and bubble with wild yeast?",
+      "Why does browning butter (Maillard reaction) create nutty flavor?",
+    ],
+  },
+  {
+    id: "science",
+    name: "Biology & Physics",
+    icon: "🔬",
+    prompts: [
+      "How do vaccines train your immune cells to recognize viruses?",
+      "Why do tree leaves change from green to vibrant autumn gold?",
+      "How do commercial airplanes fly upside down without falling?",
+      "What actually happens inside quantum entanglement across space?",
+    ],
+  },
 ];
 
 const TARGET_AUDIENCES = [
@@ -15,25 +62,37 @@ const TARGET_AUDIENCES = [
     id: "general",
     label: "Curious Public",
     icon: "🌟",
-    desc: "Viral reel, relatable analogies & everyday puzzles",
+    badge: "VIRAL REEL",
+    desc: "Snappy analogies, relatable hooks & zero academic fluff",
+    color: "#315CEB",
+    bg: "#EEF2FF",
   },
   {
     id: "students",
     label: "Students & Exams",
     icon: "🎓",
-    desc: "Step-by-step logic, worked numerical examples & diagrams",
+    badge: "WORKED EXAMPLES",
+    desc: "Clear step-by-step logic, concrete numbers & visual diagrams",
+    color: "#059669",
+    bg: "#ECFDF5",
   },
   {
     id: "beginners",
     label: "Kids & Beginners",
     icon: "🧒",
-    desc: "Playful metaphors, super simple words & fun visuals",
+    badge: "PLAYFUL & SIMPLE",
+    desc: "Fun cartoon metaphors, simple vocabulary & bright visuals",
+    color: "#D97706",
+    bg: "#FFFBEB",
   },
   {
     id: "professionals",
     label: "Developers & Pros",
     icon: "💼",
-    desc: "Fast-paced, technical depth & real metrics",
+    badge: "PRODUCTION GRADE",
+    desc: "Fast-paced, mathematical depth & real system trade-offs",
+    color: "#7C3AED",
+    bg: "#F5F3FF",
   },
 ];
 
@@ -41,25 +100,32 @@ export function CreateProjectCard() {
   const router = useRouter();
   const [topic, setTopic] = useState("");
   const [audience, setAudience] = useState("general");
+  const [selectedCat, setSelectedCat] = useState("trending");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const activeCategory = TOPIC_CATEGORIES.find((c) => c.id === selectedCat) || TOPIC_CATEGORIES[0];
+
   async function handleCreate(topicToUse?: string) {
     const finalTopic = topicToUse || topic;
     if (!finalTopic.trim()) {
-      setError("Please enter an educational topic or pick a suggestion below.");
+      setError("Please enter a concept or choose one of the suggestions below.");
       return;
     }
 
     setError(null);
     setLoading(true);
-    setLoadingStep("1. Initializing project draft...");
+    setLoadingStep("Analyzing pedagogical structure & concrete example...");
 
     try {
       setTimeout(() => {
-        setLoadingStep(`2. Synthesizing realistic script for ${TARGET_AUDIENCES.find(a => a.id === audience)?.label || "your audience"}...`);
-      }, 900);
+        setLoadingStep("Generating custom SVG motion-graphics blueprints...");
+      }, 1200);
+
+      setTimeout(() => {
+        setLoadingStep("Synthesizing speech timestamps & scene layout...");
+      }, 2600);
 
       const res = await fetch("/api/projects", {
         method: "POST",
@@ -76,7 +142,7 @@ export function CreateProjectCard() {
         throw new Error(data.error || "Failed to create project");
       }
 
-      setLoadingStep("3. Storyboard ready! Opening studio...");
+      setLoadingStep("Opening Studio with AI Storyboard!");
       router.push(`/dashboard/project/${data.project._id}`);
       router.refresh();
     } catch (err: unknown) {
@@ -88,48 +154,71 @@ export function CreateProjectCard() {
 
   return (
     <div
+      className="interactive-card"
       style={{
         background: "#FFFFFF",
         border: "1px solid #E8E5DF",
-        borderRadius: "12px",
-        padding: "1.75rem",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
+        borderRadius: "16px",
+        padding: "2rem",
+        boxShadow: "0 10px 30px -10px rgba(0,0,0,0.06), 0 2px 8px -2px rgba(0,0,0,0.03)",
         display: "flex",
         flexDirection: "column",
-        gap: "1.25rem",
+        gap: "1.5rem",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Decorative top accent line */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "4px",
+          background: "linear-gradient(90deg, #315CEB 0%, #06B6D4 50%, #E9AE45 100%)",
+        }}
+      />
+
+      {/* Header */}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "#315CEB",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+              }}
+            >
+              <span>✨</span> AI VIDEO CREATOR STUDIO
+            </span>
+          </div>
           <span
             style={{
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              color: "#315CEB",
-            }}
-          >
-            START A NEW EXPLAINER
-          </span>
-          <span
-            style={{
-              fontSize: "0.7rem",
+              fontSize: "0.72rem",
               background: "#EEF2FF",
               color: "#315CEB",
-              padding: "0.15rem 0.5rem",
-              borderRadius: "4px",
-              fontWeight: 600,
+              border: "1px solid #C7D2FE",
+              padding: "0.2rem 0.65rem",
+              borderRadius: "20px",
+              fontWeight: 700,
             }}
           >
-            Audience Tailored (60–90s)
+            ● 1080x1920 Vertical Reel
           </span>
         </div>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#17191F", margin: 0 }}>
+
+        <h2 style={{ fontSize: "1.375rem", fontWeight: 800, color: "#17191F", margin: 0, letterSpacing: "-0.02em" }}>
           What concept do you want to explain?
         </h2>
-        <p style={{ fontSize: "0.875rem", color: "#666B73", margin: "0.25rem 0 0" }}>
-          Type any scientific concept, algorithm, history question, or everyday curiosity.
+        <p style={{ fontSize: "0.875rem", color: "#666B73", margin: "0.35rem 0 0", lineHeight: 1.5 }}>
+          Type any scientific puzzle, coding logic, recipe, or everyday curiosity. VidyaMotion creates voice-synced diagrams and custom illustrations.
         </p>
       </div>
 
@@ -137,38 +226,46 @@ export function CreateProjectCard() {
         <div
           role="alert"
           style={{
-            padding: "0.75rem 1rem",
-            background: "#FEE2E2",
+            padding: "0.85rem 1.15rem",
+            background: "#FEF2F2",
             color: "#991B1B",
-            borderRadius: "6px",
+            borderRadius: "8px",
             fontSize: "0.875rem",
             border: "1px solid #FCA5A5",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
           }}
         >
-          {error}
+          <span>⚠️</span>
+          <span>{error}</span>
         </div>
       )}
 
       {/* Target Audience Selector */}
       <div>
-        <span
-          style={{
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            color: "#666B73",
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-            display: "block",
-            marginBottom: "0.5rem",
-          }}
-        >
-          🎯 WHO IS YOUR TARGET AUDIENCE?
-        </span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.6rem" }}>
+          <span
+            style={{
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              color: "#666B73",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+            }}
+          >
+            🎯 1. CHOOSE AUDIENCE TONE
+          </span>
+          <span style={{ fontSize: "0.72rem", color: "#94A3B8" }}>
+            Adapts vocabulary, analogies, and pacing
+          </span>
+        </div>
+
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "0.6rem",
+            gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+            gap: "0.75rem",
           }}
         >
           {TARGET_AUDIENCES.map((a) => {
@@ -184,31 +281,46 @@ export function CreateProjectCard() {
                   flexDirection: "column",
                   alignItems: "flex-start",
                   textAlign: "left",
-                  padding: "0.65rem 0.85rem",
-                  borderRadius: "8px",
-                  border: isSelected ? "2px solid #315CEB" : "1px solid #E8E5DF",
-                  background: isSelected ? "#EEF2FF" : "#FAF9F6",
+                  padding: "0.85rem 1rem",
+                  borderRadius: "10px",
+                  border: isSelected ? `2px solid ${a.color}` : "1px solid #E8E5DF",
+                  background: isSelected ? a.bg : "#FAF9F6",
                   cursor: loading ? "not-allowed" : "pointer",
-                  transition: "all 0.15s ease",
+                  transition: "all 0.18s ease",
+                  boxShadow: isSelected ? "0 4px 12px rgba(49, 92, 235, 0.12)" : "none",
+                  transform: isSelected ? "translateY(-1px)" : "none",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.15rem" }}>
-                  <span>{a.icon}</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "0.3rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <span style={{ fontSize: "1.1rem" }}>{a.icon}</span>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 700,
+                        color: isSelected ? a.color : "#17191F",
+                      }}
+                    >
+                      {a.label}
+                    </span>
+                  </div>
                   <span
                     style={{
-                      fontSize: "0.8125rem",
-                      fontWeight: 700,
-                      color: isSelected ? "#315CEB" : "#17191F",
+                      fontSize: "0.65rem",
+                      fontWeight: 800,
+                      color: a.color,
+                      letterSpacing: "0.04em",
+                      opacity: 0.9,
                     }}
                   >
-                    {a.label}
+                    {a.badge}
                   </span>
                 </div>
                 <span
                   style={{
-                    fontSize: "0.72rem",
-                    color: isSelected ? "#2548B8" : "#64748B",
-                    lineHeight: "1.25",
+                    fontSize: "0.75rem",
+                    color: isSelected ? "#1E293B" : "#64748B",
+                    lineHeight: "1.35",
                   }}
                 >
                   {a.desc}
@@ -219,113 +331,214 @@ export function CreateProjectCard() {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-        <input
-          type="text"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="e.g. Why does salt melt ice on winter roads?"
-          disabled={loading}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleCreate();
-            }
-          }}
+      {/* Main Topic Input & Generation Button */}
+      <div>
+        <span
           style={{
-            flex: 1,
-            minWidth: "280px",
-            padding: "0.75rem 1rem",
-            borderRadius: "8px",
-            border: "1px solid #E8E5DF",
-            background: "#FAF9F6",
-            fontSize: "0.9375rem",
-            color: "#17191F",
-            outline: "none",
-          }}
-        />
-        <button
-          onClick={() => handleCreate()}
-          disabled={loading}
-          className="button"
-          style={{
-            padding: "0.75rem 1.5rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.8 : 1,
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            color: "#666B73",
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            display: "block",
+            marginBottom: "0.6rem",
           }}
         >
-          {loading ? (
-            <>
-              <span
-                className="spinner"
+          💡 2. ENTER TOPIC OR QUESTION
+        </span>
+
+        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+          <div style={{ position: "relative", flex: 1, minWidth: "280px" }}>
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="e.g. How the binary search tree works..."
+              disabled={loading}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleCreate();
+                }
+              }}
+              style={{
+                width: "100%",
+                padding: "0.875rem 2.5rem 0.875rem 1.15rem",
+                borderRadius: "10px",
+                border: "1.5px solid #D1D5DB",
+                background: "#FFFFFF",
+                fontSize: "0.9375rem",
+                color: "#17191F",
+                outline: "none",
+                transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+                boxSizing: "border-box",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#315CEB";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(49, 92, 235, 0.15)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#D1D5DB";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+            {topic.length > 0 && !loading && (
+              <button
+                type="button"
+                onClick={() => setTopic("")}
                 style={{
-                  display: "inline-block",
-                  width: 14,
-                  height: 14,
-                  border: "2px solid #fff",
-                  borderTopColor: "transparent",
-                  borderRadius: "50%",
-                  animation: "spin 0.8s linear infinite",
+                  position: "absolute",
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "transparent",
+                  border: "none",
+                  color: "#94A3B8",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  padding: "4px",
                 }}
-              />
-              <span>Generating...</span>
-            </>
-          ) : (
-            <>
-              <span>Generate Storyboard</span>
-              <span aria-hidden="true">→</span>
-            </>
-          )}
-        </button>
+                title="Clear input"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={() => handleCreate()}
+            disabled={loading}
+            style={{
+              padding: "0.875rem 1.75rem",
+              borderRadius: "10px",
+              border: "none",
+              background: loading
+                ? "#94A3B8"
+                : "linear-gradient(135deg, #315CEB 0%, #2548B8 100%)",
+              color: "#FFFFFF",
+              fontSize: "0.9375rem",
+              fontWeight: 700,
+              cursor: loading ? "not-allowed" : "pointer",
+              boxShadow: "0 4px 14px rgba(49, 92, 235, 0.25)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.6rem",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+            }}
+            onMouseOver={(e) => {
+              if (!loading) e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseOut={(e) => {
+              if (!loading) e.currentTarget.style.transform = "none";
+            }}
+          >
+            {loading ? (
+              <>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 16,
+                    height: 16,
+                    border: "2px solid #FFFFFF",
+                    borderTopColor: "transparent",
+                    borderRadius: "50%",
+                    animation: "spin 0.75s linear infinite",
+                  }}
+                />
+                <span>Generating Explainer...</span>
+              </>
+            ) : (
+              <>
+                <span>Generate Video Storyboard</span>
+                <span aria-hidden="true" style={{ fontSize: "1.1rem" }}>→</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
+      {/* Loading Progress State */}
       {loading && (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#315CEB", fontSize: "0.8125rem", fontWeight: 500 }}>
-          <span>⚙️</span>
-          <span>{loadingStep}</span>
+        <div
+          style={{
+            background: "#F0FDF4",
+            border: "1px solid #86EFAC",
+            borderRadius: "10px",
+            padding: "0.85rem 1.25rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            color: "#166534",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+          }}
+        >
+          <span style={{ fontSize: "1.2rem", animation: "spin 1.5s linear infinite", display: "inline-block" }}>
+            ⚙️
+          </span>
+          <div style={{ flex: 1 }}>
+            <div>{loadingStep}</div>
+            <div style={{ fontSize: "0.75rem", color: "#15803D", fontWeight: 500, marginTop: "2px" }}>
+              Tailoring technical diagrams, timing cues, and speech pacing.
+            </div>
+          </div>
         </div>
       )}
 
+      {/* Topic Suggestions by Category */}
       <div>
-        <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#666B73", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-          ✨ OR PICK A POPULAR TOPIC:
-        </span>
-        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
-          {QUICK_TOPICS.map((t) => (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.6rem" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#666B73", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            ✨ 3. OR GET INSPIRED BY TOPIC:
+          </span>
+
+          {/* Category Tabs */}
+          <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
+            {TOPIC_CATEGORIES.map((cat) => {
+              const isSelected = selectedCat === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCat(cat.id)}
+                  style={{
+                    background: isSelected ? "#315CEB" : "#F1F5F9",
+                    color: isSelected ? "#FFFFFF" : "#475569",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "0.25rem 0.6rem",
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Category Prompts */}
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {activeCategory.prompts.map((pText) => (
             <button
-              key={t}
+              key={pText}
               type="button"
               disabled={loading}
               onClick={() => {
-                setTopic(t);
-                handleCreate(t);
+                setTopic(pText);
+                handleCreate(pText);
               }}
-              style={{
-                background: "#FAF9F6",
-                border: "1px solid #E8E5DF",
-                borderRadius: "20px",
-                padding: "0.4rem 0.85rem",
-                fontSize: "0.8125rem",
-                color: "#17191F",
-                cursor: loading ? "not-allowed" : "pointer",
-                textAlign: "left",
-                transition: "all 0.15s ease",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = "#315CEB";
-                e.currentTarget.style.color = "#315CEB";
-                e.currentTarget.style.background = "#EEF2FF";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.borderColor = "#E8E5DF";
-                e.currentTarget.style.color = "#17191F";
-                e.currentTarget.style.background = "#FAF9F6";
-              }}
+              className="chip-button"
             >
-              {t} ↗
+              <span>{pText}</span>
+              <span style={{ color: "#315CEB" }}>↗</span>
             </button>
           ))}
         </div>

@@ -912,3 +912,66 @@ PEDAGOGICAL DIRECTIVES:
     scenes: currentScenes,
   };
 }
+
+export async function generateSceneVisualAI(
+  topic: string,
+  sceneTitle: string,
+  sceneNarration: string,
+  userHint?: string
+): Promise<{ svgCode: string; headline: string; badge: string }> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const prompt = `You are an elite SVG vector diagram illustrator for educational explainers.
+TOPIC: "${topic}"
+SCENE TITLE: "${sceneTitle}"
+SCENE NARRATION: "${sceneNarration}"
+${userHint ? `USER CUSTOM DIRECTION: "${userHint}"` : ""}
+
+DIRECTIVE:
+Generate a clean, high-impact SVG vector illustration with viewBox="0 0 400 300" that visually illustrates the concrete objects or mechanism of this specific scene.
+- For food/cooking: Draw the actual pan/utensils, ingredients, golden foods, heating steam.
+- For data structures: Draw actual tree nodes, connected branch lines, comparison indicators.
+- For science/nature/biology: Draw the cells, molecules, organs, physical forces.
+- Use clean modern colors: #168779 (teal), #e9a64d (gold/orange), #153c3a (dark ink), #ffffff, #619ab4 (soft blue).
+- Return ONLY valid SVG code starting with <svg viewBox="0 0 400 300"> and ending with </svg>. Do not include markdown codeblocks or extra text.`;
+
+  const preferredModel = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+  const models = [preferredModel, ...CANDIDATE_MODELS.filter((m) => m !== preferredModel)];
+
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+        signal: AbortSignal.timeout(18000),
+      });
+
+      const data = await res.json();
+      if (!res.ok) continue;
+
+      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+      const match = raw.match(/<svg[\s\S]*<\/svg>/i);
+      if (match) {
+        return {
+          svgCode: match[0],
+          headline: sceneTitle,
+          badge: "DYNAMIC VISUAL",
+        };
+      }
+    } catch {
+      // try next model
+    }
+  }
+
+  // Graceful fallback SVG
+  return {
+    svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="200" cy="135" r="48" fill="#168779"/><text x="200" y="143" fill="#fff" font-size="24" font-weight="700" text-anchor="middle">✨</text><text x="200" y="235" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">${sceneTitle.slice(0, 24)}</text></svg>`,
+    headline: sceneTitle,
+    badge: "DYNAMIC VISUAL",
+  };
+}
