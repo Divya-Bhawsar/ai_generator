@@ -7,6 +7,31 @@ import { syntheticAlignment, type SpeechResult } from "./timing";
 
 const execFileAsync = promisify(execFile);
 
+let cachedPythonBin: string | null = null;
+
+export function getPythonBinary(): string {
+  if (cachedPythonBin) return cachedPythonBin;
+
+  const candidates = [
+    "/usr/local/bin/python3",
+    "/opt/homebrew/bin/python3",
+    "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+    "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+    "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+    "python3",
+  ];
+
+  for (const p of candidates) {
+    if (p.startsWith("/") && fs.existsSync(p)) {
+      cachedPythonBin = p;
+      return p;
+    }
+  }
+
+  cachedPythonBin = "python3";
+  return cachedPythonBin;
+}
+
 export async function probeDuration(filePath: string): Promise<number> {
   try {
     const { stdout } = await execFileAsync("ffprobe", [
@@ -41,8 +66,34 @@ export async function synthesizeSceneAudio({
 }): Promise<SpeechResult> {
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
 
-  // 1. Try ElevenLabs API with timestamps (if key is provided)
-  if (apiKey && voiceId && !["neerja", "prabhat", "christopher", "jenny", "viraj", "monica"].includes(voiceId.toLowerCase())) {
+  const normalizedVoiceId = (voiceId || "").toLowerCase();
+  const normalizedVoiceName = (voiceName || "").toLowerCase();
+
+  // Edge-TTS Neural Voice Map (100% Free, Studio-Grade Neural Clarity)
+  const EDGE_VOICE_MAP: Record<string, string> = {
+    madhur: "hi-IN-MadhurNeural",
+    swara: "hi-IN-SwaraNeural",
+    neerja: "en-IN-NeerjaNeural",
+    prabhat: "en-IN-PrabhatNeural",
+    viraj: "en-IN-PrabhatNeural",
+    monica: "en-IN-NeerjaNeural",
+    christopher: "en-US-ChristopherNeural",
+    guy: "en-US-GuyNeural",
+    jenny: "en-US-JennyNeural",
+    aria: "en-US-AriaNeural",
+    ryan: "en-GB-RyanNeural",
+    sonia: "en-GB-SoniaNeural",
+  };
+
+  const isEdgeVoice =
+    Boolean(EDGE_VOICE_MAP[normalizedVoiceId]) ||
+    Boolean(EDGE_VOICE_MAP[normalizedVoiceName]) ||
+    /madhur|swara|neerja|prabhat|christopher|jenny|viraj|monica|guy|aria|ryan|sonia/i.test(
+      `${voiceId} ${voiceName}`
+    );
+
+  // 1. Try ElevenLabs API ONLY if an explicit custom 20+ char ElevenLabs ID is provided (NOT our Edge voices)
+  if (apiKey && !isEdgeVoice && voiceId && voiceId.length > 15) {
     try {
       const url = `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
         voiceId
@@ -60,7 +111,7 @@ export async function synthesizeSceneAudio({
           model_id: "eleven_multilingual_v2",
           voice_settings: { stability: 0.5, similarity_boost: 0.75 },
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(12000),
       });
 
       if (res.ok) {
@@ -85,37 +136,29 @@ export async function synthesizeSceneAudio({
     }
   }
 
-  // 2. Microsoft Edge Neural Voice Engine (100% Free, Studio-Grade Clarity, Zero API Keys)
-  const EDGE_VOICE_MAP: Record<string, string> = {
-    neerja: "en-IN-NeerjaNeural",
-    monica: "en-IN-NeerjaNeural",
-    prabhat: "en-IN-PrabhatNeural",
-    viraj: "en-IN-PrabhatNeural",
-    madhur: "hi-IN-MadhurNeural",
-    swara: "hi-IN-SwaraNeural",
-    christopher: "en-US-ChristopherNeural",
-    guy: "en-US-GuyNeural",
-    jenny: "en-US-JennyNeural",
-    aria: "en-US-AriaNeural",
-    ryan: "en-GB-RyanNeural",
-    sonia: "en-GB-SoniaNeural",
-  };
-
+  // 2. Microsoft Edge Neural Voice Engine (Studio-Grade Distinct Personalities)
   const selectedEdgeVoice =
-    EDGE_VOICE_MAP[voiceName.toLowerCase()] ||
-    EDGE_VOICE_MAP[voiceId.toLowerCase()] ||
-    (/swara/i.test(voiceName)
+    EDGE_VOICE_MAP[normalizedVoiceName] ||
+    EDGE_VOICE_MAP[normalizedVoiceId] ||
+    (/swara/i.test(`${voiceId} ${voiceName}`)
       ? "hi-IN-SwaraNeural"
-      : /madhur/i.test(voiceName)
+      : /madhur/i.test(`${voiceId} ${voiceName}`)
       ? "hi-IN-MadhurNeural"
-      : /female|monica|neerja|jenny|aria|tara/i.test(voiceName)
+      : /christopher|male.*us/i.test(`${voiceId} ${voiceName}`)
+      ? "en-US-ChristopherNeural"
+      : /jenny|female.*us/i.test(`${voiceId} ${voiceName}`)
+      ? "en-US-JennyNeural"
+      : /neerja|monica|female/i.test(`${voiceId} ${voiceName}`)
       ? "en-IN-NeerjaNeural"
       : "en-IN-PrabhatNeural");
 
+  const pythonBin = getPythonBinary();
+
   try {
-    await execFileAsync("python3", [
+    await execFileAsync(pythonBin, [
       "-m",
       "edge_tts",
+      "--no-progress",
       "--voice",
       selectedEdgeVoice,
       "--text",
@@ -134,11 +177,38 @@ export async function synthesizeSceneAudio({
       };
     }
   } catch (err) {
-    console.warn("Edge Neural TTS failed, trying macOS say fallback:", err);
+    console.warn(`Edge Neural TTS (${selectedEdgeVoice}) failed with ${pythonBin}, trying macOS voice fallback:`, err);
   }
 
-  // 3. macOS System Voice Fallback (if edge-tts is unavailable)
-  const sysVoice = /monica|neerja|female/i.test(voiceName) ? "Tara" : "Aman";
+  // 3. macOS Distinct Voice Fallback (if edge-tts is temporarily offline)
+  const MACOS_VOICE_MAP: Record<string, string> = {
+    madhur: "Rishi",
+    prabhat: "Aman",
+    viraj: "Aman",
+    swara: "Lekha",
+    neerja: "Tara",
+    monica: "Tara",
+    christopher: "Alex",
+    jenny: "Samantha",
+    aria: "Samantha",
+    guy: "Alex",
+  };
+
+  const sysVoice =
+    MACOS_VOICE_MAP[normalizedVoiceName] ||
+    MACOS_VOICE_MAP[normalizedVoiceId] ||
+    (/swara/i.test(`${voiceId} ${voiceName}`)
+      ? "Lekha"
+      : /madhur/i.test(`${voiceId} ${voiceName}`)
+      ? "Rishi"
+      : /christopher/i.test(`${voiceId} ${voiceName}`)
+      ? "Alex"
+      : /jenny/i.test(`${voiceId} ${voiceName}`)
+      ? "Samantha"
+      : /neerja|monica|female/i.test(`${voiceId} ${voiceName}`)
+      ? "Tara"
+      : "Aman");
+
   const tempAiff = destPath.replace(/\.mp3$/, ".aiff");
 
   try {
@@ -169,7 +239,7 @@ export async function synthesizeSceneAudio({
     console.warn("System TTS failed, using audio tone generator fallback:", err);
   }
 
-  // 3. Fallback: silent audio generator
+  // 4. Fallback: silent audio generator
   const estDuration = Math.max(5.0, text.split(/\s+/).length / 2.5);
   await execFileAsync("ffmpeg", [
     "-y",

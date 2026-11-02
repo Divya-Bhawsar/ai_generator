@@ -1,11 +1,15 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
+import { execFile } from "child_process";
+import { promisify } from "util";
 import { bundle } from "@remotion/bundler";
-import { selectComposition, renderMedia, renderStill } from "@remotion/renderer";
+import { selectComposition, renderMedia } from "@remotion/renderer";
 import { synthesizeSceneAudio } from "./tts";
 import { compileTimeline, type SpeechResult } from "./timing";
 import type { Timeline } from "./remotion/contracts";
 
+const execFileAsync = promisify(execFile);
 const CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 export interface RenderJobParams {
@@ -80,41 +84,40 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       stage: `Synthesizing neural voiceover (${voiceName})...`,
     });
 
-    // 1. Synthesize Audio for each scene
+    // 1. Synthesize Audio for each scene in parallel
     const speechMap: Record<string, SpeechResult> = {};
     const rawScenes = storyboard.scenes || [];
-    const totalScenes = Math.max(1, rawScenes.length);
 
-    for (let i = 0; i < rawScenes.length; i++) {
-      const scene = rawScenes[i];
-      const sceneId = scene.id || scene.sceneId || `scene-${i + 1}`;
-      const destAudio = path.join(audioDir, `${sceneId}.mp3`);
+    updateRenderStatus(statusFilePath, {
+      status: "rendering",
+      progress: 10,
+      stage: `Synthesizing neural voiceover in parallel (${voiceName})...`,
+    });
 
-      const progress = Math.round(10 + (i / totalScenes) * 35);
-      updateRenderStatus(statusFilePath, {
-        status: "rendering",
-        progress,
-        stage: `Synthesizing voice for Scene ${i + 1} of ${totalScenes}...`,
-      });
+    const speechResults = await Promise.all(
+      rawScenes.map(async (scene, i) => {
+        const sceneId = scene.id || scene.sceneId || `scene-${i + 1}`;
+        const destAudio = path.join(audioDir, `${sceneId}.mp3`);
+        const speech = await synthesizeSceneAudio({
+          text: scene.narration,
+          voiceId,
+          voiceName,
+          destPath: destAudio,
+          apiKey,
+        });
+        speech.audioFile = `renders/${projectId}/audio/${sceneId}.mp3`;
+        return { sceneId, speech };
+      })
+    );
 
-      const speech = await synthesizeSceneAudio({
-        text: scene.narration,
-        voiceId,
-        voiceName,
-        destPath: destAudio,
-        apiKey,
-      });
-
-      // Remotion staticFile resolves paths relative to the publicDir
-      speech.audioFile = `renders/${projectId}/audio/${sceneId}.mp3`;
-
+    for (const { sceneId, speech } of speechResults) {
       speechMap[sceneId] = speech;
     }
 
     // 2. Compile Timeline with precise cue frames
     updateRenderStatus(statusFilePath, {
       status: "rendering",
-      progress: 48,
+      progress: 30,
       stage: "Compiling kinetic timeline and audio cues...",
     });
 
@@ -133,7 +136,7 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     // 3. Bundle Remotion Composition
     updateRenderStatus(statusFilePath, {
       status: "rendering",
-      progress: 55,
+      progress: 38,
       stage: "Bundling React motion graphics engine...",
     });
 
@@ -153,35 +156,14 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       browserExecutable,
     });
 
-    // 4. Render Preview Stills for Storyboard Studio
+    // 4. Render Final MP4 Media with Multi-Core Concurrency
+    const cpuCores = os.cpus()?.length || 4;
+    const renderConcurrency = Math.min(8, Math.max(4, cpuCores - 1));
+
     updateRenderStatus(statusFilePath, {
       status: "rendering",
-      progress: 62,
-      stage: "Generating high-resolution scene previews...",
-    });
-
-    for (let i = 0; i < timeline.scenes.length; i++) {
-      const s = timeline.scenes[i];
-      const targetFrame = s.start + Math.min(s.frames - 2, Math.max(10, s.cueFrame + 15));
-      try {
-        await renderStill({
-          serveUrl,
-          composition,
-          inputProps,
-          browserExecutable,
-          frame: targetFrame,
-          output: path.join(previewDir, `${s.id}.png`),
-        });
-      } catch (stillErr) {
-        console.warn(`Could not render preview still for ${s.id}:`, stillErr);
-      }
-    }
-
-    // 5. Render Final MP4 Media
-    updateRenderStatus(statusFilePath, {
-      status: "rendering",
-      progress: 68,
-      stage: "Rendering 1080x1920 30fps MP4 video...",
+      progress: 45,
+      stage: `Rendering 1080x1920 30fps MP4 video on ${renderConcurrency} CPU cores...`,
     });
 
     const tempPartialMp4 = path.join(projectDir, "output.partial.mp4");
@@ -193,11 +175,12 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       browserExecutable,
       codec: "h264",
       audioCodec: "aac",
+      pixelFormat: "yuv420p",
       outputLocation: tempPartialMp4,
-      concurrency: 2,
+      concurrency: renderConcurrency,
       crf: 22,
       onProgress: ({ progress }) => {
-        const renderProgress = Math.round(68 + progress * 28);
+        const renderProgress = Math.round(45 + progress * 50);
         updateRenderStatus(statusFilePath, {
           status: "rendering",
           progress: renderProgress,
@@ -210,6 +193,37 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     if (fs.existsSync(tempPartialMp4)) {
       fs.renameSync(tempPartialMp4, outputMp4Path);
     }
+
+    // 5. Fast Scene Preview Stills Extraction via ffmpeg
+    updateRenderStatus(statusFilePath, {
+      status: "rendering",
+      progress: 96,
+      stage: "Extracting high-resolution scene thumbnails...",
+    });
+
+    await Promise.all(
+      timeline.scenes.map(async (s) => {
+        const targetFrame = s.start + Math.min(s.frames - 2, Math.max(10, s.cueFrame + 15));
+        const timeSeconds = (targetFrame / 30).toFixed(2);
+        const destPng = path.join(previewDir, `${s.id}.png`);
+        try {
+          await execFileAsync("ffmpeg", [
+            "-y",
+            "-ss",
+            timeSeconds,
+            "-i",
+            outputMp4Path,
+            "-frames:v",
+            "1",
+            "-q:v",
+            "2",
+            destPng,
+          ]);
+        } catch (stillErr) {
+          console.warn(`Could not extract preview still for ${s.id}:`, stillErr);
+        }
+      })
+    );
 
     const durationSeconds = timeline.frames / 30;
     const publicUrl = `/videos/${projectId}.mp4`;
