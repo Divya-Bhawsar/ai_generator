@@ -6,6 +6,8 @@ import { listProjects } from "@/lib/db/projects";
 import { SignOutButton } from "@/components/sign-out-button";
 import { CreateProjectCard } from "@/components/create-project-card";
 import { DashboardProjectList } from "@/components/dashboard-project-list";
+import { InstagramStoriesTray } from "@/components/instagram-stories-tray";
+import { InstagramBottomNav } from "@/components/instagram-bottom-nav";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -59,16 +61,90 @@ export default async function DashboardPage() {
             <span className="workspace-nav-icon" aria-hidden="true">⌂</span>
             <span>Explainers ({projects.length})</span>
           </div>
+
+          <Link
+            href="/reels"
+            className="workspace-nav-item"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              textDecoration: "none",
+              color: "#DD2A7B",
+              fontWeight: 700,
+            }}
+          >
+            <span className="workspace-nav-icon" aria-hidden="true">🎬</span>
+            <span>Instagram Reels</span>
+          </Link>
+
+          <Link
+            href="/explore"
+            className="workspace-nav-item"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              textDecoration: "none",
+              color: "#315CEB",
+              fontWeight: 600,
+            }}
+          >
+            <span className="workspace-nav-icon" aria-hidden="true">🔍</span>
+            <span>Explore Topics</span>
+          </Link>
+
+          <Link
+            href="/profile"
+            className="workspace-nav-item"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              textDecoration: "none",
+              color: "#64748B",
+              fontWeight: 600,
+            }}
+          >
+            <span className="workspace-nav-icon" aria-hidden="true">👤</span>
+            <span>Creator Profile</span>
+          </Link>
+
           <div className="workspace-rail-note">
             Your ideas and videos are private to your account.
           </div>
         </aside>
 
-        <section className="workspace-main" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          <div className="workspace-welcome">
-            <p className="eyebrow"><span className="eyebrow-dot" /> YOUR CREATOR STUDIO</p>
-            <h1>Welcome back, <span>{session.name || "Creator"}.</span></h1>
-            <p>Transform any educational idea into a voice-synced, motion-animated Instagram Reel.</p>
+        <section className="workspace-main" style={{ display: "flex", flexDirection: "column", gap: "1.75rem", paddingBottom: "5rem" }}>
+          {/* Instagram Stories Tray */}
+          <InstagramStoriesTray />
+
+          <div className="workspace-welcome" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <p className="eyebrow"><span className="eyebrow-dot" /> YOUR CREATOR STUDIO</p>
+              <h1>Welcome back, <span>{session.name || "Creator"}.</span></h1>
+              <p style={{ margin: 0 }}>Transform any educational idea into a voice-synced, motion-animated Instagram Reel.</p>
+            </div>
+
+            <Link
+              href="/reels"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.75rem 1.25rem",
+                borderRadius: "12px",
+                background: "linear-gradient(45deg, #F58529, #DD2A7B, #8134AF)",
+                color: "#FFFFFF",
+                fontWeight: 700,
+                fontSize: "0.875rem",
+                textDecoration: "none",
+                boxShadow: "0 4px 15px rgba(221, 42, 123, 0.35)",
+              }}
+            >
+              <span>🎬</span>
+              <span>Watch Reels Feed →</span>
+            </Link>
           </div>
 
           {/* New Explainer Creator Box */}
@@ -101,6 +177,9 @@ export default async function DashboardPage() {
           </div>
         </section>
       </div>
+
+      {/* Instagram Bottom Navigation Bar */}
+      <InstagramBottomNav />
     </main>
   );
 }

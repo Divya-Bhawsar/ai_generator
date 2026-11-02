@@ -547,3 +547,82 @@ h1 span { color: var(--blue); }
   .workspace-empty-card h2 { font-size: 19px; }
   .workspace-footnote { align-items: flex-start; font-size: 9px; }
 }
+
+/* ==========================================================================
+   Instagram Reels & Mobile Social Styles
+   ========================================================================== */
+
+@keyframes insta-heart-burst {
+  0% {
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  35% {
+    transform: scale(1.35) rotate(0deg);
+    opacity: 1;
+  }
+  65% {
+    transform: scale(1.05) rotate(5deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(0.6) translateY(-50px);
+    opacity: 0;
+  }
+}
+
+@keyframes spin-vinyl {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.audio-marquee {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 14s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
+  }
+}
+
+/* Hide scrollbars for reels snap feed */
+.reel-slide::-webkit-scrollbar,
+div[style*="scroll-snap-type"]::-webkit-scrollbar {
+  display: none !important;
+}

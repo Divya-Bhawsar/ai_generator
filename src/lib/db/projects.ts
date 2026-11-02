@@ -249,6 +249,14 @@ export async function getProjectById(
   return { project, storyboard: latestSb };
 }
 
+export async function getStoryboardByProjectId(
+  ownerId: string,
+  projectId: string
+): Promise<StoryboardRecord | null> {
+  const { storyboard } = await getProjectById(ownerId, projectId);
+  return storyboard;
+}
+
 export async function saveStoryboard(data: {
   projectId: string;
   ownerId: string;
