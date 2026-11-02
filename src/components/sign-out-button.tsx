@@ -12,15 +12,11 @@ export function SignOutButton() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/auth/sign-out", { method: "POST" });
-      if (!res.ok) {
-        throw new Error("Failed to sign out");
-      }
-      router.push("/sign-in");
-      router.refresh();
+      await fetch("/api/auth/sign-out", { method: "POST" });
+      // Hard redirect to /sign-in so that all session cookies and caches are completely cleared
+      window.location.href = "/sign-in";
     } catch {
-      setError("Sign out failed. Try again.");
-      setLoading(false);
+      window.location.href = "/sign-in";
     }
   }
 

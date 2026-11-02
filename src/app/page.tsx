@@ -224,6 +224,7 @@ export default function HomePage() {
 
       {/* Navigation Header */}
       <header
+        className="landing-header"
         style={{
           position: "sticky",
           top: 0,
@@ -232,7 +233,7 @@ export default function HomePage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 2rem",
+          padding: "0 1.25rem",
           background: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
@@ -398,6 +399,7 @@ export default function HomePage() {
 
           {/* Interactive AI Prompt Box in Hero */}
           <div
+            className="landing-hero-prompt-bar"
             style={{
               maxWidth: "760px",
               margin: "0 auto 2rem",
@@ -587,9 +589,10 @@ export default function HomePage() {
 
             {/* Split Content: Cards on Left, Video Output on Right */}
             <div
+              className="landing-showcase-grid"
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
                 gap: "1.75rem",
                 padding: "1.75rem",
               }}

@@ -69,10 +69,11 @@ export function GammaWorkspaceHeader({
           <span>VidyaMotion</span>
         </Link>
 
-        <span style={{ color: "#CBD5E1", fontSize: "1rem" }}>/</span>
+        <span className="gamma-workspace-pill" style={{ color: "#CBD5E1", fontSize: "1rem" }}>/</span>
 
         {/* Workspace Pill */}
         <div
+          className="gamma-workspace-pill"
           style={{
             display: "flex",
             alignItems: "center",
@@ -105,19 +106,19 @@ export function GammaWorkspaceHeader({
       </div>
 
       {/* Right Actions */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+      <div className="gamma-workspace-header-actions" style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
         {onOpenCreate && (
           <button
             type="button"
             onClick={onOpenCreate}
             className="gamma-gradient-btn"
             style={{
-              padding: "0.5rem 1rem",
+              padding: "0.5rem 0.85rem",
               fontSize: "0.8125rem",
             }}
           >
             <span>✦</span>
-            <span>New Explainer</span>
+            <span>New<span className="gamma-header-new-btn-text"> Explainer</span></span>
           </button>
         )}
 

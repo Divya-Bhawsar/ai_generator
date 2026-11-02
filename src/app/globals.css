@@ -760,3 +760,70 @@ div[style*="scroll-snap-type"]::-webkit-scrollbar {
   border-color: rgba(99, 102, 241, 0.3);
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
 }
+
+/* ========================================================
+   Mobile Responsiveness Enhancements (< 768px & < 640px)
+   ======================================================== */
+@media (max-width: 860px) {
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-header {
+    padding: 0 0.85rem !important;
+  }
+
+  .landing-hero-prompt-bar {
+    flex-wrap: wrap !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+    border-radius: 14px !important;
+  }
+  .landing-hero-prompt-bar input {
+    width: calc(100% - 90px) !important;
+    min-width: 0 !important;
+    font-size: 0.9375rem !important;
+  }
+  .landing-hero-prompt-bar button:last-child {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 0.35rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .gamma-workspace-pill {
+    display: none !important;
+  }
+  .gamma-header-new-btn-text {
+    display: none !important;
+  }
+  .gamma-workspace-header-actions {
+    gap: 0.5rem !important;
+  }
+
+  .gamma-hero-input-row {
+    flex-wrap: wrap !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+    border-radius: 14px !important;
+  }
+  .gamma-hero-input-row input {
+    width: calc(100% - 90px) !important;
+    min-width: 0 !important;
+    font-size: 0.9375rem !important;
+  }
+  .gamma-hero-input-row .gamma-gradient-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 0.35rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .landing-showcase-grid {
+    padding: 1rem !important;
+    gap: 1.25rem !important;
+  }
+}
+

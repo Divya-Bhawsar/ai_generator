@@ -424,6 +424,7 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
       {/* Main Input Card with Relative Dropdown Anchor */}
       <div style={{ position: "relative", marginBottom: "0.85rem" }}>
         <div
+          className="gamma-hero-input-row"
           style={{
             background: "#FFFFFF",
             border: isListening ? "2px solid #EF4444" : isInputFocused ? "2px solid #4F46E5" : "1.5px solid #CBD5E1",
@@ -444,6 +445,7 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
 
           <input
             type="text"
+            className="gamma-hero-input-field"
             value={topic}
             onFocus={() => {
               if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
