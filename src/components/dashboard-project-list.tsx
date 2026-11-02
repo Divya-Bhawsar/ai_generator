@@ -42,7 +42,7 @@ export function DashboardProjectList({ projects }: { projects: ProjectRecord[] }
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))",
           gap: "1rem",
         }}
       >
@@ -229,7 +229,7 @@ export function DashboardProjectList({ projects }: { projects: ProjectRecord[] }
         </div>
 
         {/* Real-time Search Input */}
-        <div style={{ position: "relative", minWidth: "260px" }}>
+        <div style={{ position: "relative", flex: "1 1 240px", minWidth: "min(100%, 240px)" }}>
           <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", fontSize: "0.85rem", color: "#94A3B8" }}>
             🔍
           </span>
@@ -247,6 +247,7 @@ export function DashboardProjectList({ projects }: { projects: ProjectRecord[] }
               fontSize: "0.8125rem",
               color: "#17191F",
               outline: "none",
+              boxSizing: "border-box",
             }}
           />
           {searchQuery && (
@@ -308,7 +309,7 @@ export function DashboardProjectList({ projects }: { projects: ProjectRecord[] }
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
             gap: "1.25rem",
           }}
         >

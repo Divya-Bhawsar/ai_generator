@@ -124,7 +124,26 @@ export default async function ProjectPage({
           </div>
         </aside>
 
-        <section className="workspace-main" style={{ padding: "2rem" }}>
+        <section className="workspace-main">
+          {/* Mobile Stage Quick Navigation (visible only on mobile & tablets <= 800px) */}
+          <nav className="mobile-stage-bar" aria-label="Mobile stage quick navigation">
+            <Link href="/dashboard" className="mobile-stage-pill" style={{ color: "#315CEB", borderColor: "#C7D2FE" }}>
+              ← Projects
+            </Link>
+            <a href="#top" className="mobile-stage-pill">
+              📋 Script
+            </a>
+            <a href="#voice-selection" className="mobile-stage-pill">
+              🎙️ Voice
+            </a>
+            <a href="#voice-selection" className="mobile-stage-pill">
+              🎬 Render
+            </a>
+            <a href="#voice-selection" className="mobile-stage-pill">
+              📱 Share
+            </a>
+          </nav>
+
           <StoryboardStudio initialProject={serializedProject} initialStoryboard={serializedStoryboard} />
         </section>
       </div>

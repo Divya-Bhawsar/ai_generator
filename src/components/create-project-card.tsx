@@ -347,8 +347,8 @@ export function CreateProjectCard() {
           💡 2. ENTER TOPIC OR QUESTION
         </span>
 
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: "280px" }}>
+        <div className="create-project-input-row">
+          <div style={{ position: "relative", flex: 1, minWidth: "min(100%, 260px)" }}>
             <input
               type="text"
               value={topic}

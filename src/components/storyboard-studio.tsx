@@ -462,7 +462,7 @@ export function StoryboardStudio({
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", paddingBottom: "6rem" }}>
       {/* Top Navigation & Status Bar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
-        <div style={{ flex: 1, minWidth: "300px" }}>
+        <div style={{ flex: "1 1 280px", minWidth: "min(100%, 280px)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
             <Link
               href="/dashboard"
@@ -644,7 +644,8 @@ export function StoryboardStudio({
             flexDirection: "column",
             gap: "0.35rem",
             boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-            minWidth: "200px",
+            minWidth: "min(100%, 220px)",
+            flex: "1 1 200px",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -759,15 +760,11 @@ export function StoryboardStudio({
       {/* COMPLETED VIDEO PREVIEW PLAYER (1080x1920) */}
       {videoUrl && (
         <div
+          className="video-player-grid"
           style={{
             background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
             color: "#FFFFFF",
             borderRadius: "16px",
-            padding: "2.25rem",
-            display: "grid",
-            gridTemplateColumns: "320px 1fr",
-            gap: "2.5rem",
-            alignItems: "center",
             boxShadow: "0 20px 45px rgba(15, 23, 42, 0.35)",
             border: "1px solid rgba(255, 255, 255, 0.1)",
           }}
@@ -1068,15 +1065,11 @@ export function StoryboardStudio({
               return (
                 <div
                   key={scene.sceneId || index}
-                  className="interactive-card"
+                  className="interactive-card scene-card-grid"
                   style={{
                     background: "#FFFFFF",
                     border: "1px solid #E2E8F0",
                     borderRadius: "14px",
-                    padding: "1.5rem",
-                    display: "grid",
-                    gridTemplateColumns: "1.1fr 0.9fr",
-                    gap: "1.75rem",
                     boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
                   }}
                 >
@@ -1480,7 +1473,7 @@ export function StoryboardStudio({
             </div>
           </div>
 
-          <form onSubmit={handleApplyRevision} style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+          <form onSubmit={handleApplyRevision} className="revision-form">
             <input
               type="text"
               value={revisionPrompt}
@@ -1571,7 +1564,7 @@ export function StoryboardStudio({
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+          <div className="voice-selection-grid">
             {VOICES.map((v) => {
               const isSelected = selectedVoice.id === v.id;
               const isPlaying = playingVoice === v.name;
@@ -1795,22 +1788,25 @@ export function StoryboardStudio({
             {/* Modal Large Canvas Display */}
             <div
               style={{
-                padding: "2rem",
+                padding: "1.25rem 1rem",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 background: "#080C14",
-                minHeight: "340px",
+                minHeight: "240px",
               }}
             >
               <div
                 style={{
                   width: "100%",
                   maxWidth: "520px",
-                  height: "320px",
+                  height: "auto",
+                  minHeight: "200px",
+                  maxHeight: "55vh",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  overflow: "hidden",
                 }}
                 dangerouslySetInnerHTML={{
                   __html: cleanSvg(inspectedSvg.svgCode),
@@ -1894,7 +1890,7 @@ export function StoryboardStudio({
             className="modal-sheet"
             onClick={(e) => e.stopPropagation()}
             style={{
-              padding: "2rem",
+              padding: "1.5rem",
               maxWidth: "560px",
             }}
           >
