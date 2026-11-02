@@ -89,6 +89,8 @@ export function StoryboardStudio({
   const [scenes, setScenes] = useState<SceneRecord[]>(initialStoryboard?.scenes || []);
   const [revisionPrompt, setRevisionPrompt] = useState("");
   const [revising, setRevising] = useState(false);
+  const [isListeningRevision, setIsListeningRevision] = useState(false);
+  const revisionRecognitionRef = useRef<any>(null);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -431,6 +433,69 @@ export function StoryboardStudio({
       setError(msg);
     } finally {
       setGenerating(false);
+    }
+  }
+
+  function toggleRevisionVoiceInput() {
+    if (isListeningRevision) {
+      if (revisionRecognitionRef.current) {
+        try {
+          revisionRecognitionRef.current.stop();
+        } catch {
+          // ignore
+        }
+      }
+      setIsListeningRevision(false);
+      return;
+    }
+
+    const SpeechRecognitionClass =
+      typeof window !== "undefined" &&
+      ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
+    if (!SpeechRecognitionClass) {
+      setError("Voice input (speech-to-text) is not supported in this browser. Please use Google Chrome, Edge, or Safari.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognitionClass();
+      recognition.lang = "en-IN"; // Native support for Indian English, Hindi & Hinglish
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListeningRevision(true);
+        setError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript) {
+          setRevisionPrompt(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn("Speech recognition error:", event?.error);
+        setIsListeningRevision(false);
+        if (event?.error === "not-allowed") {
+          setError("Microphone permission was denied. Please allow microphone access in your browser address bar.");
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListeningRevision(false);
+      };
+
+      revisionRecognitionRef.current = recognition;
+      recognition.start();
+    } catch (err: unknown) {
+      console.warn("Speech recognition start exception:", err);
+      setIsListeningRevision(false);
     }
   }
 
@@ -1513,23 +1578,78 @@ export function StoryboardStudio({
           </div>
 
           <form onSubmit={handleApplyRevision} className="revision-form">
-            <input
-              type="text"
-              value={revisionPrompt}
-              onChange={(e) => setRevisionPrompt(e.target.value)}
-              placeholder="e.g. 'Make the opening hook more dramatic', 'Explain scene 2 like I am 10 years old', 'Add concrete numbers'..."
-              disabled={revising}
-              style={{
-                flex: 1,
-                padding: "0.85rem 1.15rem",
-                borderRadius: "8px",
-                border: "1px solid #CBD5E1",
-                background: "#FAF9F6",
-                fontSize: "0.9375rem",
-                color: "#17191F",
-                outline: "none",
-              }}
-            />
+            <div style={{ position: "relative", flex: 1, display: "flex", alignItems: "center" }}>
+              <input
+                type="text"
+                value={revisionPrompt}
+                onChange={(e) => setRevisionPrompt(e.target.value)}
+                placeholder={isListeningRevision ? "Listening... Speak your revision instructions now..." : "e.g. 'Make the opening hook more dramatic', 'Explain scene 2 like I am 10 years old', 'Add concrete numbers'..."}
+                disabled={revising}
+                style={{
+                  width: "100%",
+                  padding: "0.85rem 4.5rem 0.85rem 1.15rem",
+                  borderRadius: "8px",
+                  border: isListeningRevision ? "1.5px solid #EF4444" : "1px solid #CBD5E1",
+                  background: isListeningRevision ? "#FFF5F5" : "#FAF9F6",
+                  fontSize: "0.9375rem",
+                  color: "#17191F",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              {/* Revision Microphone Button */}
+              <button
+                type="button"
+                onClick={toggleRevisionVoiceInput}
+                disabled={revising}
+                title={isListeningRevision ? "Stop listening" : "Speak revision with microphone (English / Hinglish)"}
+                style={{
+                  position: "absolute",
+                  right: revisionPrompt.length > 0 ? "34px" : "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: isListeningRevision ? "#EF4444" : "#F1F5F9",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "28px",
+                  height: "28px",
+                  display: "grid",
+                  placeItems: "center",
+                  cursor: revising ? "not-allowed" : "pointer",
+                  color: isListeningRevision ? "#FFFFFF" : "#475569",
+                  fontSize: "0.95rem",
+                  animation: isListeningRevision ? "pulse-subtle 1s infinite" : "none",
+                  transition: "all 0.15s ease",
+                  padding: 0,
+                }}
+              >
+                {isListeningRevision ? "⏹" : "🎙️"}
+              </button>
+
+              {revisionPrompt.length > 0 && !revising && (
+                <button
+                  type="button"
+                  onClick={() => setRevisionPrompt("")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "0.85rem",
+                    color: "#94A3B8",
+                    padding: "4px",
+                    lineHeight: 1,
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={revising || !revisionPrompt.trim()}
@@ -1539,11 +1659,19 @@ export function StoryboardStudio({
                 cursor: revising || !revisionPrompt.trim() ? "not-allowed" : "pointer",
                 opacity: revising || !revisionPrompt.trim() ? 0.7 : 1,
                 fontWeight: 700,
+                whiteSpace: "nowrap",
               }}
             >
               {revising ? "Revising Storyboard..." : "Apply AI Revision →"}
             </button>
           </form>
+
+          {isListeningRevision && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.35rem", fontSize: "0.75rem", color: "#DC2626", fontWeight: 700 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#DC2626", display: "inline-block", animation: "pulse-subtle 1s infinite" }} />
+              <span>Listening... Speak your revision instructions in English or Hinglish!</span>
+            </div>
+          )}
 
           {/* Audience & Style Quick Revision Chips */}
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "1rem", alignItems: "center" }}>

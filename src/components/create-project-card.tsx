@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 interface CategoryPrompts {
@@ -115,8 +115,73 @@ export function CreateProjectCard() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const activeCategory = TOPIC_CATEGORIES.find((c) => c.id === selectedCat) || TOPIC_CATEGORIES[0];
+
+  function toggleVoiceInput() {
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // ignore
+        }
+      }
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognitionClass =
+      typeof window !== "undefined" &&
+      ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
+    if (!SpeechRecognitionClass) {
+      setError("Voice input (speech-to-text) is not supported in this browser. Please use Google Chrome, Edge, or Safari.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognitionClass();
+      recognition.lang = "en-IN"; // Native support for Indian English, Hindi & Hinglish
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript) {
+          setTopic(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn("Speech recognition error:", event?.error);
+        setIsListening(false);
+        if (event?.error === "not-allowed") {
+          setError("Microphone permission was denied. Please allow microphone access in your browser address bar.");
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err: unknown) {
+      console.warn("Speech recognition start exception:", err);
+      setIsListening(false);
+    }
+  }
 
   async function handleCreate(topicToUse?: string) {
     const finalTopic = topicToUse || topic;
@@ -364,7 +429,7 @@ export function CreateProjectCard() {
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="e.g. How the binary search tree works..."
+              placeholder={isListening ? "Listening... Speak your topic now..." : "e.g. How the binary search tree works..."}
               disabled={loading}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -374,10 +439,10 @@ export function CreateProjectCard() {
               }}
               style={{
                 width: "100%",
-                padding: "0.875rem 2.5rem 0.875rem 1.15rem",
+                padding: "0.875rem 4.75rem 0.875rem 1.15rem",
                 borderRadius: "10px",
-                border: "1.5px solid #D1D5DB",
-                background: "#FFFFFF",
+                border: isListening ? "1.5px solid #EF4444" : "1.5px solid #D1D5DB",
+                background: isListening ? "#FFF5F5" : "#FFFFFF",
                 fontSize: "0.9375rem",
                 color: "#17191F",
                 outline: "none",
@@ -385,21 +450,55 @@ export function CreateProjectCard() {
                 boxSizing: "border-box",
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = "#315CEB";
-                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(49, 92, 235, 0.15)";
+                if (!isListening) {
+                  e.currentTarget.style.borderColor = "#315CEB";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(49, 92, 235, 0.15)";
+                }
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = "#D1D5DB";
-                e.currentTarget.style.boxShadow = "none";
+                if (!isListening) {
+                  e.currentTarget.style.borderColor = "#D1D5DB";
+                  e.currentTarget.style.boxShadow = "none";
+                }
               }}
             />
+
+            {/* Mic Dictation Button */}
+            <button
+              type="button"
+              onClick={toggleVoiceInput}
+              disabled={loading}
+              title={isListening ? "Stop listening" : "Speak topic with microphone (English / Hinglish)"}
+              style={{
+                position: "absolute",
+                right: topic.length > 0 ? "34px" : "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: isListening ? "#EF4444" : "#F1F5F9",
+                border: "none",
+                borderRadius: "50%",
+                width: "28px",
+                height: "28px",
+                display: "grid",
+                placeItems: "center",
+                cursor: loading ? "not-allowed" : "pointer",
+                color: isListening ? "#FFFFFF" : "#475569",
+                fontSize: "0.95rem",
+                animation: isListening ? "pulse-subtle 1s infinite" : "none",
+                transition: "all 0.15s ease",
+                padding: 0,
+              }}
+            >
+              {isListening ? "⏹" : "🎙️"}
+            </button>
+
             {topic.length > 0 && !loading && (
               <button
                 type="button"
                 onClick={() => setTopic("")}
                 style={{
                   position: "absolute",
-                  right: "12px",
+                  right: "10px",
                   top: "50%",
                   transform: "translateY(-50%)",
                   background: "transparent",
@@ -413,6 +512,13 @@ export function CreateProjectCard() {
               >
                 ✕
               </button>
+            )}
+
+            {isListening && (
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.35rem", fontSize: "0.75rem", color: "#DC2626", fontWeight: 700 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#DC2626", display: "inline-block", animation: "pulse-subtle 1s infinite" }} />
+                <span>Listening... Speak your topic in English or Hinglish!</span>
+              </div>
             )}
           </div>
 
