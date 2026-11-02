@@ -83,25 +83,44 @@ export default async function ProjectPage({
 
       <div className="workspace-body">
         <aside className="workspace-rail" aria-label="Workspace navigation">
+          <Link
+            href="/dashboard"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              fontSize: "0.8125rem",
+              fontWeight: 700,
+              color: "#315CEB",
+              marginBottom: "1rem",
+              textDecoration: "none",
+            }}
+          >
+            ← Back to Projects
+          </Link>
           <span className="workspace-rail-label">STUDIO STAGES</span>
-          <div className="workspace-nav-item workspace-nav-active">
+          <a href="#top" className="workspace-nav-item workspace-nav-active">
             <span className="workspace-nav-icon" aria-hidden="true">📋</span>
-            <span>Storyboard</span>
-          </div>
-          <div className="workspace-nav-item" style={{ opacity: 0.5, cursor: "not-allowed" }}>
+            <span>Storyboard Script</span>
+          </a>
+          <a href="#voice-selection" className="workspace-nav-item">
             <span className="workspace-nav-icon" aria-hidden="true">🎙️</span>
             <span>Voice & Audio</span>
-          </div>
-          <div className="workspace-nav-item" style={{ opacity: 0.5, cursor: "not-allowed" }}>
+          </a>
+          <a href="#voice-selection" className="workspace-nav-item">
             <span className="workspace-nav-icon" aria-hidden="true">🎬</span>
-            <span>Render Video</span>
-          </div>
-          <div className="workspace-nav-item" style={{ opacity: 0.5, cursor: "not-allowed" }}>
+            <span>Render Reel</span>
+          </a>
+          <a
+            href="#voice-selection"
+            className="workspace-nav-item"
+            style={{ opacity: 0.8 }}
+          >
             <span className="workspace-nav-icon" aria-hidden="true">📱</span>
-            <span>Instagram</span>
-          </div>
+            <span>Instagram Share</span>
+          </a>
           <div className="workspace-rail-note" style={{ marginTop: "auto" }}>
-            Every change to script or visual cues autosaves to MongoDB.
+            Every manual or AI revision to scenes and vector graphics saves automatically to your project.
           </div>
         </aside>
 

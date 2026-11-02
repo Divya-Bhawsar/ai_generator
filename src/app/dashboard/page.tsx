@@ -5,7 +5,7 @@ import { isMongoConfigured } from "@/lib/mongodb";
 import { listProjects } from "@/lib/db/projects";
 import { SignOutButton } from "@/components/sign-out-button";
 import { CreateProjectCard } from "@/components/create-project-card";
-import { ProjectCard } from "@/components/project-card";
+import { DashboardProjectList } from "@/components/dashboard-project-list";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -74,14 +74,8 @@ export default async function DashboardPage() {
           {/* New Explainer Creator Box */}
           <CreateProjectCard />
 
-          {/* Projects List Section */}
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "#17191F", margin: 0 }}>
-                Your Explainer Projects {projects.length > 0 && `(${projects.length})`}
-              </h2>
-            </div>
-
+          {/* Projects List with Metrics, Filters and Real-time Search */}
+          <section>
             {projects.length === 0 ? (
               <div className="workspace-empty-card" style={{ marginTop: 0 }}>
                 <div className="workspace-empty-art" aria-hidden="true">
@@ -97,19 +91,9 @@ export default async function DashboardPage() {
                 <p>Type a topic above or pick one of the recommended ideas to generate your first storyboard!</p>
               </div>
             ) : (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                  gap: "1.25rem",
-                }}
-              >
-                {projects.map((p) => (
-                  <ProjectCard key={p._id} project={p} />
-                ))}
-              </div>
+              <DashboardProjectList projects={JSON.parse(JSON.stringify(projects))} />
             )}
-          </div>
+          </section>
 
           <div className="workspace-footnote">
             <span className="workspace-footnote-mark">✳</span>
