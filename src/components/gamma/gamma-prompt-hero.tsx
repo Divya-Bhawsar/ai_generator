@@ -122,7 +122,7 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
 
     setLoading(true);
     setError(null);
-    setLoadingStep("Structuring Gamma presentation cards with Gemini AI...");
+    setLoadingStep("Structuring animated presentation cards with Gemini AI...");
 
     try {
       // 1. Create Project
@@ -170,26 +170,28 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
   return (
     <div
       style={{
-        background: "radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.15) 0%, rgba(12, 13, 20, 0) 70%), #141624",
-        border: "1px solid var(--gamma-border)",
+        background: "linear-gradient(135deg, #EEF2FF 0%, #FAF5FF 50%, #FDF2F8 100%)",
+        border: "1.5px solid #C7D2FE",
         borderRadius: "24px",
-        padding: "2rem 1.75rem",
-        boxShadow: "0 10px 40px rgba(0, 0, 0, 0.35)",
+        padding: "2.5rem 2rem",
+        boxShadow: "0 10px 40px rgba(99, 102, 241, 0.08)",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Gamma Header Tag */}
+      {/* Header Tag */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.85rem" }}>
         <span
           style={{
-            fontSize: "0.72rem",
+            fontSize: "0.75rem",
             fontWeight: 800,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            background: "linear-gradient(90deg, #818CF8, #C084FC)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            color: "#4338CA",
+            background: "rgba(99, 102, 241, 0.15)",
+            border: "1px solid #C7D2FE",
+            padding: "0.25rem 0.65rem",
+            borderRadius: "12px",
             display: "inline-flex",
             alignItems: "center",
             gap: "0.35rem",
@@ -201,10 +203,10 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
 
       <h1
         style={{
-          fontSize: "clamp(1.65rem, 3.2vw, 2.35rem)",
+          fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)",
           fontWeight: 800,
-          color: "#FFFFFF",
-          margin: "0 0 0.5rem",
+          color: "#0F172A",
+          margin: "0 0 0.65rem",
           letterSpacing: "-0.03em",
           lineHeight: 1.15,
         }}
@@ -221,7 +223,7 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
         </span>
       </h1>
 
-      <p style={{ fontSize: "0.9375rem", color: "var(--gamma-text-muted)", margin: "0 0 1.5rem", lineHeight: 1.6 }}>
+      <p style={{ fontSize: "1rem", color: "#334155", margin: "0 0 1.75rem", lineHeight: 1.6, fontWeight: 450 }}>
         Type or speak any topic. VidyaMotion synthesizes structured visual cards, animated vector diagrams, and synchronized voice narration.
       </p>
 
@@ -230,9 +232,9 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
           style={{
             padding: "0.75rem 1rem",
             borderRadius: "10px",
-            background: "rgba(239, 68, 68, 0.15)",
-            border: "1px solid rgba(239, 68, 68, 0.3)",
-            color: "#FCA5A5",
+            background: "#FEE2E2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
             fontSize: "0.85rem",
             marginBottom: "1.25rem",
           }}
@@ -241,22 +243,22 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
         </div>
       )}
 
-      {/* Main Gamma Input Card */}
+      {/* Main Input Card */}
       <div
         style={{
-          background: "#1A1C2C",
-          border: isListening ? "1.5px solid #EF4444" : "1px solid rgba(255, 255, 255, 0.12)",
+          background: "#FFFFFF",
+          border: isListening ? "2px solid #EF4444" : "1.5px solid #CBD5E1",
           borderRadius: "16px",
-          padding: "0.6rem 0.6rem 0.6rem 1.15rem",
+          padding: "0.6rem 0.6rem 0.6rem 1.25rem",
           display: "flex",
           alignItems: "center",
           gap: "0.75rem",
-          boxShadow: isListening ? "0 0 25px rgba(239, 68, 68, 0.25)" : "0 4px 20px rgba(0, 0, 0, 0.2)",
-          marginBottom: "1rem",
+          boxShadow: isListening ? "0 0 25px rgba(239, 68, 68, 0.25)" : "0 4px 20px rgba(15, 23, 42, 0.06)",
+          marginBottom: "1.25rem",
           transition: "all 0.2s ease",
         }}
       >
-        <span style={{ fontSize: "1.2rem", color: "#818CF8" }}>✦</span>
+        <span style={{ fontSize: "1.25rem", color: "#4F46E5" }}>✦</span>
 
         <input
           type="text"
@@ -268,8 +270,8 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
             flex: 1,
             background: "transparent",
             border: "none",
-            color: "#FFFFFF",
-            fontSize: "1rem",
+            color: "#0F172A",
+            fontSize: "1.05rem",
             outline: "none",
             fontWeight: 500,
           }}
@@ -287,18 +289,17 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
           disabled={loading}
           title={isListening ? "Stop listening" : "Speak topic with microphone (English & Hinglish)"}
           style={{
-            background: isListening ? "#EF4444" : "rgba(255, 255, 255, 0.08)",
-            border: "none",
+            background: isListening ? "#EF4444" : "#F1F5F9",
+            border: "1px solid #E2E8F0",
             borderRadius: "10px",
-            width: "36px",
-            height: "36px",
+            width: "38px",
+            height: "38px",
             display: "grid",
             placeItems: "center",
             cursor: "pointer",
-            fontSize: "1rem",
-            color: "#FFFFFF",
+            fontSize: "1.05rem",
+            color: isListening ? "#FFFFFF" : "#334155",
             transition: "all 0.15s ease",
-            animation: isListening ? "pulse-subtle 1s infinite" : "none",
           }}
         >
           {isListening ? "⏹" : "🎙️"}
@@ -311,7 +312,7 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
             style={{
               background: "transparent",
               border: "none",
-              color: "#71717A",
+              color: "#64748B",
               cursor: "pointer",
               padding: "4px 8px",
             }}
@@ -320,15 +321,15 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
           </button>
         )}
 
-        {/* Big Gamma Generate Button */}
+        {/* Big Generate Button */}
         <button
           type="button"
           disabled={loading || !topic.trim()}
           onClick={() => handleGenerate()}
           className="gamma-gradient-btn"
           style={{
-            padding: "0.85rem 1.6rem",
-            fontSize: "0.9375rem",
+            padding: "0.85rem 1.65rem",
+            fontSize: "0.95rem",
             opacity: loading || !topic.trim() ? 0.6 : 1,
             cursor: loading || !topic.trim() ? "not-allowed" : "pointer",
             whiteSpace: "nowrap",
@@ -339,16 +340,16 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
       </div>
 
       {loading && (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "#A5B4FC", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "#4338CA", fontSize: "0.875rem", fontWeight: 700, marginBottom: "1rem" }}>
           <span style={{ animation: "spin-vinyl 1s linear infinite", display: "inline-block" }}>✦</span>
           <span>{loadingStep}</span>
         </div>
       )}
 
       {/* Control Pills: Language & Style */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1.5rem" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "0.75rem", color: "var(--gamma-text-dim)", fontWeight: 700, textTransform: "uppercase" }}>
+          <span style={{ fontSize: "0.75rem", color: "#475569", fontWeight: 800, textTransform: "uppercase" }}>
             Narration Voice:
           </span>
           <button
@@ -370,7 +371,7 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "0.75rem", color: "var(--gamma-text-dim)", fontWeight: 700, textTransform: "uppercase" }}>
+          <span style={{ fontSize: "0.75rem", color: "#475569", fontWeight: 800, textTransform: "uppercase" }}>
             Target Level:
           </span>
           <button
@@ -397,9 +398,9 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
         </div>
       </div>
 
-      {/* Gamma Template Gallery Cards */}
+      {/* Starter Deck Gallery */}
       <div>
-        <span style={{ fontSize: "0.75rem", color: "var(--gamma-text-dim)", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "0.75rem", letterSpacing: "0.06em" }}>
+        <span style={{ fontSize: "0.75rem", color: "#475569", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "0.75rem", letterSpacing: "0.06em" }}>
           ✦ OR START FROM A CURATED TOPIC DECK:
         </span>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "0.75rem" }}>
@@ -410,36 +411,39 @@ export function GammaPromptHero({ onSuccess }: GammaPromptHeroProps) {
               disabled={loading}
               onClick={() => handleGenerate(tmpl.prompt)}
               style={{
-                background: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.06)",
+                background: "#FFFFFF",
+                border: "1px solid #E2E8F0",
                 borderRadius: "14px",
-                padding: "0.85rem 1rem",
+                padding: "0.95rem 1.15rem",
                 textAlign: "left",
                 cursor: loading ? "not-allowed" : "pointer",
-                transition: "all 0.15s ease",
+                transition: "all 0.18s ease",
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.25rem",
+                boxShadow: "0 2px 8px rgba(15, 23, 42, 0.04)",
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.background = "rgba(99, 102, 241, 0.1)";
-                e.currentTarget.style.borderColor = "rgba(99, 102, 241, 0.3)";
+                e.currentTarget.style.borderColor = "#818CF8";
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 8px 24px rgba(79, 70, 229, 0.12)";
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)";
+                e.currentTarget.style.borderColor = "#E2E8F0";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(15, 23, 42, 0.04)";
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "1.25rem" }}>{tmpl.icon}</span>
-                <span style={{ fontSize: "0.6875rem", color: "#818CF8", fontWeight: 700 }}>
+                <span style={{ fontSize: "1.35rem" }}>{tmpl.icon}</span>
+                <span style={{ fontSize: "0.6875rem", color: "#4F46E5", fontWeight: 700, background: "#EEF2FF", padding: "0.15rem 0.5rem", borderRadius: "10px" }}>
                   {tmpl.category}
                 </span>
               </div>
-              <strong style={{ fontSize: "0.875rem", color: "#FFFFFF", marginTop: "0.25rem" }}>
+              <strong style={{ fontSize: "0.9375rem", color: "#0F172A", marginTop: "0.35rem" }}>
                 {tmpl.title}
               </strong>
-              <p style={{ fontSize: "0.75rem", color: "var(--gamma-text-muted)", margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontSize: "0.8125rem", color: "#475569", margin: 0, lineHeight: 1.45 }}>
                 {tmpl.prompt}
               </p>
             </button>

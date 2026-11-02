@@ -58,8 +58,8 @@ export default async function ProjectPage({
           <Link
             href="/dashboard"
             style={{
-              fontSize: "0.8125rem",
-              color: "#818CF8",
+              fontSize: "0.875rem",
+              color: "#4F46E5",
               fontWeight: 700,
               textDecoration: "none",
               display: "inline-flex",
@@ -69,23 +69,23 @@ export default async function ProjectPage({
           >
             ← Back to All Decks
           </Link>
-          <span style={{ color: "rgba(255,255,255,0.2)" }}>/</span>
-          <span style={{ fontSize: "0.8125rem", color: "#E2E8F0", fontWeight: 600 }}>
+          <span style={{ color: "#CBD5E1" }}>/</span>
+          <span style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 700 }}>
             {serializedStoryboard?.title || serializedProject.title}
           </span>
           <span
             style={{
               marginLeft: "auto",
               fontSize: "0.72rem",
-              background: "rgba(99, 102, 241, 0.15)",
-              color: "#A5B4FC",
-              border: "1px solid rgba(99, 102, 241, 0.25)",
-              padding: "0.2rem 0.55rem",
+              background: "#EEF2FF",
+              color: "#4338CA",
+              border: "1px solid #C7D2FE",
+              padding: "0.25rem 0.65rem",
               borderRadius: "12px",
               fontWeight: 700,
             }}
           >
-            ✦ GAMMA CARD CANVAS
+            ✦ CARD CANVAS
           </span>
         </div>
 

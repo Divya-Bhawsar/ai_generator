@@ -561,7 +561,7 @@ export function StoryboardStudio({
     estimatedDuration >= 50 && estimatedDuration <= 80
       ? { label: "Optimal Reel Pacing", color: "#059669", bg: "#ECFDF5", border: "#A7F3D0" }
       : estimatedDuration < 50
-      ? { label: "Snappy & Fast (<50s)", color: "#315CEB", bg: "#EEF2FF", border: "#C7D2FE" }
+      ? { label: "Snappy & Fast (<50s)", color: "#4F46E5", bg: "#EEF2FF", border: "#C7D2FE" }
       : { label: "In-Depth (>80s)", color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" };
 
   return (
@@ -569,23 +569,7 @@ export function StoryboardStudio({
       {/* Top Navigation & Status Bar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
         <div style={{ flex: "1 1 280px", minWidth: "min(100%, 280px)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-            <Link
-              href="/dashboard"
-              style={{
-                fontSize: "0.8125rem",
-                color: "#315CEB",
-                fontWeight: 600,
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                transition: "transform 0.15s ease",
-              }}
-            >
-              ← Back to All Projects
-            </Link>
-
+          <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "0.5rem" }}>
             {!confirmDelete ? (
               <button
                 type="button"
@@ -611,7 +595,7 @@ export function StoryboardStudio({
                   e.currentTarget.style.background = "transparent";
                 }}
               >
-                🗑️ Delete Project
+                🗑️ Delete Deck
               </button>
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -640,8 +624,8 @@ export function StoryboardStudio({
                   disabled={deletingProject}
                   onClick={() => setConfirmDelete(false)}
                   style={{
-                    background: "#F3F4F6",
-                    color: "#475569",
+                    background: "#F1F5F9",
+                    color: "#334155",
                     border: "none",
                     borderRadius: "4px",
                     padding: "0.25rem 0.65rem",
@@ -657,14 +641,14 @@ export function StoryboardStudio({
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-            <h1 style={{ fontSize: "1.65rem", fontWeight: 800, color: "#17191F", margin: 0, letterSpacing: "-0.025em" }}>
+            <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0F172A", margin: 0, letterSpacing: "-0.025em" }}>
               {storyboard?.title || project.title}
             </h1>
             <span
               style={{
                 fontSize: "0.75rem",
                 background: "#EEF2FF",
-                color: "#315CEB",
+                color: "#4338CA",
                 padding: "0.25rem 0.65rem",
                 borderRadius: "20px",
                 fontWeight: 700,
@@ -698,8 +682,8 @@ export function StoryboardStudio({
               onClick={() => setPresenterOpen(true)}
               className="gamma-gradient-btn"
               style={{
-                padding: "0.3rem 0.85rem",
-                fontSize: "0.75rem",
+                padding: "0.35rem 0.95rem",
+                fontSize: "0.78125rem",
                 borderRadius: "20px",
               }}
             >
@@ -708,13 +692,13 @@ export function StoryboardStudio({
             </button>
           </div>
 
-          <p style={{ margin: "0.35rem 0 0", fontSize: "0.875rem", color: "#64748B" }}>
-            Topic: <strong style={{ color: "#1E293B" }}>&ldquo;{project.topic}&rdquo;</strong>
+          <p style={{ margin: "0.4rem 0 0", fontSize: "0.875rem", color: "#334155" }}>
+            Topic: <strong style={{ color: "#0F172A" }}>&ldquo;{project.topic}&rdquo;</strong>
           </p>
 
           {/* Interactive Target Audience Switcher */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#334155", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               🎯 Target Audience:
             </span>
             {TARGET_AUDIENCES.map((a) => {
@@ -733,16 +717,16 @@ export function StoryboardStudio({
                     fontSize: "0.75rem",
                     padding: "0.3rem 0.75rem",
                     borderRadius: "16px",
-                    border: isSelected ? "1.5px solid #315CEB" : "1px solid #E2E8F0",
-                    background: isSelected ? "#EEF2FF" : "#FAF9F6",
-                    color: isSelected ? "#315CEB" : "#475569",
+                    border: isSelected ? "1.5px solid #4F46E5" : "1px solid #E2E8F0",
+                    background: isSelected ? "#EEF2FF" : "#FFFFFF",
+                    color: isSelected ? "#4338CA" : "#334155",
                     fontWeight: isSelected ? 700 : 500,
                     cursor: generating || revising ? "not-allowed" : "pointer",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "0.35rem",
                     transition: "all 0.15s ease",
-                    boxShadow: isSelected ? "0 2px 6px rgba(49, 92, 235, 0.15)" : "none",
+                    boxShadow: isSelected ? "0 2px 6px rgba(79, 70, 229, 0.15)" : "none",
                   }}
                 >
                   <span>{a.icon}</span>
@@ -758,18 +742,18 @@ export function StoryboardStudio({
           style={{
             background: "#FFFFFF",
             border: `1.5px solid ${pacingStatus.border}`,
-            borderRadius: "12px",
+            borderRadius: "14px",
             padding: "0.85rem 1.25rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.35rem",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+            boxShadow: "0 4px 14px rgba(15, 23, 42, 0.05)",
             minWidth: "min(100%, 220px)",
             flex: "1 1 200px",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: "0.68rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            <span style={{ fontSize: "0.68rem", color: "#475569", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
               REEL PACING GAUGE
             </span>
             <span
@@ -786,9 +770,9 @@ export function StoryboardStudio({
             </span>
           </div>
 
-          <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#17191F", letterSpacing: "-0.02em" }}>
+          <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>
             ~{estimatedDuration}s{" "}
-            <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#64748B" }}>
+            <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#475569" }}>
               ({totalWords} words)
             </span>
           </div>
@@ -806,7 +790,7 @@ export function StoryboardStudio({
             />
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "#94A3B8" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "#64748B" }}>
             <span>Target: 50–75s</span>
             <span>~150 WPM cadence</span>
           </div>
@@ -832,10 +816,10 @@ export function StoryboardStudio({
         <div
           style={{
             background: "#FFFFFF",
-            border: "1.5px solid #315CEB",
-            borderRadius: "14px",
+            border: "1.5px solid #4F46E5",
+            borderRadius: "16px",
             padding: "2rem",
-            boxShadow: "0 10px 30px rgba(49, 92, 235, 0.12)",
+            boxShadow: "0 10px 30px rgba(79, 70, 229, 0.12)",
             display: "flex",
             flexDirection: "column",
             gap: "1.25rem",
@@ -843,17 +827,17 @@ export function StoryboardStudio({
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <span className="spinner" style={{ width: 22, height: 22, border: "2.5px solid #315CEB", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+              <span className="spinner" style={{ width: 22, height: 22, border: "2.5px solid #4F46E5", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
               <div>
-                <h3 style={{ margin: 0, fontSize: "1.2rem", color: "#17191F", fontWeight: 700 }}>
+                <h3 style={{ margin: 0, fontSize: "1.2rem", color: "#0F172A", fontWeight: 700 }}>
                   Synthesizing High-Definition Reel ({renderProgress}%)
                 </h3>
-                <p style={{ margin: "0.2rem 0 0", fontSize: "0.8125rem", color: "#64748B" }}>
+                <p style={{ margin: "0.2rem 0 0", fontSize: "0.8125rem", color: "#334155" }}>
                   Generating neural voiceover, compiling Remotion dynamic SVG scenes, and burning kinetic captions
                 </p>
               </div>
             </div>
-            <span style={{ fontSize: "0.8125rem", color: "#315CEB", fontWeight: 700, background: "#EEF2FF", padding: "0.3rem 0.75rem", borderRadius: "20px" }}>
+            <span style={{ fontSize: "0.8125rem", color: "#4338CA", fontWeight: 700, background: "#EEF2FF", padding: "0.3rem 0.75rem", borderRadius: "20px" }}>
               Voice: {selectedVoice.label} · 1080x1920 MP4
             </span>
           </div>
@@ -863,14 +847,14 @@ export function StoryboardStudio({
               style={{
                 width: `${renderProgress}%`,
                 height: "100%",
-                background: "linear-gradient(90deg, #315CEB 0%, #45D6B5 100%)",
+                background: "linear-gradient(90deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
                 borderRadius: "5px",
                 transition: "width 0.4s ease",
               }}
             />
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "#64748B" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "#334155" }}>
             <span>{renderStage || "Processing video pipeline..."}</span>
             <span>Estimated time: ~15-25 seconds</span>
           </div>
@@ -1047,7 +1031,7 @@ export function StoryboardStudio({
               height: 64,
               borderRadius: "50%",
               background: "#EEF2FF",
-              color: "#315CEB",
+              color: "#4F46E5",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -1057,10 +1041,10 @@ export function StoryboardStudio({
             📋
           </div>
           <div>
-            <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#17191F", margin: 0 }}>
+            <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
               No Storyboard Generated Yet
             </h2>
-            <p style={{ fontSize: "0.9375rem", color: "#64748B", maxWidth: "480px", margin: "0.5rem auto 0", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.9375rem", color: "#334155", maxWidth: "480px", margin: "0.5rem auto 0", lineHeight: 1.5 }}>
               Generate a 5-scene educational script and dynamic SVG vector storyboard for:{" "}
               <strong style={{ color: "#0F172A" }}>&ldquo;{project.topic}&rdquo;</strong>
             </p>
@@ -1068,7 +1052,7 @@ export function StoryboardStudio({
           <button
             onClick={() => handleGenerateStoryboard()}
             disabled={generating}
-            className="button"
+            className="gamma-gradient-btn"
             style={{
               padding: "0.85rem 2rem",
               fontSize: "1rem",
@@ -1077,6 +1061,7 @@ export function StoryboardStudio({
               alignItems: "center",
               gap: "0.5rem",
               cursor: generating ? "not-allowed" : "pointer",
+              borderRadius: "12px",
             }}
           >
             {generating ? (
@@ -1108,10 +1093,10 @@ export function StoryboardStudio({
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#17191F", margin: 0, letterSpacing: "-0.02em" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0F172A", margin: 0, letterSpacing: "-0.02em" }}>
                 Scene-by-Scene Script & Motion Visuals
               </h2>
-              <span style={{ fontSize: "0.75rem", background: "#F1F5F9", color: "#475569", padding: "0.2rem 0.6rem", borderRadius: "12px", fontWeight: 700 }}>
+              <span style={{ fontSize: "0.75rem", background: "#F1F5F9", color: "#334155", padding: "0.2rem 0.6rem", borderRadius: "12px", fontWeight: 700 }}>
                 {scenes.length} Scenes
               </span>
             </div>
@@ -1121,9 +1106,9 @@ export function StoryboardStudio({
                 onClick={addScene}
                 className="chip-button"
                 style={{
-                  background: "#F8FAFC",
+                  background: "#FFFFFF",
                   border: "1.5px solid #CBD5E1",
-                  color: "#1E293B",
+                  color: "#0F172A",
                   fontWeight: 700,
                 }}
               >
@@ -1134,9 +1119,9 @@ export function StoryboardStudio({
                 onClick={handleSaveChanges}
                 disabled={saving}
                 style={{
-                  background: isDirty ? "#315CEB" : "#FAF9F6",
-                  border: isDirty ? "1px solid #244BD2" : "1px solid #E8E5DF",
-                  color: isDirty ? "#FFFFFF" : "#17191F",
+                  background: isDirty ? "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)" : "#FFFFFF",
+                  border: isDirty ? "none" : "1px solid #CBD5E1",
+                  color: isDirty ? "#FFFFFF" : "#0F172A",
                   borderRadius: "8px",
                   padding: "0.45rem 1rem",
                   fontSize: "0.8125rem",
@@ -1145,7 +1130,7 @@ export function StoryboardStudio({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "0.35rem",
-                  boxShadow: isDirty ? "0 4px 12px rgba(49, 92, 235, 0.2)" : "none",
+                  boxShadow: isDirty ? "0 4px 14px rgba(79, 70, 229, 0.3)" : "none",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -1156,13 +1141,13 @@ export function StoryboardStudio({
                 onClick={() => handleGenerateStoryboard()}
                 disabled={generating}
                 style={{
-                  background: "#FAF9F6",
-                  border: "1px solid #E8E5DF",
+                  background: "#FFFFFF",
+                  border: "1px solid #CBD5E1",
                   borderRadius: "8px",
                   padding: "0.45rem 0.95rem",
                   fontSize: "0.8125rem",
-                  color: "#315CEB",
-                  fontWeight: 600,
+                  color: "#4F46E5",
+                  fontWeight: 700,
                   cursor: generating ? "not-allowed" : "pointer",
                   display: "inline-flex",
                   alignItems: "center",
@@ -1189,8 +1174,8 @@ export function StoryboardStudio({
                   style={{
                     background: "#FFFFFF",
                     border: "1px solid #E2E8F0",
-                    borderRadius: "14px",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
+                    borderRadius: "16px",
+                    boxShadow: "0 4px 20px -2px rgba(15, 23, 42, 0.05)",
                   }}
                 >
                   {/* Left Column: Narration Scripting */}
@@ -1201,10 +1186,11 @@ export function StoryboardStudio({
                           style={{
                             fontSize: "0.75rem",
                             fontWeight: 800,
-                            background: "#1E293B",
+                            background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)",
                             color: "#FFFFFF",
-                            padding: "0.2rem 0.55rem",
-                            borderRadius: "6px",
+                            padding: "0.25rem 0.6rem",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 6px rgba(79, 70, 229, 0.25)",
                           }}
                         >
                           #{index + 1}
@@ -1217,13 +1203,14 @@ export function StoryboardStudio({
                           style={{
                             fontSize: "0.9375rem",
                             fontWeight: 700,
-                            color: "#17191F",
-                            background: "#F8FAFC",
-                            border: "1px solid #E2E8F0",
-                            borderRadius: "6px",
-                            padding: "0.3rem 0.65rem",
+                            color: "#0F172A",
+                            background: "#FFFFFF",
+                            border: "1px solid #CBD5E1",
+                            borderRadius: "8px",
+                            padding: "0.35rem 0.75rem",
                             flex: 1,
                             maxWidth: "280px",
+                            outline: "none",
                           }}
                         />
                       </div>
@@ -1238,9 +1225,10 @@ export function StoryboardStudio({
                           style={{
                             background: "#F1F5F9",
                             border: "1px solid #CBD5E1",
-                            borderRadius: "4px",
-                            padding: "0.2rem 0.45rem",
+                            borderRadius: "6px",
+                            padding: "0.25rem 0.5rem",
                             fontSize: "0.75rem",
+                            color: "#334155",
                             cursor: index === 0 ? "not-allowed" : "pointer",
                             opacity: index === 0 ? 0.4 : 1,
                           }}
@@ -1255,9 +1243,10 @@ export function StoryboardStudio({
                           style={{
                             background: "#F1F5F9",
                             border: "1px solid #CBD5E1",
-                            borderRadius: "4px",
-                            padding: "0.2rem 0.45rem",
+                            borderRadius: "6px",
+                            padding: "0.25rem 0.5rem",
                             fontSize: "0.75rem",
+                            color: "#334155",
                             cursor: index === scenes.length - 1 ? "not-allowed" : "pointer",
                             opacity: index === scenes.length - 1 ? 0.4 : 1,
                           }}
@@ -1271,8 +1260,8 @@ export function StoryboardStudio({
                           style={{
                             background: "#FEE2E2",
                             border: "1px solid #FCA5A5",
-                            borderRadius: "4px",
-                            padding: "0.2rem 0.45rem",
+                            borderRadius: "6px",
+                            padding: "0.25rem 0.5rem",
                             fontSize: "0.75rem",
                             color: "#DC2626",
                             cursor: scenes.length <= 1 ? "not-allowed" : "pointer",
@@ -1285,14 +1274,14 @@ export function StoryboardStudio({
                     </div>
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#334155", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         🎙️ Spoken Narration
                       </label>
                       <span
                         style={{
                           fontSize: "0.72rem",
                           fontWeight: 600,
-                          color: wordCount > 35 ? "#D97706" : "#64748B",
+                          color: wordCount > 35 ? "#D97706" : "#475569",
                         }}
                       >
                         ~{scene.estimatedSeconds}s · {wordCount} words
@@ -1307,10 +1296,10 @@ export function StoryboardStudio({
                         width: "100%",
                         padding: "0.85rem",
                         borderRadius: "8px",
-                        border: "1px solid #E2E8F0",
-                        background: "#FAF9F6",
+                        border: "1px solid #CBD5E1",
+                        background: "#FFFFFF",
                         fontSize: "0.9375rem",
-                        color: "#17191F",
+                        color: "#0F172A",
                         lineHeight: 1.55,
                         fontFamily: "inherit",
                         resize: "vertical",
@@ -1470,7 +1459,7 @@ export function StoryboardStudio({
                         style={{
                           background: "#EEF2FF",
                           border: "1px solid #C7D2FE",
-                          color: "#315CEB",
+                          color: "#4338CA",
                           borderRadius: "6px",
                           padding: "0.3rem 0.65rem",
                           fontSize: "0.75rem",
@@ -1499,7 +1488,7 @@ export function StoryboardStudio({
                           style={{
                             background: "transparent",
                             border: "1px solid #CBD5E1",
-                            color: "#475569",
+                            color: "#334155",
                             borderRadius: "6px",
                             padding: "0.3rem 0.65rem",
                             fontSize: "0.75rem",
@@ -1522,13 +1511,14 @@ export function StoryboardStudio({
                         width: "100%",
                         padding: "0.5rem",
                         borderRadius: "6px",
-                        border: "1px solid #E2E8F0",
+                        border: "1px solid #CBD5E1",
                         background: "#FFFFFF",
                         fontSize: "0.8125rem",
-                        color: "#17191F",
+                        color: "#0F172A",
                         lineHeight: 1.45,
                         resize: "vertical",
                         fontFamily: "inherit",
+                        outline: "none",
                       }}
                     />
                   </div>
@@ -1545,8 +1535,8 @@ export function StoryboardStudio({
               padding: "1rem",
               background: "#FFFFFF",
               border: "2px dashed #CBD5E1",
-              borderRadius: "12px",
-              color: "#315CEB",
+              borderRadius: "14px",
+              color: "#4F46E5",
               fontWeight: 700,
               fontSize: "0.875rem",
               cursor: "pointer",
@@ -1557,8 +1547,8 @@ export function StoryboardStudio({
               transition: "all 0.15s ease",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = "#315CEB";
-              e.currentTarget.style.background = "#F8FAFF";
+              e.currentTarget.style.borderColor = "#4F46E5";
+              e.currentTarget.style.background = "#EEF2FF";
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.borderColor = "#CBD5E1";
@@ -1574,20 +1564,20 @@ export function StoryboardStudio({
       {scenes.length > 0 && (
         <div
           style={{
-            background: "#FFFFFF",
-            border: "1.5px solid #315CEB",
-            borderRadius: "14px",
+            background: "linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 50%, #FDF2F8 100%)",
+            border: "1.5px solid #C7D2FE",
+            borderRadius: "16px",
             padding: "1.75rem",
-            boxShadow: "0 6px 24px rgba(49, 92, 235, 0.08)",
+            boxShadow: "0 10px 30px -4px rgba(79, 70, 229, 0.1)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.5rem" }}>
-            <span style={{ fontSize: "1.3rem" }}>🤖</span>
+            <span style={{ fontSize: "1.4rem" }}>🤖</span>
             <div>
-              <h3 style={{ fontSize: "1.0625rem", fontWeight: 800, color: "#17191F", margin: 0 }}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
                 AI Revision Co-Pilot
               </h3>
-              <p style={{ margin: "0.15rem 0 0", fontSize: "0.8125rem", color: "#64748B" }}>
+              <p style={{ margin: "0.15rem 0 0", fontSize: "0.8125rem", color: "#334155" }}>
                 Request natural language revisions to pacing, tone, metaphors, or visual graphics across all scenes.
               </p>
             </div>
@@ -1604,13 +1594,14 @@ export function StoryboardStudio({
                 style={{
                   width: "100%",
                   padding: "0.85rem 4.5rem 0.85rem 1.15rem",
-                  borderRadius: "8px",
-                  border: isListeningRevision ? "1.5px solid #EF4444" : "1px solid #CBD5E1",
-                  background: isListeningRevision ? "#FFF5F5" : "#FAF9F6",
+                  borderRadius: "10px",
+                  border: isListeningRevision ? "1.5px solid #EF4444" : "1.5px solid #CBD5E1",
+                  background: isListeningRevision ? "#FFF5F5" : "#FFFFFF",
                   fontSize: "0.9375rem",
-                  color: "#17191F",
+                  color: "#0F172A",
                   outline: "none",
                   boxSizing: "border-box",
+                  boxShadow: "0 2px 6px rgba(0, 0, 0, 0.02)",
                 }}
               />
 
@@ -1633,7 +1624,7 @@ export function StoryboardStudio({
                   display: "grid",
                   placeItems: "center",
                   cursor: revising ? "not-allowed" : "pointer",
-                  color: isListeningRevision ? "#FFFFFF" : "#475569",
+                  color: isListeningRevision ? "#FFFFFF" : "#334155",
                   fontSize: "0.95rem",
                   animation: isListeningRevision ? "pulse-subtle 1s infinite" : "none",
                   transition: "all 0.15s ease",
@@ -1656,7 +1647,7 @@ export function StoryboardStudio({
                     border: "none",
                     cursor: "pointer",
                     fontSize: "0.85rem",
-                    color: "#94A3B8",
+                    color: "#64748B",
                     padding: "4px",
                     lineHeight: 1,
                   }}
@@ -1669,13 +1660,15 @@ export function StoryboardStudio({
             <button
               type="submit"
               disabled={revising || !revisionPrompt.trim()}
-              className="button"
+              className="gamma-gradient-btn"
               style={{
-                padding: "0.85rem 1.5rem",
+                padding: "0.85rem 1.65rem",
                 cursor: revising || !revisionPrompt.trim() ? "not-allowed" : "pointer",
-                opacity: revising || !revisionPrompt.trim() ? 0.7 : 1,
+                opacity: revising || !revisionPrompt.trim() ? 0.65 : 1,
+                fontSize: "0.875rem",
                 fontWeight: 700,
                 whiteSpace: "nowrap",
+                borderRadius: "10px",
               }}
             >
               {revising ? "Revising Storyboard..." : "Apply AI Revision →"}
@@ -1691,7 +1684,7 @@ export function StoryboardStudio({
 
           {/* Audience & Style Quick Revision Chips */}
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "1rem", alignItems: "center" }}>
-            <span style={{ fontSize: "0.72rem", color: "#64748B", fontWeight: 800, textTransform: "uppercase" }}>
+            <span style={{ fontSize: "0.72rem", color: "#334155", fontWeight: 800, textTransform: "uppercase" }}>
               💡 Quick Adapters:
             </span>
             {[
@@ -1712,6 +1705,13 @@ export function StoryboardStudio({
                   handleApplyRevision(undefined, chip.prompt);
                 }}
                 className="chip-button"
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #CBD5E1",
+                  color: "#0F172A",
+                  fontWeight: 600,
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
+                }}
               >
                 {chip.label}
               </button>
@@ -1728,7 +1728,7 @@ export function StoryboardStudio({
           style={{
             background: "#FFFFFF",
             border: "1px solid #E2E8F0",
-            borderRadius: "14px",
+            borderRadius: "16px",
             padding: "2rem",
             display: "flex",
             flexDirection: "column",
@@ -1737,13 +1737,13 @@ export function StoryboardStudio({
           }}
         >
           <div>
-            <span style={{ fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", color: "#315CEB", letterSpacing: "0.06em" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", color: "#4F46E5", letterSpacing: "0.06em" }}>
               STAGE 3: NEURAL VOICE & VIDEO SYNTHESIS
             </span>
-            <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#17191F", margin: "0.3rem 0 0", letterSpacing: "-0.02em" }}>
+            <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#0F172A", margin: "0.3rem 0 0", letterSpacing: "-0.02em" }}>
               Select Narration Voice
             </h3>
-            <p style={{ fontSize: "0.875rem", color: "#64748B", margin: "0.25rem 0 0" }}>
+            <p style={{ fontSize: "0.875rem", color: "#334155", margin: "0.25rem 0 0" }}>
               Audition the neural voices below. Each voice delivers natural breathing pauses and authentic Indian English pronunciation.
             </p>
           </div>
@@ -1759,22 +1759,22 @@ export function StoryboardStudio({
                   onClick={() => setSelectedVoice(v)}
                   className="interactive-card"
                   style={{
-                    border: `2px solid ${isSelected ? "#315CEB" : "#E2E8F0"}`,
-                    background: isSelected ? "#F8FAFF" : "#FFFFFF",
-                    borderRadius: "12px",
+                    border: `2px solid ${isSelected ? "#4F46E5" : "#E2E8F0"}`,
+                    background: isSelected ? "#EEF2FF" : "#FFFFFF",
+                    borderRadius: "14px",
                     padding: "1.35rem",
                     cursor: "pointer",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    boxShadow: isSelected ? "0 6px 20px rgba(49, 92, 235, 0.1)" : "none",
+                    boxShadow: isSelected ? "0 6px 20px rgba(79, 70, 229, 0.12)" : "none",
                   }}
                 >
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                      <span style={{ fontWeight: 800, color: "#17191F", fontSize: "1.1rem" }}>{v.label}</span>
+                      <span style={{ fontWeight: 800, color: "#0F172A", fontSize: "1.1rem" }}>{v.label}</span>
                       {isSelected && (
-                        <span style={{ fontSize: "0.7rem", background: "#315CEB", color: "#FFF", padding: "0.15rem 0.5rem", borderRadius: "10px", fontWeight: 700 }}>
+                        <span style={{ fontSize: "0.7rem", background: "#4F46E5", color: "#FFF", padding: "0.15rem 0.5rem", borderRadius: "10px", fontWeight: 700 }}>
                           Selected
                         </span>
                       )}
@@ -1789,8 +1789,8 @@ export function StoryboardStudio({
                         </div>
                       )}
                     </div>
-                    <div style={{ fontSize: "0.8125rem", color: "#64748B", marginTop: "0.25rem" }}>{v.description}</div>
-                    <div style={{ fontSize: "0.72rem", color: "#315CEB", fontWeight: 600, marginTop: "0.35rem" }}>{v.tag}</div>
+                    <div style={{ fontSize: "0.8125rem", color: "#334155", marginTop: "0.25rem" }}>{v.description}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#4338CA", fontWeight: 700, marginTop: "0.35rem" }}>{v.tag}</div>
                   </div>
 
                   <button
@@ -1800,8 +1800,8 @@ export function StoryboardStudio({
                       playVoicePreview(v);
                     }}
                     style={{
-                      background: isPlaying ? "#F25F4C" : "#F8FAFC",
-                      color: isPlaying ? "#FFFFFF" : "#17191F",
+                      background: isPlaying ? "#EF4444" : "#F8FAFC",
+                      color: isPlaying ? "#FFFFFF" : "#0F172A",
                       border: "1px solid #CBD5E1",
                       borderRadius: "20px",
                       padding: "0.45rem 0.95rem",
@@ -1823,12 +1823,12 @@ export function StoryboardStudio({
 
           {/* Render Action Button */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #E2E8F0", paddingTop: "1.5rem", marginTop: "0.5rem", flexWrap: "wrap", gap: "1rem" }}>
-            <div style={{ fontSize: "0.875rem", color: "#64748B" }}>
+            <div style={{ fontSize: "0.875rem", color: "#334155" }}>
               Outputs vertical <strong>1080x1920 MP4</strong> with dynamic vector motion graphics, neural narration, and synchronized captions.
             </div>
             <button
               onClick={handleStartRender}
-              className="button"
+              className="gamma-gradient-btn"
               style={{
                 padding: "0.95rem 2.25rem",
                 fontSize: "1.0625rem",
@@ -1836,7 +1836,7 @@ export function StoryboardStudio({
                 display: "flex",
                 alignItems: "center",
                 gap: "0.6rem",
-                boxShadow: "0 6px 20px rgba(49, 92, 235, 0.25)",
+                borderRadius: "12px",
               }}
             >
               <span>Generate Reel with {selectedVoice.label} 🎬</span>
@@ -1885,7 +1885,7 @@ export function StoryboardStudio({
               <span>● Save Unsaved Edits</span>
             </button>
           ) : (
-            <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>✓ Synced</span>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>✓ Synced</span>
           )}
 
           <button
@@ -1896,19 +1896,13 @@ export function StoryboardStudio({
                 handleStartRender();
               }
             }}
+            className="gamma-gradient-btn"
             style={{
-              background: "#315CEB",
-              color: "#FFFFFF",
-              border: "none",
               borderRadius: "20px",
               padding: "0.45rem 1.15rem",
               fontSize: "0.8125rem",
               fontWeight: 700,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
               gap: "0.4rem",
-              boxShadow: "0 2px 10px rgba(49, 92, 235, 0.4)",
             }}
           >
             <span>Render Reel 🎬</span>
@@ -2074,16 +2068,19 @@ export function StoryboardStudio({
             className="modal-sheet"
             onClick={(e) => e.stopPropagation()}
             style={{
-              padding: "1.5rem",
+              padding: "1.75rem",
               maxWidth: "560px",
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: "16px",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
               <div>
-                <span style={{ fontSize: "0.72rem", color: "#315CEB", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                <span style={{ fontSize: "0.72rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                   AI VISUAL REDRAW · SCENE #{redrawSceneModal.index + 1}
                 </span>
-                <h3 style={{ margin: "0.25rem 0 0", fontSize: "1.35rem", fontWeight: 800, color: "#17191F" }}>
+                <h3 style={{ margin: "0.25rem 0 0", fontSize: "1.35rem", fontWeight: 800, color: "#0F172A" }}>
                   Redraw Scene Illustration
                 </h3>
               </div>
@@ -2101,18 +2098,19 @@ export function StoryboardStudio({
                   display: "grid",
                   placeItems: "center",
                   fontSize: "0.9rem",
+                  color: "#334155",
                 }}
               >
                 ✕
               </button>
             </div>
 
-            <p style={{ fontSize: "0.875rem", color: "#64748B", margin: "0 0 1rem", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.875rem", color: "#334155", margin: "0 0 1rem", lineHeight: 1.5 }}>
               Topic: <strong>{project.topic}</strong> &bull; Scene: <em>{redrawSceneModal.title}</em>
             </p>
 
             <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", display: "block", marginBottom: "0.4rem" }}>
+              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#334155", textTransform: "uppercase", display: "block", marginBottom: "0.4rem" }}>
                 Visual Style or Custom Direction (Optional)
               </label>
               <textarea
@@ -2126,9 +2124,9 @@ export function StoryboardStudio({
                   padding: "0.75rem",
                   borderRadius: "8px",
                   border: "1px solid #CBD5E1",
-                  background: "#FAF9F6",
+                  background: "#FFFFFF",
                   fontSize: "0.875rem",
-                  color: "#17191F",
+                  color: "#0F172A",
                   outline: "none",
                   fontFamily: "inherit",
                 }}
@@ -2150,7 +2148,13 @@ export function StoryboardStudio({
                   disabled={redrawing}
                   onClick={() => setRedrawHint(suggestion)}
                   className="chip-button"
-                  style={{ fontSize: "0.72rem", padding: "0.25rem 0.6rem" }}
+                  style={{
+                    fontSize: "0.72rem",
+                    padding: "0.25rem 0.6rem",
+                    background: "#FFFFFF",
+                    border: "1px solid #CBD5E1",
+                    color: "#0F172A",
+                  }}
                 >
                   {suggestion}
                 </button>
@@ -2170,7 +2174,7 @@ export function StoryboardStudio({
                   padding: "0.65rem 1.15rem",
                   fontSize: "0.875rem",
                   fontWeight: 600,
-                  color: "#475569",
+                  color: "#334155",
                   cursor: redrawing ? "not-allowed" : "pointer",
                 }}
               >
@@ -2180,7 +2184,7 @@ export function StoryboardStudio({
                 type="button"
                 disabled={redrawing}
                 onClick={handleRedrawSingleScene}
-                className="button"
+                className="gamma-gradient-btn"
                 style={{
                   padding: "0.65rem 1.35rem",
                   fontSize: "0.875rem",

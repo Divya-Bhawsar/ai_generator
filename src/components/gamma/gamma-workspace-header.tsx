@@ -22,8 +22,8 @@ export function GammaWorkspaceHeader({
     <header
       style={{
         height: "64px",
-        borderBottom: "1px solid var(--gamma-border)",
-        background: "rgba(12, 13, 20, 0.9)",
+        borderBottom: "1px solid #E2E8F0",
+        background: "rgba(255, 255, 255, 0.95)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         padding: "0 1.5rem",
@@ -33,6 +33,7 @@ export function GammaWorkspaceHeader({
         position: "sticky",
         top: 0,
         zIndex: 50,
+        boxShadow: "0 1px 3px rgba(15, 23, 42, 0.05)",
       }}
     >
       {/* Left: Brand + Workspace Selector */}
@@ -44,7 +45,7 @@ export function GammaWorkspaceHeader({
             alignItems: "center",
             gap: "0.5rem",
             textDecoration: "none",
-            color: "#FFFFFF",
+            color: "#0F172A",
             fontWeight: 800,
             fontSize: "1.05rem",
             letterSpacing: "-0.02em",
@@ -60,7 +61,7 @@ export function GammaWorkspaceHeader({
               placeItems: "center",
               fontSize: "14px",
               color: "#FFFFFF",
-              boxShadow: "0 0 14px rgba(99, 102, 241, 0.4)",
+              boxShadow: "0 2px 10px rgba(79, 70, 229, 0.3)",
             }}
           >
             ✦
@@ -68,7 +69,7 @@ export function GammaWorkspaceHeader({
           <span>VidyaMotion</span>
         </Link>
 
-        <span style={{ color: "rgba(255, 255, 255, 0.2)", fontSize: "1rem" }}>/</span>
+        <span style={{ color: "#CBD5E1", fontSize: "1rem" }}>/</span>
 
         {/* Workspace Pill */}
         <div
@@ -78,10 +79,10 @@ export function GammaWorkspaceHeader({
             gap: "0.45rem",
             padding: "0.3rem 0.65rem",
             borderRadius: "8px",
-            background: "rgba(255, 255, 255, 0.05)",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "#F1F5F9",
+            border: "1px solid #E2E8F0",
             fontSize: "0.8125rem",
-            color: "#E2E8F0",
+            color: "#1E293B",
             fontWeight: 600,
           }}
         >
@@ -90,8 +91,9 @@ export function GammaWorkspaceHeader({
           <span
             style={{
               fontSize: "0.6875rem",
-              background: "rgba(99, 102, 241, 0.25)",
-              color: "#A5B4FC",
+              background: "#EEF2FF",
+              color: "#4338CA",
+              border: "1px solid #C7D2FE",
               padding: "0.1rem 0.4rem",
               borderRadius: "10px",
               fontWeight: 700,

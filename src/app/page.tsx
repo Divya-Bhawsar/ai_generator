@@ -31,7 +31,7 @@ const SHOWCASE_CARDS: ShowcaseCard[] = [
     title: "Inspect the Midpoint",
     narration: "Binary search checks the middle element immediately and halves the search space in one single calculation.",
     visualLabel: "Midpoint Pivot at Index 500k",
-    accent: "#6366F1",
+    accent: "#4F46E5",
   },
   {
     id: "card-3",
@@ -40,7 +40,7 @@ const SHOWCASE_CARDS: ShowcaseCard[] = [
     title: "Exponential Elimination",
     narration: "By discarding the wrong half each step, one million items are searched in only twenty comparisons: O(log n).",
     visualLabel: "Logarithmic Tree Graph",
-    accent: "#8B5CF6",
+    accent: "#7C3AED",
   },
   {
     id: "card-4",
@@ -67,7 +67,9 @@ const BENTO_FEATURES = [
     title: "Prompt-to-Storyboard Intelligence",
     description: "Type any complex topic or dictate verbally with your microphone. The AI synthesizes structured visual cards, pacing formulas, and conversational scripts in seconds.",
     tag: "Gemini AI Director",
-    gradient: "linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%)",
+    bg: "#EEF2FF",
+    border: "#C7D2FE",
+    iconBg: "#4F46E5",
   },
   {
     span: "col-span-1",
@@ -75,7 +77,9 @@ const BENTO_FEATURES = [
     title: "Dynamic Vector Diagrams",
     description: "Automatic algorithmic trees, CPU cache ladders, chemical reactions, and aerodynamic streamlines rendered in clean animated SVG.",
     tag: "Remotion Motion Engine",
-    gradient: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.05) 100%)",
+    bg: "#ECFDF5",
+    border: "#A7F3D0",
+    iconBg: "#10B981",
   },
   {
     span: "col-span-1",
@@ -83,7 +87,9 @@ const BENTO_FEATURES = [
     title: "Studio Neural Voiceovers",
     description: "Crystal-clear neural speech in both conversational Hinglish (Hindi + English) and natural English, free of robotic cadence.",
     tag: "Dual-Language Audio",
-    gradient: "linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 100%)",
+    bg: "#FFFBEB",
+    border: "#FDE68A",
+    iconBg: "#F59E0B",
   },
   {
     span: "col-span-2",
@@ -91,7 +97,9 @@ const BENTO_FEATURES = [
     title: "Kinetic Word-by-Word Captions",
     description: "Word-level timing alignment burns animated, high-retention captions directly into 1080x1920 vertical or 16:9 widescreen MP4 videos.",
     tag: "Burned-In Kinetic Captions",
-    gradient: "linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(168, 85, 247, 0.05) 100%)",
+    bg: "#FDF2F8",
+    border: "#FBCFE8",
+    iconBg: "#EC4899",
   },
   {
     span: "col-span-1",
@@ -99,7 +107,9 @@ const BENTO_FEATURES = [
     title: "Natural Language AI Co-Pilot",
     description: "Revise scripts instantly: 'Simplify scene 2 for a beginner', 'Add concrete numbers', or 'Translate to Hinglish' in one click.",
     tag: "Interactive Revisions",
-    gradient: "linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(14, 165, 233, 0.05) 100%)",
+    bg: "#F0F9FF",
+    border: "#BAE6FD",
+    iconBg: "#0284C7",
   },
   {
     span: "col-span-2",
@@ -107,7 +117,9 @@ const BENTO_FEATURES = [
     title: "Full-Screen Presenter Mode",
     description: "Present seamlessly with interactive scene chapter timeline, speaker notes drawer, and one-click 1080p MP4 download.",
     tag: "Presentation Deck Stage",
-    gradient: "linear-gradient(135deg, rgba(129, 140, 248, 0.2) 0%, rgba(99, 102, 241, 0.05) 100%)",
+    bg: "#FAF5FF",
+    border: "#E9D5FF",
+    iconBg: "#7C3AED",
   },
 ];
 
@@ -184,29 +196,27 @@ export default function HomePage() {
     }
   }
 
-  const activeCard = SHOWCASE_CARDS[activeCardIndex];
-
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#0A0B10",
-        color: "#F8FAFC",
+        background: "#F8FAFC",
+        color: "#0F172A",
         fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
         position: "relative",
         overflowX: "hidden",
       }}
     >
-      {/* Background Luminous Aura */}
+      {/* Background Luminous Radiant Aura */}
       <div
         style={{
           position: "absolute",
           top: 0,
           left: "50%",
           transform: "translateX(-50%)",
-          width: "1000px",
-          height: "550px",
-          background: "radial-gradient(ellipse 70% 50% at 50% -5%, rgba(99, 102, 241, 0.28) 0%, rgba(139, 92, 246, 0.15) 45%, rgba(10, 11, 16, 0) 80%)",
+          width: "1200px",
+          height: "600px",
+          background: "radial-gradient(ellipse 70% 50% at 50% -5%, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.06) 50%, rgba(248, 250, 252, 0) 80%)",
           pointerEvents: "none",
           zIndex: 0,
         }}
@@ -223,10 +233,11 @@ export default function HomePage() {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0 2rem",
-          background: "rgba(10, 11, 16, 0.85)",
+          background: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          borderBottom: "1px solid #E2E8F0",
+          boxShadow: "0 1px 3px rgba(15, 23, 42, 0.05)",
         }}
       >
         <Link
@@ -236,7 +247,7 @@ export default function HomePage() {
             alignItems: "center",
             gap: "0.6rem",
             textDecoration: "none",
-            color: "#FFFFFF",
+            color: "#0F172A",
             fontWeight: 800,
             fontSize: "1.15rem",
             letterSpacing: "-0.02em",
@@ -247,12 +258,12 @@ export default function HomePage() {
               width: "30px",
               height: "30px",
               borderRadius: "8px",
-              background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%)",
+              background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
               display: "grid",
               placeItems: "center",
               fontSize: "15px",
               color: "#FFFFFF",
-              boxShadow: "0 0 16px rgba(99, 102, 241, 0.45)",
+              boxShadow: "0 2px 10px rgba(79, 70, 229, 0.35)",
             }}
           >
             ✦
@@ -269,16 +280,16 @@ export default function HomePage() {
           }}
           className="desktop-nav"
         >
-          <a href="#showcase" style={{ color: "#E2E8F0", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
+          <a href="#showcase" style={{ color: "#334155", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
             Capabilities
           </a>
-          <a href="#bento" style={{ color: "#E2E8F0", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
+          <a href="#bento" style={{ color: "#334155", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
             Motion Engine
           </a>
-          <a href="#how-it-works" style={{ color: "#E2E8F0", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
+          <a href="#how-it-works" style={{ color: "#334155", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
             Workflow
           </a>
-          <a href="#examples" style={{ color: "#E2E8F0", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
+          <a href="#examples" style={{ color: "#334155", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
             Featured Decks
           </a>
         </nav>
@@ -288,7 +299,7 @@ export default function HomePage() {
           <Link
             href="/sign-in"
             style={{
-              color: "#E2E8F0",
+              color: "#334155",
               fontSize: "0.875rem",
               fontWeight: 600,
               textDecoration: "none",
@@ -300,14 +311,14 @@ export default function HomePage() {
           <Link
             href="/sign-up"
             style={{
-              background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%)",
+              background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
               color: "#FFFFFF",
               fontSize: "0.875rem",
               fontWeight: 700,
               padding: "0.55rem 1.15rem",
               borderRadius: "10px",
               textDecoration: "none",
-              boxShadow: "0 4px 18px rgba(99, 102, 241, 0.35)",
+              boxShadow: "0 4px 18px rgba(79, 70, 229, 0.35)",
               display: "inline-flex",
               alignItems: "center",
               gap: "0.4rem",
@@ -328,19 +339,19 @@ export default function HomePage() {
             <span
               style={{
                 fontSize: "0.78125rem",
-                fontWeight: 700,
-                color: "#C7D2FE",
-                background: "rgba(99, 102, 241, 0.18)",
-                border: "1px solid rgba(129, 140, 248, 0.35)",
+                fontWeight: 800,
+                color: "#4338CA",
+                background: "#EEF2FF",
+                border: "1px solid #C7D2FE",
                 borderRadius: "20px",
                 padding: "0.35rem 0.95rem",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.45rem",
-                boxShadow: "0 0 20px rgba(99, 102, 241, 0.2)",
+                boxShadow: "0 2px 8px rgba(99, 102, 241, 0.08)",
               }}
             >
-              <span style={{ color: "#818CF8" }}>✦</span>
+              <span style={{ color: "#4F46E5" }}>✦</span>
               <span>AI-POWERED EDUCATIONAL MOTION DECKS</span>
             </span>
           </div>
@@ -350,17 +361,17 @@ export default function HomePage() {
             style={{
               fontSize: "clamp(2.35rem, 5.5vw, 4.25rem)",
               fontWeight: 800,
-              color: "#FFFFFF",
+              color: "#0F172A",
               letterSpacing: "-0.035em",
               lineHeight: 1.12,
               margin: "0 auto 1.5rem",
-              maxWidth: "920px",
+              maxWidth: "940px",
             }}
           >
             Turn any complex idea into an{" "}
             <span
               style={{
-                background: "linear-gradient(135deg, #818CF8 0%, #C084FC 50%, #F472B6 100%)",
+                background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 display: "inline-block",
@@ -374,8 +385,8 @@ export default function HomePage() {
           <p
             style={{
               fontSize: "clamp(1.05rem, 1.8vw, 1.25rem)",
-              color: "#E2E8F0",
-              maxWidth: "760px",
+              color: "#334155",
+              maxWidth: "780px",
               margin: "0 auto 2.5rem",
               lineHeight: 1.65,
               fontWeight: 450,
@@ -388,20 +399,20 @@ export default function HomePage() {
           {/* Interactive AI Prompt Box in Hero */}
           <div
             style={{
-              maxWidth: "740px",
+              maxWidth: "760px",
               margin: "0 auto 2rem",
-              background: "#141624",
-              border: isListening ? "1.5px solid #EF4444" : "1px solid rgba(255, 255, 255, 0.15)",
+              background: "#FFFFFF",
+              border: isListening ? "2px solid #EF4444" : "1.5px solid #CBD5E1",
               borderRadius: "18px",
               padding: "0.6rem 0.6rem 0.6rem 1.25rem",
               display: "flex",
               alignItems: "center",
               gap: "0.75rem",
-              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5), 0 0 35px rgba(99, 102, 241, 0.15)",
+              boxShadow: "0 10px 40px rgba(15, 23, 42, 0.08), 0 0 25px rgba(79, 70, 229, 0.08)",
               transition: "all 0.2s ease",
             }}
           >
-            <span style={{ fontSize: "1.25rem", color: "#818CF8" }}>✦</span>
+            <span style={{ fontSize: "1.25rem", color: "#4F46E5" }}>✦</span>
 
             <input
               type="text"
@@ -412,8 +423,8 @@ export default function HomePage() {
                 flex: 1,
                 background: "transparent",
                 border: "none",
-                color: "#FFFFFF",
-                fontSize: "1rem",
+                color: "#0F172A",
+                fontSize: "1.05rem",
                 outline: "none",
                 fontWeight: 500,
               }}
@@ -428,8 +439,8 @@ export default function HomePage() {
               onClick={toggleVoiceInput}
               title={isListening ? "Stop listening" : "Dictate topic with microphone (English & Hinglish)"}
               style={{
-                background: isListening ? "#EF4444" : "rgba(255, 255, 255, 0.08)",
-                border: "none",
+                background: isListening ? "#EF4444" : "#F1F5F9",
+                border: "1px solid #E2E8F0",
                 borderRadius: "10px",
                 width: "38px",
                 height: "38px",
@@ -437,7 +448,7 @@ export default function HomePage() {
                 placeItems: "center",
                 cursor: "pointer",
                 fontSize: "1.05rem",
-                color: "#FFFFFF",
+                color: isListening ? "#FFFFFF" : "#334155",
                 transition: "all 0.15s ease",
               }}
             >
@@ -449,7 +460,7 @@ export default function HomePage() {
               type="button"
               onClick={() => handleStart()}
               style={{
-                background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%)",
+                background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
                 border: "none",
                 borderRadius: "12px",
                 padding: "0.85rem 1.65rem",
@@ -457,7 +468,7 @@ export default function HomePage() {
                 fontSize: "0.9375rem",
                 fontWeight: 700,
                 cursor: "pointer",
-                boxShadow: "0 4px 18px rgba(99, 102, 241, 0.35)",
+                boxShadow: "0 4px 18px rgba(79, 70, 229, 0.35)",
                 whiteSpace: "nowrap",
                 display: "flex",
                 alignItems: "center",
@@ -471,7 +482,7 @@ export default function HomePage() {
 
           {/* Quick Idea Chips */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.78125rem", color: "#94A3B8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+            <span style={{ fontSize: "0.78125rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
               Try a topic:
             </span>
             {SAMPLE_TOPICS.map((topic, i) => (
@@ -480,28 +491,29 @@ export default function HomePage() {
                 type="button"
                 onClick={() => handleStart(topic.prompt)}
                 style={{
-                  background: "rgba(255, 255, 255, 0.04)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
                   borderRadius: "20px",
-                  padding: "0.35rem 0.85rem",
-                  color: "#E2E8F0",
+                  padding: "0.4rem 0.95rem",
+                  color: "#334155",
                   fontSize: "0.8125rem",
                   fontWeight: 600,
                   cursor: "pointer",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.35rem",
+                  gap: "0.4rem",
+                  boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
                   transition: "all 0.15s ease",
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = "rgba(99, 102, 241, 0.15)";
-                  e.currentTarget.style.borderColor = "rgba(99, 102, 241, 0.35)";
-                  e.currentTarget.style.color = "#FFFFFF";
+                  e.currentTarget.style.background = "#EEF2FF";
+                  e.currentTarget.style.borderColor = "#818CF8";
+                  e.currentTarget.style.color = "#4338CA";
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.color = "#E2E8F0";
+                  e.currentTarget.style.background = "#FFFFFF";
+                  e.currentTarget.style.borderColor = "#E2E8F0";
+                  e.currentTarget.style.color = "#334155";
                 }}
               >
                 <span>{topic.icon}</span>
@@ -515,19 +527,19 @@ export default function HomePage() {
         <section id="showcase" style={{ marginBottom: "6rem" }}>
           <div
             style={{
-              background: "#121422",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
+              background: "#FFFFFF",
+              border: "1.5px solid #E2E8F0",
               borderRadius: "24px",
-              boxShadow: "0 25px 70px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.12)",
+              boxShadow: "0 25px 70px rgba(15, 23, 42, 0.08), 0 0 40px rgba(99, 102, 241, 0.06)",
               overflow: "hidden",
             }}
           >
             {/* Mock Window Header */}
             <div
               style={{
-                height: "48px",
-                background: "#0E101A",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                height: "52px",
+                background: "#F8FAFC",
+                borderBottom: "1px solid #E2E8F0",
                 padding: "0 1.25rem",
                 display: "flex",
                 alignItems: "center",
@@ -535,10 +547,10 @@ export default function HomePage() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#EF4444", display: "inline-block" }} />
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F59E0B", display: "inline-block" }} />
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#10B981", display: "inline-block" }} />
-                <span style={{ fontSize: "0.8125rem", color: "#94A3B8", marginLeft: "0.75rem", fontWeight: 600 }}>
+                <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#EF4444", display: "inline-block" }} />
+                <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#F59E0B", display: "inline-block" }} />
+                <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#10B981", display: "inline-block" }} />
+                <span style={{ fontSize: "0.85rem", color: "#0F172A", marginLeft: "0.75rem", fontWeight: 700 }}>
                   Binary Search Algorithm — 4-Card Presentation Deck
                 </span>
               </div>
@@ -546,26 +558,26 @@ export default function HomePage() {
               <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                 <span
                   style={{
-                    fontSize: "0.6875rem",
+                    fontSize: "0.72rem",
                     fontWeight: 700,
-                    color: "#A5B4FC",
-                    background: "rgba(99, 102, 241, 0.15)",
-                    border: "1px solid rgba(99, 102, 241, 0.25)",
+                    color: "#4338CA",
+                    background: "#EEF2FF",
+                    border: "1px solid #C7D2FE",
                     borderRadius: "10px",
-                    padding: "0.2rem 0.5rem",
+                    padding: "0.2rem 0.55rem",
                   }}
                 >
                   ✦ PRESENTATION CANVAS
                 </span>
                 <span
                   style={{
-                    fontSize: "0.6875rem",
+                    fontSize: "0.72rem",
                     fontWeight: 700,
-                    color: "#6EE7B7",
-                    background: "rgba(16, 185, 129, 0.15)",
-                    border: "1px solid rgba(16, 185, 129, 0.25)",
+                    color: "#065F46",
+                    background: "#ECFDF5",
+                    border: "1px solid #A7F3D0",
                     borderRadius: "10px",
-                    padding: "0.2rem 0.5rem",
+                    padding: "0.2rem 0.55rem",
                   }}
                 >
                   ● 1080p Video Synced
@@ -585,10 +597,10 @@ export default function HomePage() {
               {/* Left Column: Interactive Modular Cards Stream */}
               <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
-                  <span style={{ fontSize: "0.75rem", color: "#818CF8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  <span style={{ fontSize: "0.75rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     ✦ STORYBOARD CARDS SEQUENCE (CLICK TO INSPECT):
                   </span>
-                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>4 Cards · 48s Total</span>
+                  <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 600 }}>4 Cards · 48s Total</span>
                 </div>
 
                 {SHOWCASE_CARDS.map((card, idx) => {
@@ -600,19 +612,19 @@ export default function HomePage() {
                       style={{
                         padding: "1rem 1.15rem",
                         borderRadius: "14px",
-                        background: isActive ? "rgba(99, 102, 241, 0.15)" : "rgba(255, 255, 255, 0.03)",
-                        border: isActive ? "1.5px solid #818CF8" : "1px solid rgba(255, 255, 255, 0.06)",
+                        background: isActive ? "#EEF2FF" : "#F8FAFC",
+                        border: isActive ? "2px solid #4F46E5" : "1px solid #E2E8F0",
                         cursor: "pointer",
                         transition: "all 0.18s ease",
-                        boxShadow: isActive ? "0 4px 20px rgba(99, 102, 241, 0.15)" : "none",
+                        boxShadow: isActive ? "0 4px 20px rgba(79, 70, 229, 0.12)" : "none",
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
                         <span
                           style={{
-                            fontSize: "0.6875rem",
+                            fontSize: "0.72rem",
                             fontWeight: 800,
-                            color: isActive ? "#C7D2FE" : "#94A3B8",
+                            color: isActive ? "#3730A3" : "#64748B",
                             letterSpacing: "0.05em",
                           }}
                         >
@@ -620,23 +632,23 @@ export default function HomePage() {
                         </span>
                         <span
                           style={{
-                            fontSize: "0.6875rem",
-                            color: "#818CF8",
-                            background: "rgba(99, 102, 241, 0.1)",
-                            padding: "0.15rem 0.45rem",
+                            fontSize: "0.72rem",
+                            color: "#4338CA",
+                            background: "#E0E7FF",
+                            padding: "0.15rem 0.5rem",
                             borderRadius: "6px",
-                            fontWeight: 600,
+                            fontWeight: 700,
                           }}
                         >
                           {card.visualLabel}
                         </span>
                       </div>
 
-                      <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#FFFFFF", margin: "0 0 0.35rem" }}>
+                      <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0F172A", margin: "0 0 0.35rem" }}>
                         {card.title}
                       </h3>
 
-                      <p style={{ fontSize: "0.8125rem", color: isActive ? "#F1F5F9" : "#CBD5E1", margin: 0, lineHeight: 1.5 }}>
+                      <p style={{ fontSize: "0.85rem", color: "#334155", margin: 0, lineHeight: 1.5 }}>
                         "{card.narration}"
                       </p>
                     </div>
@@ -651,10 +663,10 @@ export default function HomePage() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "#08090E",
+                  background: "#F8FAFC",
                   borderRadius: "18px",
                   padding: "1.5rem",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
+                  border: "1px solid #E2E8F0",
                 }}
               >
                 {/* 9:16 Video Stage */}
@@ -665,8 +677,8 @@ export default function HomePage() {
                     aspectRatio: "9/16",
                     borderRadius: "14px",
                     overflow: "hidden",
-                    boxShadow: "0 16px 45px rgba(0, 0, 0, 0.8)",
-                    border: "2px solid rgba(255, 255, 255, 0.12)",
+                    boxShadow: "0 16px 45px rgba(15, 23, 42, 0.18)",
+                    border: "2px solid #CBD5E1",
                     background: "#000",
                     position: "relative",
                   }}
@@ -681,13 +693,13 @@ export default function HomePage() {
 
                 {/* Video Info Badges */}
                 <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "1.25rem", flexWrap: "wrap", justifyContent: "center" }}>
-                  <span style={{ fontSize: "0.75rem", color: "#E2E8F0", background: "rgba(255, 255, 255, 0.08)", padding: "0.3rem 0.65rem", borderRadius: "10px", fontWeight: 600 }}>
+                  <span style={{ fontSize: "0.75rem", color: "#0F172A", background: "#FFFFFF", border: "1px solid #E2E8F0", padding: "0.3rem 0.65rem", borderRadius: "10px", fontWeight: 600 }}>
                     🎙️ Voice: Christopher Neural
                   </span>
-                  <span style={{ fontSize: "0.75rem", color: "#E2E8F0", background: "rgba(255, 255, 255, 0.08)", padding: "0.3rem 0.65rem", borderRadius: "10px", fontWeight: 600 }}>
+                  <span style={{ fontSize: "0.75rem", color: "#0F172A", background: "#FFFFFF", border: "1px solid #E2E8F0", padding: "0.3rem 0.65rem", borderRadius: "10px", fontWeight: 600 }}>
                     ⏱️ Duration: 48s
                   </span>
-                  <span style={{ fontSize: "0.75rem", color: "#6EE7B7", background: "rgba(16, 185, 129, 0.15)", padding: "0.3rem 0.65rem", borderRadius: "10px", fontWeight: 700 }}>
+                  <span style={{ fontSize: "0.75rem", color: "#065F46", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "0.3rem 0.65rem", borderRadius: "10px", fontWeight: 700 }}>
                     1080x1920 MP4
                   </span>
                 </div>
@@ -699,13 +711,13 @@ export default function HomePage() {
         {/* BENTO GRID: CAPABILITIES */}
         <section id="bento" style={{ marginBottom: "6rem" }}>
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <span style={{ fontSize: "0.78125rem", color: "#818CF8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <span style={{ fontSize: "0.78125rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
               ✦ A COMPLETE MOTION KNOWLEDGE ENGINE
             </span>
-            <h2 style={{ fontSize: "clamp(1.85rem, 3.5vw, 2.75rem)", fontWeight: 800, color: "#FFFFFF", letterSpacing: "-0.025em", margin: "0.5rem 0 0.75rem" }}>
+            <h2 style={{ fontSize: "clamp(1.85rem, 3.5vw, 2.75rem)", fontWeight: 800, color: "#0F172A", letterSpacing: "-0.025em", margin: "0.5rem 0 0.75rem" }}>
               Built for deep conceptual clarity.
             </h2>
-            <p style={{ color: "#E2E8F0", fontSize: "1.05rem", maxWidth: "650px", margin: "0 auto", lineHeight: 1.6 }}>
+            <p style={{ color: "#334155", fontSize: "1.05rem", maxWidth: "650px", margin: "0 auto", lineHeight: 1.6 }}>
               Everything needed to turn technical documentation, algorithmic logic, and science principles into engaging motion graphics.
             </p>
           </div>
@@ -722,76 +734,64 @@ export default function HomePage() {
               <div
                 key={idx}
                 style={{
-                  background: "#131522",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: bento.bg,
+                  border: `1.5px solid ${bento.border}`,
                   borderRadius: "20px",
-                  padding: "1.75rem",
+                  padding: "1.85rem",
                   position: "relative",
                   overflow: "hidden",
                   transition: "all 0.2s ease",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
+                  boxShadow: "0 2px 8px rgba(15, 23, 42, 0.04)",
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(129, 140, 248, 0.35)";
                   e.currentTarget.style.transform = "translateY(-3px)";
-                  e.currentTarget.style.boxShadow = "0 12px 35px rgba(99, 102, 241, 0.12)";
+                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(15, 23, 42, 0.1)";
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(15, 23, 42, 0.04)";
                 }}
               >
-                {/* Ambient Card Background Gradient */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "140px",
-                    background: bento.gradient,
-                    pointerEvents: "none",
-                  }}
-                />
-
-                <div style={{ position: "relative", zIndex: 1 }}>
+                <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                     <span
                       style={{
-                        width: "36px",
-                        height: "36px",
+                        width: "38px",
+                        height: "38px",
                         borderRadius: "10px",
-                        background: "rgba(255, 255, 255, 0.08)",
+                        background: bento.iconBg,
                         display: "grid",
                         placeItems: "center",
-                        fontSize: "1.1rem",
+                        fontSize: "1.15rem",
                         color: "#FFFFFF",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                       }}
                     >
                       {bento.icon}
                     </span>
                     <span
                       style={{
-                        fontSize: "0.6875rem",
+                        fontSize: "0.72rem",
                         fontWeight: 800,
-                        color: "#A5B4FC",
-                        background: "rgba(99, 102, 241, 0.18)",
-                        padding: "0.2rem 0.55rem",
+                        color: "#0F172A",
+                        background: "rgba(255, 255, 255, 0.8)",
+                        padding: "0.25rem 0.6rem",
                         borderRadius: "10px",
+                        border: "1px solid rgba(0,0,0,0.06)",
                       }}
                     >
                       {bento.tag}
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#FFFFFF", margin: "0 0 0.6rem", letterSpacing: "-0.01em" }}>
+                  <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0F172A", margin: "0 0 0.6rem", letterSpacing: "-0.01em" }}>
                     {bento.title}
                   </h3>
 
-                  <p style={{ fontSize: "0.875rem", color: "#E2E8F0", lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ fontSize: "0.9375rem", color: "#334155", lineHeight: 1.6, margin: 0 }}>
                     {bento.description}
                   </p>
                 </div>
@@ -803,10 +803,10 @@ export default function HomePage() {
         {/* 3-STEP WORKFLOW */}
         <section id="how-it-works" style={{ marginBottom: "6rem" }}>
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <span style={{ fontSize: "0.78125rem", color: "#818CF8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <span style={{ fontSize: "0.78125rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
               ✦ SIMPLE 3-STEP CREATOR WORKFLOW
             </span>
-            <h2 style={{ fontSize: "clamp(1.85rem, 3.5vw, 2.75rem)", fontWeight: 800, color: "#FFFFFF", letterSpacing: "-0.025em", margin: "0.5rem 0 0.75rem" }}>
+            <h2 style={{ fontSize: "clamp(1.85rem, 3.5vw, 2.75rem)", fontWeight: 800, color: "#0F172A", letterSpacing: "-0.025em", margin: "0.5rem 0 0.75rem" }}>
               From idea to finished presentation in minutes.
             </h2>
           </div>
@@ -838,29 +838,30 @@ export default function HomePage() {
               <div
                 key={idx}
                 style={{
-                  background: "#131522",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: "#FFFFFF",
+                  border: "1.5px solid #E2E8F0",
                   borderRadius: "20px",
                   padding: "2rem",
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.75rem",
+                  boxShadow: "0 4px 16px -2px rgba(15, 23, 42, 0.05)",
                 }}
               >
                 <span
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: "1.65rem",
                     fontWeight: 900,
-                    color: "#818CF8",
+                    color: "#4F46E5",
                     letterSpacing: "-0.03em",
                   }}
                 >
                   {step.step}
                 </span>
-                <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
                   {step.title}
                 </h3>
-                <p style={{ fontSize: "0.875rem", color: "#E2E8F0", lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontSize: "0.9375rem", color: "#334155", lineHeight: 1.6, margin: 0 }}>
                   {step.description}
                 </p>
               </div>
@@ -872,10 +873,10 @@ export default function HomePage() {
         <section id="examples" style={{ marginBottom: "6rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
             <div>
-              <span style={{ fontSize: "0.78125rem", color: "#818CF8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <span style={{ fontSize: "0.78125rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 ✦ CURATED PRESENTATION SHOWCASE
               </span>
-              <h2 style={{ fontSize: "1.85rem", fontWeight: 800, color: "#FFFFFF", margin: "0.35rem 0 0" }}>
+              <h2 style={{ fontSize: "1.85rem", fontWeight: 800, color: "#0F172A", margin: "0.35rem 0 0" }}>
                 Explore live animated explainer decks
               </h2>
             </div>
@@ -883,7 +884,7 @@ export default function HomePage() {
             <Link
               href="/dashboard"
               style={{
-                color: "#A5B4FC",
+                color: "#4F46E5",
                 fontSize: "0.875rem",
                 fontWeight: 700,
                 textDecoration: "none",
@@ -936,12 +937,13 @@ export default function HomePage() {
               <div
                 key={idx}
                 style={{
-                  background: "#131522",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: "#FFFFFF",
+                  border: "1.5px solid #E2E8F0",
                   borderRadius: "18px",
                   overflow: "hidden",
                   display: "flex",
                   flexDirection: "column",
+                  boxShadow: "0 4px 16px -2px rgba(15, 23, 42, 0.05)",
                 }}
               >
                 <div style={{ position: "relative", aspectRatio: "16/9", background: "#000" }}>
@@ -962,11 +964,11 @@ export default function HomePage() {
                       position: "absolute",
                       bottom: "8px",
                       right: "8px",
-                      fontSize: "0.6875rem",
+                      fontSize: "0.72rem",
                       fontWeight: 700,
-                      background: "rgba(0,0,0,0.7)",
+                      background: "rgba(0,0,0,0.75)",
                       color: "#FFFFFF",
-                      padding: "0.15rem 0.45rem",
+                      padding: "0.2rem 0.5rem",
                       borderRadius: "6px",
                       backdropFilter: "blur(4px)",
                     }}
@@ -976,13 +978,13 @@ export default function HomePage() {
                 </div>
 
                 <div style={{ padding: "1.15rem", display: "flex", flexDirection: "column", gap: "0.4rem", flex: 1 }}>
-                  <span style={{ fontSize: "0.6875rem", color: "#818CF8", fontWeight: 700 }}>
+                  <span style={{ fontSize: "0.72rem", color: "#4F46E5", fontWeight: 700 }}>
                     {deck.voice}
                   </span>
-                  <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
                     {deck.title}
                   </h3>
-                  <p style={{ fontSize: "0.78125rem", color: "#CBD5E1", margin: 0, lineHeight: 1.45 }}>
+                  <p style={{ fontSize: "0.85rem", color: "#475569", margin: 0, lineHeight: 1.5 }}>
                     {deck.topic}
                   </p>
 
@@ -991,16 +993,16 @@ export default function HomePage() {
                       href="/dashboard"
                       style={{
                         width: "100%",
-                        padding: "0.55rem 0",
+                        padding: "0.6rem 0",
                         borderRadius: "10px",
-                        background: "rgba(255, 255, 255, 0.06)",
-                        color: "#FFFFFF",
+                        background: "#F8FAFC",
+                        color: "#0F172A",
                         fontSize: "0.8125rem",
-                        fontWeight: 600,
+                        fontWeight: 700,
                         textDecoration: "none",
                         textAlign: "center",
                         display: "block",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        border: "1px solid #CBD5E1",
                       }}
                     >
                       Open in Studio →
@@ -1015,25 +1017,26 @@ export default function HomePage() {
         {/* BIG BOTTOM CALL TO ACTION */}
         <section
           style={{
-            background: "radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.22) 0%, rgba(139, 92, 246, 0.08) 60%, rgba(18, 20, 34, 0.95) 100%)",
-            border: "1px solid rgba(129, 140, 248, 0.25)",
+            background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
             borderRadius: "28px",
-            padding: "4rem 2rem",
+            padding: "4.5rem 2rem",
             textAlign: "center",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(99, 102, 241, 0.15)",
+            boxShadow: "0 20px 60px rgba(79, 70, 229, 0.25)",
             marginBottom: "6rem",
+            color: "#FFFFFF",
           }}
         >
           <span
             style={{
               fontSize: "0.78125rem",
               fontWeight: 800,
-              color: "#C7D2FE",
-              background: "rgba(99, 102, 241, 0.25)",
-              padding: "0.3rem 0.85rem",
+              color: "#FFFFFF",
+              background: "rgba(255, 255, 255, 0.2)",
+              padding: "0.35rem 0.95rem",
               borderRadius: "20px",
               display: "inline-block",
               marginBottom: "1.25rem",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
             }}
           >
             ✦ START CREATING TODAY
@@ -1055,28 +1058,28 @@ export default function HomePage() {
 
           <p
             style={{
-              fontSize: "1.1rem",
-              color: "#E2E8F0",
+              fontSize: "1.15rem",
+              color: "rgba(255, 255, 255, 0.9)",
               maxWidth: "600px",
               margin: "0 auto 2.5rem",
               lineHeight: 1.6,
             }}
           >
-            Join thousands of educators, engineers, and creators who generate clear animated explainer presentations with AI.
+            Join educators, engineers, and creators who generate clear animated explainer presentations with AI.
           </p>
 
           <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
             <Link
               href="/sign-up"
               style={{
-                background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%)",
-                color: "#FFFFFF",
+                background: "#FFFFFF",
+                color: "#4F46E5",
                 fontSize: "1rem",
-                fontWeight: 700,
-                padding: "0.85rem 2rem",
+                fontWeight: 800,
+                padding: "0.95rem 2.25rem",
                 borderRadius: "12px",
                 textDecoration: "none",
-                boxShadow: "0 4px 25px rgba(99, 102, 241, 0.45)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
@@ -1089,12 +1092,12 @@ export default function HomePage() {
             <Link
               href="/dashboard"
               style={{
-                background: "rgba(255, 255, 255, 0.06)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
+                background: "rgba(255, 255, 255, 0.15)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
                 color: "#FFFFFF",
                 fontSize: "1rem",
-                fontWeight: 600,
-                padding: "0.85rem 1.75rem",
+                fontWeight: 700,
+                padding: "0.95rem 1.85rem",
                 borderRadius: "12px",
                 textDecoration: "none",
               }}
@@ -1105,11 +1108,11 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* MODERN DARK FOOTER */}
+      {/* MODERN SLATE FOOTER */}
       <footer
         style={{
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-          background: "#08090E",
+          borderTop: "1px solid #E2E8F0",
+          background: "#FFFFFF",
           padding: "3.5rem 1.5rem 2.5rem",
         }}
       >
@@ -1130,7 +1133,7 @@ export default function HomePage() {
                 width: "26px",
                 height: "26px",
                 borderRadius: "6px",
-                background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%)",
+                background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
                 display: "grid",
                 placeItems: "center",
                 fontSize: "13px",
@@ -1139,20 +1142,20 @@ export default function HomePage() {
             >
               ✦
             </span>
-            <span style={{ fontWeight: 800, color: "#FFFFFF", fontSize: "1rem" }}>VidyaMotion</span>
-            <span style={{ color: "#94A3B8", fontSize: "0.8125rem", marginLeft: "0.5rem" }}>
+            <span style={{ fontWeight: 800, color: "#0F172A", fontSize: "1rem" }}>VidyaMotion</span>
+            <span style={{ color: "#64748B", fontSize: "0.8125rem", marginLeft: "0.5rem" }}>
               Educational motion decks made clear.
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", fontSize: "0.8125rem", color: "#94A3B8" }}>
-            <Link href="/dashboard" style={{ color: "#E2E8F0", textDecoration: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", fontSize: "0.85rem", color: "#64748B" }}>
+            <Link href="/dashboard" style={{ color: "#334155", textDecoration: "none", fontWeight: 600 }}>
               Studio
             </Link>
-            <Link href="/sign-in" style={{ color: "#E2E8F0", textDecoration: "none" }}>
+            <Link href="/sign-in" style={{ color: "#334155", textDecoration: "none", fontWeight: 600 }}>
               Sign In
             </Link>
-            <Link href="/sign-up" style={{ color: "#E2E8F0", textDecoration: "none" }}>
+            <Link href="/sign-up" style={{ color: "#334155", textDecoration: "none", fontWeight: 600 }}>
               Get Started
             </Link>
             <span>© {new Date().getFullYear()} VidyaMotion</span>

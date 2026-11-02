@@ -73,7 +73,7 @@ export function SignUpForm() {
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="name" style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#17191F" }}>
+        <label htmlFor="name" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#0F172A" }}>
           Full name (optional)
         </label>
         <input
@@ -85,18 +85,18 @@ export function SignUpForm() {
           disabled={loading}
           style={{
             padding: "0.625rem 0.75rem",
-            borderRadius: "6px",
-            border: "1px solid #E8E5DF",
-            background: "#FAF9F6",
+            borderRadius: "8px",
+            border: "1px solid #CBD5E1",
+            background: "#FFFFFF",
             fontSize: "0.9375rem",
-            color: "#17191F",
+            color: "#0F172A",
             outline: "none",
           }}
         />
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="email" style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#17191F" }}>
+        <label htmlFor="email" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#0F172A" }}>
           Email address
         </label>
         <input
@@ -109,18 +109,18 @@ export function SignUpForm() {
           disabled={loading}
           style={{
             padding: "0.625rem 0.75rem",
-            borderRadius: "6px",
-            border: "1px solid #E8E5DF",
-            background: "#FAF9F6",
+            borderRadius: "8px",
+            border: "1px solid #CBD5E1",
+            background: "#FFFFFF",
             fontSize: "0.9375rem",
-            color: "#17191F",
+            color: "#0F172A",
             outline: "none",
           }}
         />
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="password" style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#17191F" }}>
+        <label htmlFor="password" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#0F172A" }}>
           Password
         </label>
         <input
@@ -133,18 +133,18 @@ export function SignUpForm() {
           disabled={loading}
           style={{
             padding: "0.625rem 0.75rem",
-            borderRadius: "6px",
-            border: "1px solid #E8E5DF",
-            background: "#FAF9F6",
+            borderRadius: "8px",
+            border: "1px solid #CBD5E1",
+            background: "#FFFFFF",
             fontSize: "0.9375rem",
-            color: "#17191F",
+            color: "#0F172A",
             outline: "none",
           }}
         />
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="confirmPassword" style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#17191F" }}>
+        <label htmlFor="confirmPassword" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#0F172A" }}>
           Confirm password
         </label>
         <input
@@ -157,11 +157,11 @@ export function SignUpForm() {
           disabled={loading}
           style={{
             padding: "0.625rem 0.75rem",
-            borderRadius: "6px",
-            border: "1px solid #E8E5DF",
-            background: "#FAF9F6",
+            borderRadius: "8px",
+            border: "1px solid #CBD5E1",
+            background: "#FFFFFF",
             fontSize: "0.9375rem",
-            color: "#17191F",
+            color: "#0F172A",
             outline: "none",
           }}
         />
@@ -170,11 +170,12 @@ export function SignUpForm() {
       <button
         type="submit"
         disabled={loading}
-        className="button"
+        className="gamma-gradient-btn"
         style={{
           marginTop: "0.5rem",
           width: "100%",
           padding: "0.75rem",
+          borderRadius: "8px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -186,7 +187,7 @@ export function SignUpForm() {
       </button>
 
       <div style={{ textAlign: "center", marginTop: "0.25rem" }}>
-        <small style={{ color: "#666B73", fontSize: "0.75rem" }}>
+        <small style={{ color: "#475569", fontSize: "0.75rem" }}>
           Database connected · Securely encrypted with bcrypt
         </small>
       </div>

@@ -6,7 +6,7 @@ import { GammaPromptHero } from "@/components/gamma/gamma-prompt-hero";
 import { GammaProjectGrid } from "@/components/gamma/gamma-project-grid";
 
 export const metadata = {
-  title: "Gamma Studio — VidyaMotion",
+  title: "Studio Workspace — VidyaMotion",
   description: "Generate structured, visual, animated explainer presentations with AI.",
 };
 

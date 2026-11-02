@@ -46,10 +46,10 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
           }}
         >
           <div>
-            <span style={{ fontSize: "0.72rem", color: "#818CF8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <span style={{ fontSize: "0.72rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
               ✦ RECENT PRESENTATIONS
             </span>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#FFFFFF", margin: "0.2rem 0 0" }}>
+            <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#0F172A", margin: "0.2rem 0 0" }}>
               Your Explainer Decks ({projects.length})
             </h2>
           </div>
@@ -62,14 +62,14 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter decks..."
               style={{
-                background: "#181A2A",
-                border: "1px solid var(--gamma-border)",
+                background: "#FFFFFF",
+                border: "1.5px solid #CBD5E1",
                 borderRadius: "10px",
                 padding: "0.45rem 0.85rem",
-                color: "#FFFFFF",
+                color: "#0F172A",
                 fontSize: "0.8125rem",
                 outline: "none",
-                width: "160px",
+                width: "180px",
               }}
             />
 
@@ -98,22 +98,22 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
           </div>
         </div>
 
-        {/* Gamma Deck Cards Grid */}
+        {/* Deck Cards Grid */}
         {filtered.length === 0 ? (
           <div
             style={{
               padding: "3.5rem 1.5rem",
               textAlign: "center",
-              background: "#141624",
-              border: "1px dashed var(--gamma-border)",
+              background: "#FFFFFF",
+              border: "1.5px dashed #CBD5E1",
               borderRadius: "20px",
             }}
           >
             <span style={{ fontSize: "2.5rem", display: "block", marginBottom: "0.75rem" }}>✦</span>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#FFFFFF", margin: "0 0 0.35rem" }}>
+            <h3 style={{ fontSize: "1.15rem", fontWeight: 700, color: "#0F172A", margin: "0 0 0.35rem" }}>
               No explainer presentations found
             </h3>
-            <p style={{ color: "var(--gamma-text-muted)", fontSize: "0.85rem", margin: 0 }}>
+            <p style={{ color: "#475569", fontSize: "0.875rem", margin: 0 }}>
               Use the AI generator bar above to synthesize your first animated topic presentation!
             </p>
           </div>
@@ -136,6 +136,8 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                     overflow: "hidden",
                     display: "flex",
                     flexDirection: "column",
+                    background: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
                   }}
                 >
                   {/* Presentation Preview Header (16:9 / Video Frame) */}
@@ -143,9 +145,9 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                     style={{
                       position: "relative",
                       aspectRatio: "16/9",
-                      background: "#0E101A",
+                      background: "#08090E",
                       overflow: "hidden",
-                      borderBottom: "1px solid var(--gamma-border)",
+                      borderBottom: "1px solid #E2E8F0",
                     }}
                   >
                     {hasVideo ? (
@@ -255,7 +257,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                       style={{
                         fontSize: "1.05rem",
                         fontWeight: 800,
-                        color: "#FFFFFF",
+                        color: "#0F172A",
                         margin: "0 0 0.35rem",
                         lineHeight: 1.3,
                         letterSpacing: "-0.01em",
@@ -267,7 +269,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                     <p
                       style={{
                         fontSize: "0.8125rem",
-                        color: "var(--gamma-text-muted)",
+                        color: "#475569",
                         margin: "0 0 1rem",
                         lineHeight: 1.5,
                         display: "-webkit-box",
@@ -280,14 +282,14 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                       {project.topic}
                     </p>
 
-                    {/* Gamma Deck Footer Actions */}
+                    {/* Deck Footer Actions */}
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
                         gap: "0.5rem",
                         paddingTop: "0.85rem",
-                        borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                        borderTop: "1px solid #E2E8F0",
                       }}
                     >
                       {hasVideo ? (
@@ -320,9 +322,9 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                           flex: 1,
                           padding: "0.55rem 0.75rem",
                           borderRadius: "10px",
-                          background: hasVideo ? "rgba(255, 255, 255, 0.05)" : "var(--gamma-gradient)",
-                          border: hasVideo ? "1px solid rgba(255, 255, 255, 0.1)" : "none",
-                          color: "#FFFFFF",
+                          background: hasVideo ? "#F8FAFC" : "var(--gamma-gradient)",
+                          border: hasVideo ? "1px solid #CBD5E1" : "none",
+                          color: hasVideo ? "#0F172A" : "#FFFFFF",
                           fontSize: "0.8125rem",
                           fontWeight: 700,
                           textAlign: "center",
@@ -331,6 +333,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                           alignItems: "center",
                           justifyContent: "center",
                           gap: "0.35rem",
+                          boxShadow: hasVideo ? "none" : "0 4px 14px rgba(79, 70, 229, 0.3)",
                         }}
                       >
                         <span>✏️</span>

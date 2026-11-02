@@ -228,16 +228,17 @@ export function GammaPresenterModal({
                 maxWidth: "600px",
                 padding: "3rem 2rem",
                 textAlign: "center",
-                background: "var(--gamma-card)",
+                background: "#181A2A",
                 borderRadius: "20px",
-                border: "1px solid var(--gamma-border)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5)",
               }}
             >
               <span style={{ fontSize: "3rem", display: "block", marginBottom: "1rem" }}>🎬</span>
-              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, margin: "0 0 0.5rem" }}>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, margin: "0 0 0.5rem", color: "#FFFFFF" }}>
                 Ready to Render Presentation
               </h2>
-              <p style={{ color: "var(--gamma-text-muted)", fontSize: "0.9375rem", marginBottom: "1.5rem" }}>
+              <p style={{ color: "#CBD5E1", fontSize: "0.9375rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
                 This presentation has its storyboard cards organized. Jump into the Studio to render the 1080p video with neural voiceover.
               </p>
               {projectId && (
