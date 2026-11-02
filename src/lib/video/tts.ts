@@ -41,8 +41,8 @@ export async function synthesizeSceneAudio({
 }): Promise<SpeechResult> {
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
 
-  // 1. Try ElevenLabs API with timestamps
-  if (apiKey && voiceId) {
+  // 1. Try ElevenLabs API with timestamps (if key is provided)
+  if (apiKey && voiceId && !["neerja", "prabhat", "christopher", "jenny", "viraj", "monica"].includes(voiceId.toLowerCase())) {
     try {
       const url = `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
         voiceId
@@ -85,8 +85,54 @@ export async function synthesizeSceneAudio({
     }
   }
 
-  // 2. macOS System Neural Voice Fallback
-  const sysVoice = /monica|female/i.test(voiceName) ? "Tara" : "Aman";
+  // 2. Microsoft Edge Neural Voice Engine (100% Free, Studio-Grade Clarity, Zero API Keys)
+  const EDGE_VOICE_MAP: Record<string, string> = {
+    neerja: "en-IN-NeerjaNeural",
+    monica: "en-IN-NeerjaNeural",
+    prabhat: "en-IN-PrabhatNeural",
+    viraj: "en-IN-PrabhatNeural",
+    christopher: "en-US-ChristopherNeural",
+    guy: "en-US-GuyNeural",
+    jenny: "en-US-JennyNeural",
+    aria: "en-US-AriaNeural",
+    ryan: "en-GB-RyanNeural",
+    sonia: "en-GB-SoniaNeural",
+  };
+
+  const selectedEdgeVoice =
+    EDGE_VOICE_MAP[voiceName.toLowerCase()] ||
+    EDGE_VOICE_MAP[voiceId.toLowerCase()] ||
+    (/female|monica|neerja|jenny|aria|tara/i.test(voiceName)
+      ? "en-IN-NeerjaNeural"
+      : "en-IN-PrabhatNeural");
+
+  try {
+    await execFileAsync("python3", [
+      "-m",
+      "edge_tts",
+      "--voice",
+      selectedEdgeVoice,
+      "--text",
+      text,
+      "--write-media",
+      destPath,
+    ]);
+
+    const duration = await probeDuration(destPath);
+    if (duration > 0.5) {
+      return {
+        duration,
+        alignment: syntheticAlignment(text, duration),
+        audioFile: destPath,
+        isSynthetic: false,
+      };
+    }
+  } catch (err) {
+    console.warn("Edge Neural TTS failed, trying macOS say fallback:", err);
+  }
+
+  // 3. macOS System Voice Fallback (if edge-tts is unavailable)
+  const sysVoice = /monica|neerja|female/i.test(voiceName) ? "Tara" : "Aman";
   const tempAiff = destPath.replace(/\.mp3$/, ".aiff");
 
   try {

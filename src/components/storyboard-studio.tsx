@@ -20,20 +20,36 @@ const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: str
 
 const VOICES = [
   {
-    id: "Q1NHvGuV9SzxtiSnVDEH",
-    name: "viraj",
-    label: "Viraj",
-    description: "Indian English · Confident, Informative Male",
-    previewUrl: "/audio/voice-viraj.mp3",
-    tag: "Recommended for Tech & Science",
+    id: "neerja",
+    name: "neerja",
+    label: "Neerja",
+    description: "Indian English · Warm, Crystal-Clear Female",
+    previewUrl: "/audio/voice-neerja.mp3",
+    tag: "Recommended for Teaching & Cooking",
   },
   {
-    id: "zuIkusKkwwtn2eFqk87f",
-    name: "monica",
-    label: "Monica",
-    description: "Indian English · Clear, Engaging Female",
-    previewUrl: "/audio/voice-monica.mp3",
-    tag: "Great for Education & Cooking",
+    id: "prabhat",
+    name: "prabhat",
+    label: "Prabhat",
+    description: "Indian English · Articulate, Confident Male",
+    previewUrl: "/audio/voice-prabhat.mp3",
+    tag: "Recommended for Coding & Tech",
+  },
+  {
+    id: "christopher",
+    name: "christopher",
+    label: "Christopher",
+    description: "US English · Deep, Engaging Explainer Male",
+    previewUrl: "/audio/voice-christopher.mp3",
+    tag: "Great for Science & Documentaries",
+  },
+  {
+    id: "jenny",
+    name: "jenny",
+    label: "Jenny",
+    description: "US English · Smooth, Friendly Studio Female",
+    previewUrl: "/audio/voice-jenny.mp3",
+    tag: "Great for General Knowledge",
   },
 ];
 
@@ -84,7 +100,14 @@ export function StoryboardStudio({
   const [redrawing, setRedrawing] = useState(false);
 
   // Voice Selection State
-  const initialVoice = VOICES.find((v) => v.id === initialProject.voiceId || v.name === initialProject.voiceName) || VOICES[0];
+  const initialVoice =
+    VOICES.find(
+      (v) =>
+        v.id === initialProject.voiceId ||
+        v.name === initialProject.voiceName ||
+        (initialProject.voiceName === "viraj" && v.name === "prabhat") ||
+        (initialProject.voiceName === "monica" && v.name === "neerja")
+    ) || VOICES[0];
   const [selectedVoice, setSelectedVoice] = useState(initialVoice);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
