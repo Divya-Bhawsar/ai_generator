@@ -3,10 +3,12 @@ import { interpolate, useCurrentFrame } from "remotion";
 import { binaryTrace } from "./search";
 import type { TimedScene } from "./contracts";
 
-const ink = "#153c3a";
-const teal = "#168779";
-const orange = "#e9a64d";
-const red = "#e5484d";
+const ink = "#FFFFFF";
+const cyan = "#38BDF8";
+const amber = "#F59E0B";
+const emerald = "#10B981";
+const red = "#EF4444";
+const slateCard = "#1E293B";
 
 export function SearchDiagram({ scene }: { scene: TimedScene }) {
   const f = useCurrentFrame();
@@ -68,16 +70,16 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
   return (
     <>
       {/* Target display card */}
-      <rect x="290" y="30" width="280" height="95" rx="22" fill="#dbe9e6" stroke="#b6d5ce" strokeWidth="2" />
-      <text x="430" y="65" textAnchor="middle" fontSize="18" letterSpacing="3" fontWeight="700" fill={teal}>
-        SEARCH TARGET
+      <rect x="290" y="25" width="280" height="95" rx="22" fill={slateCard} stroke="rgba(99, 102, 241, 0.4)" strokeWidth="1.5" />
+      <text x="430" y="58" textAnchor="middle" fontSize="16" letterSpacing="3" fontWeight="800" fill={cyan}>
+        TARGET VALUE
       </text>
-      <text x="430" y="106" textAnchor="middle" fontSize="36" fontWeight="700" fill={ink}>
+      <text x="430" y="100" textAnchor="middle" fontSize="38" fontWeight="800" fill={ink}>
         {s.target}
       </text>
 
       {/* Operation subtitle */}
-      <text x="430" y="185" textAnchor="middle" fontSize="22" fontWeight="600" fill="#6c827b">
+      <text x="430" y="175" textAnchor="middle" fontSize="20" fontWeight="700" fill="#94A3B8" letterSpacing="1">
         {setup ? "SORTED ARRAY · INDEX 0 TO " + (s.values.length - 1) : `STEP ${stepIndex + 1} OF ${trace.length}`}
       </text>
 
@@ -90,15 +92,15 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
         const isMatched = (found || (decided && step.outcome === "found")) && i === step.mid;
         const x = left + i * (cell + gap);
 
-        const fillColor = isMatched ? teal : isMid ? "#f5dfbb" : "#e0e8df";
-        const strokeColor = isMatched ? teal : isMid ? orange : "#c3d5ce";
-        const strokeW = isMid || isMatched ? 4 : 2;
+        const fillColor = isMatched ? "rgba(16, 185, 129, 0.25)" : isMid ? "rgba(245, 158, 11, 0.2)" : slateCard;
+        const strokeColor = isMatched ? emerald : isMid ? amber : "rgba(255, 255, 255, 0.12)";
+        const strokeW = isMid || isMatched ? 3 : 1.5;
 
         return (
           <g key={i} opacity={opacity}>
             <rect
               x={x}
-              y="235"
+              y="225"
               width={cell}
               height="95"
               rx="16"
@@ -108,11 +110,11 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
             />
             <text
               x={x + cell / 2}
-              y="295"
+              y="285"
               textAnchor="middle"
-              fill={isMatched ? "#ffffff" : ink}
-              fontSize="32"
-              fontWeight="700"
+              fill={isMatched ? "#34D399" : isMid ? "#FBBF24" : ink}
+              fontSize="30"
+              fontWeight="800"
             >
               {value}
             </text>
@@ -120,7 +122,7 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
             {/* Red elimination strike-through slash */}
             {!retained && decided && (
               <path
-                d={`M${x + 10} 250 L${x + cell - 10} 315`}
+                d={`M${x + 10} 240 L${x + cell - 10} 305`}
                 stroke={red}
                 strokeWidth="4"
                 strokeLinecap="round"
@@ -133,11 +135,11 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
 
       {/* Upward midpoint pointer */}
       {checked && (
-        <g transform={`translate(${left + step.mid * (cell + gap) + cell / 2} 355)`}>
+        <g transform={`translate(${left + step.mid * (cell + gap) + cell / 2} 350)`}>
           <path
             d="M0 24 V0 M-8 8 L0 0 L8 8"
             fill="none"
-            stroke={found ? teal : orange}
+            stroke={found ? emerald : amber}
             strokeWidth="4"
             strokeLinecap="round"
           />
@@ -146,9 +148,9 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
             y="54"
             textAnchor="middle"
             fontSize="18"
-            fontWeight="700"
+            fontWeight="800"
             letterSpacing="1"
-            fill={found ? teal : orange}
+            fill={found ? emerald : amber}
           >
             {found ? "MATCH" : "MIDPOINT"}
           </text>
@@ -160,31 +162,31 @@ export function SearchDiagram({ scene }: { scene: TimedScene }) {
         x="70"
         y="450"
         width="720"
-        height="115"
+        height="125"
         rx="24"
-        fill={found ? "#cfe4db" : "#ffffff90"}
-        stroke={found ? teal : "#d0dcd4"}
-        strokeWidth="2"
+        fill={found ? "rgba(16, 185, 129, 0.18)" : "rgba(30, 41, 59, 0.75)"}
+        stroke={found ? emerald : "rgba(255, 255, 255, 0.12)"}
+        strokeWidth="1.5"
       />
-      <text x="430" y="495" textAnchor="middle" fontSize="28" fontWeight="700" fill={ink}>
+      <text x="430" y="498" textAnchor="middle" fontSize="28" fontWeight="800" fill={ink}>
         {note}
       </text>
-      <text x="430" y="534" textAnchor="middle" fontSize="20" fontWeight="600" fill={teal}>
+      <text x="430" y="540" textAnchor="middle" fontSize="19" fontWeight="600" fill={cyan}>
         {found
-          ? "Target located in O(log N) time"
+          ? "Target located in O(log N) logarithmic time"
           : absent
           ? "Value not found in search space"
           : `${remaining} candidate${remaining === 1 ? "" : "s"} remaining in active range`}
       </text>
 
       {/* Legend */}
-      <g transform="translate(285 625)">
-        <rect width="16" height="16" rx="4" fill={teal} />
-        <text x="26" y="14" fontSize="18" fontWeight="600" fill={ink}>
-          Candidates
+      <g transform="translate(285 630)">
+        <rect width="16" height="16" rx="4" fill={cyan} />
+        <text x="26" y="14" fontSize="17" fontWeight="600" fill={ink}>
+          Active Search
         </text>
-        <rect x="180" width="16" height="16" rx="4" fill="#c0c9c3" />
-        <text x="206" y="14" fontSize="18" fontWeight="600" fill="#6c827b">
+        <rect x="180" width="16" height="16" rx="4" fill="rgba(255, 255, 255, 0.2)" />
+        <text x="206" y="14" fontSize="17" fontWeight="600" fill="#94A3B8">
           Eliminated
         </text>
       </g>

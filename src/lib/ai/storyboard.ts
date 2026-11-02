@@ -621,7 +621,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: [topicKeyword.toLowerCase(), "reality", "practical"],
         estimatedSeconds: 12.0,
         cue: topicKeyword.toLowerCase(),
-        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="200" cy="130" r="55" fill="#168779"/><circle cx="200" cy="130" r="40" fill="#fcfbf8"/><text x="200" y="140" fill="#153c3a" font-size="32" font-weight="800" text-anchor="middle">?</text><text x="200" y="235" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">${title.slice(0, 24)}</text></svg>`,
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#0F172A" rx="20"/><circle cx="200" cy="130" r="55" fill="#1E293B" stroke="#6366F1" stroke-width="2.5"/><text x="200" y="145" fill="#FFFFFF" font-size="38" font-weight="800" text-anchor="middle">?</text><rect x="60" y="215" width="280" height="38" rx="12" fill="rgba(99,102,241,0.2)" stroke="#818CF8" stroke-width="1"/><text x="200" y="239" fill="#38BDF8" font-size="14" font-weight="800" text-anchor="middle">${title.slice(0, 24)}</text></svg>`,
         diagram: {
           diagram_type: "vector_system",
           headline: `Core Principle of ${title}`,
@@ -642,7 +642,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["specific rule", "interact", "pattern"],
         estimatedSeconds: 13.0,
         cue: "interact",
-        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="90" cy="145" r="32" fill="#168779"/><line x1="122" y1="145" x2="168" y2="145" stroke="#e9a64d" stroke-width="4"/><circle cx="200" cy="145" r="32" fill="#e9a64d"/><line x1="232" y1="145" x2="278" y2="145" stroke="#168779" stroke-width="4"/><circle cx="310" cy="145" r="32" fill="#168779"/><text x="200" y="235" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Progressive Mechanism</text></svg>`,
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#0F172A" rx="20"/><circle cx="90" cy="140" r="32" fill="#1E293B" stroke="#38BDF8" stroke-width="2.5"/><line x1="124" y1="140" x2="166" y2="140" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/><circle cx="200" cy="140" r="32" fill="#1E293B" stroke="#F59E0B" stroke-width="2.5"/><line x1="234" y1="140" x2="276" y2="140" stroke="#6366F1" stroke-width="4" stroke-linecap="round"/><circle cx="310" cy="140" r="32" fill="#1E293B" stroke="#6366F1" stroke-width="2.5"/><text x="200" y="235" fill="#FFFFFF" font-size="15" font-weight="800" text-anchor="middle">Progressive Mechanism</text></svg>`,
         diagram: {
           diagram_type: "flow_pipeline",
           headline: "Underlying Reaction Sequence",
@@ -664,7 +664,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["starting condition", "core shift", "target state"],
         estimatedSeconds: 13.5,
         cue: "core shift",
-        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><rect x="70" y="95" width="105" height="95" rx="14" fill="#168779"/><text x="122" y="150" fill="#fff" font-size="18" font-weight="700" text-anchor="middle">Input</text><line x1="185" y1="142" x2="225" y2="142" stroke="#e9a64d" stroke-width="4"/><rect x="235" y="95" width="105" height="95" rx="14" fill="#e9a64d"/><text x="287" y="150" fill="#153c3a" font-size="18" font-weight="700" text-anchor="middle">Output</text><text x="200" y="240" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Step Transformation</text></svg>`,
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#0F172A" rx="20"/><rect x="65" y="90" width="110" height="100" rx="16" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/><text x="120" y="148" fill="#38BDF8" font-size="18" font-weight="800" text-anchor="middle">Input</text><line x1="185" y1="140" x2="225" y2="140" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/><rect x="235" y="90" width="110" height="100" rx="16" fill="#1E293B" stroke="#10B981" stroke-width="2"/><text x="290" y="148" fill="#10B981" font-size="18" font-weight="800" text-anchor="middle">Output</text><text x="200" y="240" fill="#FFFFFF" font-size="15" font-weight="800" text-anchor="middle">Step Transformation</text></svg>`,
         diagram: {
           diagram_type: "flow_pipeline",
           headline: "Three-Stage Process Chain",
@@ -686,7 +686,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["standard approach", "wasted effort", "exact result"],
         estimatedSeconds: 12.5,
         cue: "exact result",
-        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><rect x="50" y="85" width="135" height="120" rx="12" fill="#ffffff" stroke="#e9a64d" stroke-width="3"/><text x="117" y="150" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">Trial & Error</text><rect x="215" y="85" width="135" height="120" rx="12" fill="#ffffff" stroke="#168779" stroke-width="3"/><text x="282" y="150" fill="#168779" font-size="16" font-weight="700" text-anchor="middle">Targeted Law</text><text x="200" y="240" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Efficiency Contrast</text></svg>`,
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#0F172A" rx="20"/><rect x="45" y="80" width="140" height="125" rx="16" fill="#1E293B" stroke="#EF4444" stroke-width="2"/><text x="115" y="148" fill="#EF4444" font-size="16" font-weight="800" text-anchor="middle">Trial & Error</text><rect x="215" y="80" width="140" height="125" rx="16" fill="#1E293B" stroke="#10B981" stroke-width="2"/><text x="285" y="148" fill="#10B981" font-size="16" font-weight="800" text-anchor="middle">Targeted Law</text><text x="200" y="245" fill="#FFFFFF" font-size="15" font-weight="800" text-anchor="middle">Efficiency Contrast</text></svg>`,
         diagram: {
           diagram_type: "split_comparison",
           headline: "Mechanism vs Standard Approach",
@@ -709,7 +709,7 @@ export function synthesizeFallbackStoryboard(
         accentWords: ["mastered", "predict", "effortlessly"],
         estimatedSeconds: 11.0,
         cue: "effortlessly",
-        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="200" cy="135" r="50" fill="#168779"/><polygon points="200,105 212,128 238,130 218,148 224,172 200,158 176,172 182,148 162,130 188,128" fill="#e9a64d"/><text x="200" y="235" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">Mastered Principle</text></svg>`,
+        svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#0F172A" rx="20"/><circle cx="200" cy="130" r="50" fill="#1E293B" stroke="#F59E0B" stroke-width="3"/><polygon points="200,102 211,124 235,126 216,142 221,165 200,152 179,165 184,142 165,126 189,124" fill="#FBBF24"/><text x="200" y="235" fill="#F59E0B" font-size="16" font-weight="800" text-anchor="middle">Mastered Principle</text></svg>`,
         diagram: {
           diagram_type: "metric_card",
           headline: `Mastering ${title}`,
@@ -757,7 +757,7 @@ STRICT PEDAGOGICAL & VISUAL DIRECTIVES:
    - For biology/medical (e.g. Vaccines): Draw the virus with spikes, white blood cells, and Y-shaped antibodies locking in.
    - For software/systems (e.g. Git): Draw commit circles, branch pointers, code files.
    - For science/physics (e.g. Pressure Cooker, Airplanes): Draw the sealed steam pot with pressure valves, or aerodynamic wings with airflow streamlines.
-   - Use clean modern colors: #168779 (teal), #e9a64d (gold/orange), #153c3a (dark ink), #ffffff, #619ab4 (soft blue). Return ONLY standard SVG tags like <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">...</svg>.
+   - Use vibrant, broadcast-grade modern colors designed for cinematic dark backgrounds: #6366F1 (electric indigo), #38BDF8 (cyber cyan), #10B981 (vivid emerald), #F59E0B (amber gold), #EF4444 (coral red), #0F172A (deep card substrate), and #FFFFFF (pure white text/details). NEVER use murky teal (#168779) or muddy beige. Return ONLY standard SVG tags like <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">...</svg>.
 6. STRUCTURED DIAGRAM BLUEPRINT: Also populate the "diagram" object with matching "diagram_type", "headline", "badge", and appropriate metrics/flow_steps/comparison.
    - "diagram_type": Choose one of "flow_pipeline", "metric_card", "split_comparison", "vector_system", or "orbital_cycle".
    - "headline": High-impact, concise title for the diagram (under 35 chars).
@@ -938,7 +938,7 @@ Generate a clean, high-impact SVG vector illustration with viewBox="0 0 400 300"
 - For food/cooking: Draw the actual pan/utensils, ingredients, golden foods, heating steam.
 - For data structures: Draw actual tree nodes, connected branch lines, comparison indicators.
 - For science/nature/biology: Draw the cells, molecules, organs, physical forces.
-- Use clean modern colors: #168779 (teal), #e9a64d (gold/orange), #153c3a (dark ink), #ffffff, #619ab4 (soft blue).
+- Use vibrant, broadcast-grade modern colors designed for cinematic dark backgrounds: #6366F1 (electric indigo), #38BDF8 (cyber cyan), #10B981 (vivid emerald), #F59E0B (amber gold), #EF4444 (coral red), and #FFFFFF (pure white text/details). NEVER use murky teal (#168779) or muddy beige.
 - Return ONLY valid SVG code starting with <svg viewBox="0 0 400 300"> and ending with </svg>. Do not include markdown codeblocks or extra text.`;
 
   const preferredModel = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
@@ -973,7 +973,7 @@ Generate a clean, high-impact SVG vector illustration with viewBox="0 0 400 300"
 
   // Graceful fallback SVG
   return {
-    svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#153c3a" rx="16"/><circle cx="200" cy="135" r="48" fill="#168779"/><text x="200" y="143" fill="#fff" font-size="24" font-weight="700" text-anchor="middle">✨</text><text x="200" y="235" fill="#e9a64d" font-size="16" font-weight="700" text-anchor="middle">${sceneTitle.slice(0, 24)}</text></svg>`,
+    svgCode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#0F172A" rx="20"/><circle cx="200" cy="130" r="48" fill="#1E293B" stroke="#6366F1" stroke-width="2.5"/><text x="200" y="142" fill="#FFFFFF" font-size="28" font-weight="800" text-anchor="middle">✨</text><text x="200" y="235" fill="#38BDF8" font-size="16" font-weight="800" text-anchor="middle">${sceneTitle.slice(0, 24)}</text></svg>`,
     headline: sceneTitle,
     badge: "DYNAMIC VISUAL",
   };

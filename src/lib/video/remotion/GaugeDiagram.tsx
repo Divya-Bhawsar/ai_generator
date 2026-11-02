@@ -2,10 +2,11 @@ import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import type { TimedScene } from "./contracts";
 
-const ink = "#153c3a";
-const teal = "#168779";
-const orange = "#e9a64d";
-const red = "#e5484d";
+const ink = "#FFFFFF";
+const cyan = "#38BDF8";
+const orange = "#F59E0B";
+const red = "#EF4444";
+const slateCard = "#1E293B";
 
 export function GaugeDiagram({ scene }: { scene: TimedScene }) {
   const f = useCurrentFrame();
@@ -33,22 +34,22 @@ export function GaugeDiagram({ scene }: { scene: TimedScene }) {
   return (
     <>
       {/* Top category pill */}
-      <rect x="270" y="25" width="320" height="44" rx="22" fill="#dbe9e6" stroke="#b6d5ce" strokeWidth="1.5" />
-      <text x="430" y="53" textAnchor="middle" fontSize="16" fontWeight="700" letterSpacing="3" fill={teal}>
-        THERMAL METRIC GAUGE
+      <rect x="250" y="20" width="360" height="46" rx="23" fill="rgba(99, 102, 241, 0.18)" stroke="rgba(129, 140, 248, 0.4)" strokeWidth="1.5" />
+      <text x="430" y="50" textAnchor="middle" fontSize="16" fontWeight="800" letterSpacing="3" fill={cyan}>
+        ✦ THERMAL METRIC GAUGE
       </text>
 
       {/* Main Gauge Frame */}
-      <g transform="translate(430 250)">
+      <g transform="translate(430 240)">
         {/* Outer Circular Bezel */}
-        <circle r="170" fill="#fbfaf7" stroke="#ced9d1" strokeWidth="3" />
-        <circle r="150" fill="none" stroke="#e0e8df" strokeWidth="16" />
+        <circle r="170" fill={slateCard} stroke="rgba(255, 255, 255, 0.12)" strokeWidth="2" />
+        <circle r="150" fill="none" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="16" />
 
-        {/* Colored progress arc (Teal to Orange to Red) */}
+        {/* Colored progress arc (Cyan to Orange to Red) */}
         <circle
           r="150"
           fill="none"
-          stroke={cuePassed ? (metricNum > 115 ? red : orange) : teal}
+          stroke={cuePassed ? (metricNum > 115 ? red : orange) : cyan}
           strokeWidth="16"
           strokeDasharray="942"
           strokeDashoffset={942 - (sweep * 580)}
@@ -66,7 +67,7 @@ export function GaugeDiagram({ scene }: { scene: TimedScene }) {
               y1="-132"
               x2="0"
               y2="-146"
-              stroke="#6c827b"
+              stroke="#64748B"
               strokeWidth={i % 2 === 0 ? "3" : "1.5"}
               transform={`rotate(${tickAngle})`}
             />
@@ -75,23 +76,23 @@ export function GaugeDiagram({ scene }: { scene: TimedScene }) {
 
         {/* Sweeping Center Needle */}
         <g transform={`rotate(${angle})`}>
-          <polygon points="-7,0 0,-138 7,0" fill={cuePassed ? red : ink} />
-          <circle r="16" fill={ink} />
+          <polygon points="-7,0 0,-138 7,0" fill={cuePassed ? red : cyan} />
+          <circle r="16" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255, 255, 255, 0.2)" strokeWidth="2" />
           <circle r="6" fill="#ffffff" />
         </g>
 
         {/* Digital Readout Box */}
-        <rect x="-90" y="55" width="180" height="65" rx="16" fill={ink} />
-        <text x="0" y="98" textAnchor="middle" fontSize="36" fontWeight="700" fill="#ffffff">
+        <rect x="-90" y="55" width="180" height="65" rx="16" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255, 255, 255, 0.12)" />
+        <text x="0" y="98" textAnchor="middle" fontSize="36" fontWeight="800" fill="#ffffff">
           {metricNum}{metricUnit}
         </text>
-        <text x="0" y="145" textAnchor="middle" fontSize="17" fontWeight="700" letterSpacing="2" fill={cuePassed ? orange : teal}>
+        <text x="0" y="145" textAnchor="middle" fontSize="16" fontWeight="800" letterSpacing="2" fill={cuePassed ? orange : cyan}>
           {subMetric}
         </text>
       </g>
 
       {/* Animated steam / pressure particle waves */}
-      <g transform="translate(130 460)">
+      <g transform="translate(130 450)">
         {Array.from({ length: 6 }).map((_, i) => {
           const t = ((f + i * 18) % 70) / 70;
           return (
@@ -100,8 +101,8 @@ export function GaugeDiagram({ scene }: { scene: TimedScene }) {
               cx={70 + i * 85 + Math.sin(t * 4 + i) * 15}
               cy={60 - t * 50}
               r={12 - t * 7}
-              fill={teal}
-              opacity={cuePassed ? 0.8 * (1 - t) : 0.25}
+              fill={cyan}
+              opacity={cuePassed ? 0.7 * (1 - t) : 0.2}
             />
           );
         })}
@@ -112,16 +113,16 @@ export function GaugeDiagram({ scene }: { scene: TimedScene }) {
         x="70"
         y="535"
         width="720"
-        height="110"
+        height="115"
         rx="24"
-        fill={cuePassed ? "#cfe4db" : "#ffffff90"}
-        stroke={cuePassed ? teal : "#ced9d1"}
-        strokeWidth="2"
+        fill={cuePassed ? "rgba(99, 102, 241, 0.22)" : "rgba(30, 41, 59, 0.75)"}
+        stroke={cuePassed ? "rgba(129, 140, 248, 0.5)" : "rgba(255, 255, 255, 0.1)"}
+        strokeWidth="1.5"
       />
-      <text x="430" y="578" textAnchor="middle" fontSize="26" fontWeight="700" fill={ink}>
+      <text x="430" y="578" textAnchor="middle" fontSize="26" fontWeight="800" fill={ink}>
         {cuePassed ? "Higher Pressure → Elevated Boiling Ceiling" : "Standard Atmospheric Pressure"}
       </text>
-      <text x="430" y="616" textAnchor="middle" fontSize="19" fontWeight="600" fill={teal}>
+      <text x="430" y="618" textAnchor="middle" fontSize="18" fontWeight="600" fill={cyan}>
         {cuePassed ? "Trapped steam accelerates cooking by 70%" : "Heat escapes as vapor at 100°C"}
       </text>
     </>

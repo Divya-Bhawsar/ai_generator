@@ -2,11 +2,12 @@ import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import type { TimedScene } from "./contracts";
 
-const ink = "#153c3a";
-const teal = "#168779";
-const orange = "#e9a64d";
-const blue = "#3a7f9e";
-const red = "#e5484d";
+const ink = "#FFFFFF";
+const cyan = "#38BDF8";
+const amber = "#F59E0B";
+const red = "#EF4444";
+const indigo = "#818CF8";
+const slateCard = "#1E293B";
 
 export function AeroDiagram({ scene }: { scene: TimedScene }) {
   const f = useCurrentFrame();
@@ -24,14 +25,14 @@ export function AeroDiagram({ scene }: { scene: TimedScene }) {
   return (
     <>
       {/* Category header */}
-      <rect x="260" y="25" width="340" height="44" rx="22" fill="#dbe9e6" stroke="#b6d5ce" strokeWidth="1.5" />
-      <text x="430" y="53" textAnchor="middle" fontSize="16" fontWeight="700" letterSpacing="3" fill={teal}>
-        AERODYNAMIC VECTOR ENGINE
+      <rect x="250" y="20" width="360" height="46" rx="23" fill="rgba(99, 102, 241, 0.18)" stroke="rgba(129, 140, 248, 0.4)" strokeWidth="1.5" />
+      <text x="430" y="50" textAnchor="middle" fontSize="16" fontWeight="800" letterSpacing="3" fill={cyan}>
+        ✦ AERODYNAMIC VECTOR ENGINE
       </text>
 
       {/* Main Airfoil Wind Tunnel Frame */}
-      <g transform="translate(100 100)">
-        <rect x="0" y="0" width="660" height="370" rx="28" fill="#fcfbf8" stroke="#ced9d1" strokeWidth="2" />
+      <g transform="translate(100 90)">
+        <rect x="0" y="0" width="660" height="380" rx="28" fill={slateCard} stroke="rgba(255, 255, 255, 0.12)" strokeWidth="1.5" />
 
         {/* Dynamic Airflow Streamlines curving past the wing */}
         {Array.from({ length: 6 }).map((_, i) => {
@@ -42,7 +43,7 @@ export function AeroDiagram({ scene }: { scene: TimedScene }) {
               key={i}
               d={`M 40 ${y} Q 310 ${curveY} 620 ${y + 15}`}
               fill="none"
-              stroke={blue}
+              stroke={cyan}
               strokeWidth="3.5"
               strokeDasharray="14 16"
               strokeDashoffset={-f * 4.5}
@@ -52,20 +53,20 @@ export function AeroDiagram({ scene }: { scene: TimedScene }) {
         })}
 
         {/* Tilting Airfoil Wing Profile */}
-        <g transform={`translate(330 185) rotate(${wingTilt})`}>
+        <g transform={`translate(330 190) rotate(${wingTilt})`}>
           {/* Airfoil SVG Path (NACA profile cross section) */}
           <path
             d="M -160 0 C -120 -55 50 -60 160 0 C 70 25 -100 20 -160 0 Z"
-            fill="#dbe9e6"
-            stroke={ink}
-            strokeWidth="4"
+            fill="rgba(99, 102, 241, 0.25)"
+            stroke={indigo}
+            strokeWidth="3.5"
           />
 
           {/* Wing chord reference line */}
-          <line x1="-170" y1="0" x2="170" y2="0" stroke="#94a3b8" strokeWidth="2" strokeDasharray="6 6" />
+          <line x1="-170" y1="0" x2="170" y2="0" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="2" strokeDasharray="6 6" />
 
           {/* Center of Lift Vector Indicator */}
-          <circle cx="0" cy="-10" r="10" fill={teal} />
+          <circle cx="0" cy="-10" r="10" fill={cyan} />
 
           {/* Upward Net Lift Vector Arrow */}
           <g transform={`rotate(${-wingTilt})`}>
@@ -74,37 +75,37 @@ export function AeroDiagram({ scene }: { scene: TimedScene }) {
               y1="-10"
               x2="0"
               y2={-10 - (80 + progress * 35)}
-              stroke={orange}
+              stroke={amber}
               strokeWidth="6"
               strokeLinecap="round"
             />
             <polygon
               points={`0,${-10 - (95 + progress * 35)} -9,${-10 - (75 + progress * 35)} 9,${-10 - (75 + progress * 35)}`}
-              fill={orange}
+              fill={amber}
             />
-            <rect x="15" y="-105" width="75" height="30" rx="8" fill={orange} />
-            <text x="52" y="-85" textAnchor="middle" fill="#ffffff" fontSize="16" fontWeight="700">
+            <rect x="15" y="-105" width="75" height="30" rx="8" fill={amber} />
+            <text x="52" y="-85" textAnchor="middle" fill="#0F172A" fontSize="15" fontWeight="800">
               LIFT
             </text>
 
             {/* Downward Weight / Gravity Vector Arrow */}
             <line x1="0" y1="-10" x2="0" y2="90" stroke={red} strokeWidth="5" strokeLinecap="round" />
             <polygon points="0,105 -8,85 8,85" fill={red} />
-            <text x="35" y="80" fill={red} fontSize="16" fontWeight="700">
+            <text x="35" y="80" fill={red} fontSize="15" fontWeight="800">
               WEIGHT
             </text>
           </g>
         </g>
 
         {/* Angle of Attack readout */}
-        <rect x="25" y="305" width="220" height="42" rx="12" fill={ink} />
-        <text x="135" y="332" textAnchor="middle" fill="#ffffff" fontSize="16" fontWeight="700" letterSpacing="1">
+        <rect x="25" y="315" width="230" height="42" rx="12" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255, 255, 255, 0.12)" />
+        <text x="140" y="342" textAnchor="middle" fill="#FFFFFF" fontSize="15" fontWeight="800" letterSpacing="1">
           ANGLE OF ATTACK: {Math.round(Math.abs(wingTilt))}°
         </text>
 
         {/* Flight condition label */}
-        <rect x="425" y="305" width="210" height="42" rx="12" fill="#dbe9e6" stroke={teal} strokeWidth="2" />
-        <text x="530" y="332" textAnchor="middle" fill={teal} fontSize="16" fontWeight="700" letterSpacing="1">
+        <rect x="425" y="315" width="210" height="42" rx="12" fill="rgba(15, 23, 42, 0.9)" stroke={cyan} strokeWidth="1.5" />
+        <text x="530" y="342" textAnchor="middle" fill={cyan} fontSize="15" fontWeight="800" letterSpacing="1">
           {isUpsideDown ? "INVERTED ATTITUDE" : "LEVEL CRUISE"}
         </text>
       </g>
@@ -116,21 +117,21 @@ export function AeroDiagram({ scene }: { scene: TimedScene }) {
         width="720"
         height="145"
         rx="24"
-        fill={cuePassed ? "#cfe4db" : "#ffffff90"}
-        stroke={cuePassed ? teal : "#ced9d1"}
-        strokeWidth="2"
+        fill={cuePassed ? "rgba(99, 102, 241, 0.22)" : "rgba(30, 41, 59, 0.75)"}
+        stroke={cuePassed ? "rgba(129, 140, 248, 0.5)" : "rgba(255, 255, 255, 0.1)"}
+        strokeWidth="1.5"
       />
-      <text x="430" y="545" textAnchor="middle" fontSize="28" fontWeight="700" fill={ink}>
+      <text x="430" y="545" textAnchor="middle" fontSize="28" fontWeight="800" fill={ink}>
         {isUpsideDown
           ? "Pilot Pushes Yoke Forward to Tilt Wing Up"
           : "Air Deflection Generates Equal Upward Lift"}
       </text>
-      <text x="430" y="585" textAnchor="middle" fontSize="20" fontWeight="600" fill={teal}>
+      <text x="430" y="585" textAnchor="middle" fontSize="19" fontWeight="600" fill={cyan}>
         {isUpsideDown
           ? "Even upside-down, positive angle of attack deflects air downward"
           : "Newton's 3rd Law: Downward mass displacement pushes plane up"}
       </text>
-      <text x="430" y="622" textAnchor="middle" fontSize="17" fontWeight="500" fill="#6c827b">
+      <text x="430" y="622" textAnchor="middle" fontSize="15" fontWeight="500" fill="#94A3B8">
         Verified aerodynamic physics: Camber is secondary to angle of attack
       </text>
     </>
