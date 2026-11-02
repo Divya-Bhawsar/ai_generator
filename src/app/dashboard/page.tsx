@@ -1,13 +1,14 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { isMongoConfigured } from "@/lib/mongodb";
 import { listProjects } from "@/lib/db/projects";
-import { SignOutButton } from "@/components/sign-out-button";
-import { CreateProjectCard } from "@/components/create-project-card";
-import { DashboardProjectList } from "@/components/dashboard-project-list";
-import { InstagramStoriesTray } from "@/components/instagram-stories-tray";
-import { InstagramBottomNav } from "@/components/instagram-bottom-nav";
+import { GammaWorkspaceHeader } from "@/components/gamma/gamma-workspace-header";
+import { GammaPromptHero } from "@/components/gamma/gamma-prompt-hero";
+import { GammaProjectGrid } from "@/components/gamma/gamma-project-grid";
+
+export const metadata = {
+  title: "Gamma Studio — VidyaMotion",
+  description: "Generate structured, visual, animated explainer presentations with AI.",
+};
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -16,170 +17,35 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  const isConnectedToMongo = isMongoConfigured();
-  const initial = (session.name || session.email)[0].toUpperCase();
   const projects = await listProjects(session.userId);
+  const serializedProjects = JSON.parse(JSON.stringify(projects));
 
   return (
-    <main className="workspace-shell">
-      <header className="workspace-header">
-        <Link className="wordmark" href="/" aria-label="VidyaMotion home">
-          <span className="wordmark-mark" aria-hidden="true">V</span>
-          <span>VidyaMotion</span>
-        </Link>
-        <div className="workspace-header-right" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", fontSize: "0.8125rem" }}>
-            <span style={{ fontWeight: 600, color: "#17191F" }}>{session.name || session.email}</span>
-            <span style={{ color: "#059669", fontSize: "0.75rem", fontWeight: 500 }}>
-              {isConnectedToMongo ? "● MongoDB Atlas" : "○ Local Database"}
-            </span>
-          </div>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: "50%",
-              background: "#315CEB",
-              color: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 600,
-              fontSize: 14,
-            }}
-          >
-            {initial}
-          </div>
-          <SignOutButton />
-        </div>
-      </header>
+    <div className="gamma-shell">
+      {/* Gamma Minimalist Top Header */}
+      <GammaWorkspaceHeader
+        userName={session.name || "Creator"}
+        userEmail={session.email}
+        projectCount={projects.length}
+      />
 
-      <div className="workspace-body">
-        <aside className="workspace-rail" aria-label="Workspace navigation">
-          <span className="workspace-rail-label">WORKSPACE</span>
-          <div className="workspace-nav-item workspace-nav-active">
-            <span className="workspace-nav-icon" aria-hidden="true">⌂</span>
-            <span>Explainers ({projects.length})</span>
-          </div>
+      {/* Main Studio Body */}
+      <main
+        style={{
+          maxWidth: "1160px",
+          margin: "0 auto",
+          padding: "2.5rem 1.5rem 6rem",
+          display: "flex",
+          flexDirection: "column",
+          gap: "3rem",
+        }}
+      >
+        {/* Gamma AI Prompt Hero Bar */}
+        <GammaPromptHero />
 
-          <Link
-            href="/reels"
-            className="workspace-nav-item"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              textDecoration: "none",
-              color: "#DD2A7B",
-              fontWeight: 700,
-            }}
-          >
-            <span className="workspace-nav-icon" aria-hidden="true">🎬</span>
-            <span>Instagram Reels</span>
-          </Link>
-
-          <Link
-            href="/explore"
-            className="workspace-nav-item"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              textDecoration: "none",
-              color: "#315CEB",
-              fontWeight: 600,
-            }}
-          >
-            <span className="workspace-nav-icon" aria-hidden="true">🔍</span>
-            <span>Explore Topics</span>
-          </Link>
-
-          <Link
-            href="/profile"
-            className="workspace-nav-item"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              textDecoration: "none",
-              color: "#64748B",
-              fontWeight: 600,
-            }}
-          >
-            <span className="workspace-nav-icon" aria-hidden="true">👤</span>
-            <span>Creator Profile</span>
-          </Link>
-
-          <div className="workspace-rail-note">
-            Your ideas and videos are private to your account.
-          </div>
-        </aside>
-
-        <section className="workspace-main" style={{ display: "flex", flexDirection: "column", gap: "1.75rem", paddingBottom: "5rem" }}>
-          {/* Instagram Stories Tray */}
-          <InstagramStoriesTray />
-
-          <div className="workspace-welcome" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
-            <div>
-              <p className="eyebrow"><span className="eyebrow-dot" /> YOUR CREATOR STUDIO</p>
-              <h1>Welcome back, <span>{session.name || "Creator"}.</span></h1>
-              <p style={{ margin: 0 }}>Transform any educational idea into a voice-synced, motion-animated Instagram Reel.</p>
-            </div>
-
-            <Link
-              href="/reels"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 1.25rem",
-                borderRadius: "12px",
-                background: "linear-gradient(45deg, #F58529, #DD2A7B, #8134AF)",
-                color: "#FFFFFF",
-                fontWeight: 700,
-                fontSize: "0.875rem",
-                textDecoration: "none",
-                boxShadow: "0 4px 15px rgba(221, 42, 123, 0.35)",
-              }}
-            >
-              <span>🎬</span>
-              <span>Watch Reels Feed →</span>
-            </Link>
-          </div>
-
-          {/* New Explainer Creator Box */}
-          <CreateProjectCard />
-
-          {/* Projects List with Metrics, Filters and Real-time Search */}
-          <section>
-            {projects.length === 0 ? (
-              <div className="workspace-empty-card" style={{ marginTop: 0 }}>
-                <div className="workspace-empty-art" aria-hidden="true">
-                  <span className="empty-art-ring ring-outer" />
-                  <span className="empty-art-ring ring-inner" />
-                  <span className="empty-art-core">V</span>
-                  <span className="empty-art-dot dot-blue" />
-                  <span className="empty-art-dot dot-coral" />
-                  <span className="empty-art-dot dot-gold" />
-                </div>
-                <p className="workspace-empty-kicker">A CLEAR START</p>
-                <h2>No explainer videos created yet.</h2>
-                <p>Type a topic above or pick one of the recommended ideas to generate your first storyboard!</p>
-              </div>
-            ) : (
-              <DashboardProjectList projects={JSON.parse(JSON.stringify(projects))} />
-            )}
-          </section>
-
-          <div className="workspace-footnote">
-            <span className="workspace-footnote-mark">✳</span>
-            <span>Designed for clear teaching. 60–90 second explainers with synchronized voice and captions.</span>
-          </div>
-        </section>
-      </div>
-
-      {/* Instagram Bottom Navigation Bar */}
-      <InstagramBottomNav />
-    </main>
+        {/* Gamma Project Decks Grid */}
+        <GammaProjectGrid projects={serializedProjects} />
+      </main>
+    </div>
   );
 }

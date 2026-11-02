@@ -4,8 +4,7 @@ import { getProjectById, saveStoryboard } from "@/lib/db/projects";
 import { generateStoryboardAI } from "@/lib/ai/storyboard";
 import { StoryboardStudio } from "@/components/storyboard-studio";
 import Link from "next/link";
-import { SignOutButton } from "@/components/sign-out-button";
-import { isMongoConfigured } from "@/lib/mongodb";
+import { GammaWorkspaceHeader } from "@/components/gamma/gamma-workspace-header";
 
 export default async function ProjectPage({
   params,
@@ -41,112 +40,57 @@ export default async function ProjectPage({
     }
   }
 
-  const isConnectedToMongo = isMongoConfigured();
-  const initial = (session.name || session.email)[0].toUpperCase();
-
   const serializedProject = JSON.parse(JSON.stringify(project));
   const serializedStoryboard = storyboard ? JSON.parse(JSON.stringify(storyboard)) : null;
 
   return (
-    <main className="workspace-shell">
-      <header className="workspace-header">
-        <Link className="wordmark" href="/" aria-label="VidyaMotion home">
-          <span className="wordmark-mark" aria-hidden="true">V</span>
-          <span>VidyaMotion</span>
-        </Link>
-        <div className="workspace-header-right" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", fontSize: "0.8125rem" }}>
-            <span style={{ fontWeight: 600, color: "#17191F" }}>{session.name || session.email}</span>
-            <span style={{ color: "#059669", fontSize: "0.75rem", fontWeight: 500 }}>
-              {isConnectedToMongo ? "● MongoDB Atlas" : "○ Local Database"}
-            </span>
-          </div>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: "50%",
-              background: "#315CEB",
-              color: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 600,
-              fontSize: 14,
-            }}
-          >
-            {initial}
-          </div>
-          <SignOutButton />
-        </div>
-      </header>
+    <div className="gamma-shell">
+      {/* Gamma Header */}
+      <GammaWorkspaceHeader
+        userName={session.name || "Creator"}
+        userEmail={session.email}
+        projectCount={1}
+      />
 
-      <div className="workspace-body">
-        <aside className="workspace-rail" aria-label="Workspace navigation">
+      <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "1.75rem 1.5rem 6rem" }}>
+        {/* Breadcrumb Navigation */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
           <Link
             href="/dashboard"
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
               fontSize: "0.8125rem",
+              color: "#818CF8",
               fontWeight: 700,
-              color: "#315CEB",
-              marginBottom: "1rem",
               textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
             }}
           >
-            ← Back to Projects
+            ← Back to All Decks
           </Link>
-          <span className="workspace-rail-label">STUDIO STAGES</span>
-          <a href="#top" className="workspace-nav-item workspace-nav-active">
-            <span className="workspace-nav-icon" aria-hidden="true">📋</span>
-            <span>Storyboard Script</span>
-          </a>
-          <a href="#voice-selection" className="workspace-nav-item">
-            <span className="workspace-nav-icon" aria-hidden="true">🎙️</span>
-            <span>Voice & Audio</span>
-          </a>
-          <a href="#voice-selection" className="workspace-nav-item">
-            <span className="workspace-nav-icon" aria-hidden="true">🎬</span>
-            <span>Render Reel</span>
-          </a>
-          <a
-            href="#voice-selection"
-            className="workspace-nav-item"
-            style={{ opacity: 0.8 }}
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>/</span>
+          <span style={{ fontSize: "0.8125rem", color: "#E2E8F0", fontWeight: 600 }}>
+            {serializedStoryboard?.title || serializedProject.title}
+          </span>
+          <span
+            style={{
+              marginLeft: "auto",
+              fontSize: "0.72rem",
+              background: "rgba(99, 102, 241, 0.15)",
+              color: "#A5B4FC",
+              border: "1px solid rgba(99, 102, 241, 0.25)",
+              padding: "0.2rem 0.55rem",
+              borderRadius: "12px",
+              fontWeight: 700,
+            }}
           >
-            <span className="workspace-nav-icon" aria-hidden="true">📱</span>
-            <span>Instagram Share</span>
-          </a>
-          <div className="workspace-rail-note" style={{ marginTop: "auto" }}>
-            Every manual or AI revision to scenes and vector graphics saves automatically to your project.
-          </div>
-        </aside>
+            ✦ GAMMA CARD CANVAS
+          </span>
+        </div>
 
-        <section className="workspace-main">
-          {/* Mobile Stage Quick Navigation (visible only on mobile & tablets <= 800px) */}
-          <nav className="mobile-stage-bar" aria-label="Mobile stage quick navigation">
-            <Link href="/dashboard" className="mobile-stage-pill" style={{ color: "#315CEB", borderColor: "#C7D2FE" }}>
-              ← Projects
-            </Link>
-            <a href="#top" className="mobile-stage-pill">
-              📋 Script
-            </a>
-            <a href="#voice-selection" className="mobile-stage-pill">
-              🎙️ Voice
-            </a>
-            <a href="#voice-selection" className="mobile-stage-pill">
-              🎬 Render
-            </a>
-            <a href="#voice-selection" className="mobile-stage-pill">
-              📱 Share
-            </a>
-          </nav>
-
-          <StoryboardStudio initialProject={serializedProject} initialStoryboard={serializedStoryboard} />
-        </section>
-      </div>
-    </main>
+        <StoryboardStudio initialProject={serializedProject} initialStoryboard={serializedStoryboard} />
+      </main>
+    </div>
   );
 }

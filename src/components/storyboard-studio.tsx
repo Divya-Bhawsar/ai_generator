@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ProjectRecord, StoryboardRecord, SceneRecord } from "@/lib/db/projects";
 import { cleanSvg } from "@/lib/video/cleanSvg";
+import { GammaPresenterModal } from "./gamma/gamma-presenter-modal";
 
 const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: string; icon: string }> = {
   hook: { bg: "#FEF2F2", text: "#DC2626", border: "#FCA5A5", icon: "🎯" },
@@ -98,6 +99,7 @@ export function StoryboardStudio({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [deletingProject, setDeletingProject] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [presenterOpen, setPresenterOpen] = useState(false);
 
   // Inspection Modal State (Full-size SVG Vector View)
   const [inspectedSvg, setInspectedSvg] = useState<{
@@ -690,6 +692,20 @@ export function StoryboardStudio({
                 1080x1920 Video Ready
               </span>
             )}
+
+            <button
+              type="button"
+              onClick={() => setPresenterOpen(true)}
+              className="gamma-gradient-btn"
+              style={{
+                padding: "0.3rem 0.85rem",
+                fontSize: "0.75rem",
+                borderRadius: "20px",
+              }}
+            >
+              <span>▷</span>
+              <span>Present Deck</span>
+            </button>
           </div>
 
           <p style={{ margin: "0.35rem 0 0", fontSize: "0.875rem", color: "#64748B" }}>
@@ -2198,6 +2214,22 @@ export function StoryboardStudio({
           </div>
         </div>
       )}
+      {/* Gamma Presentation Mode Modal */}
+      <GammaPresenterModal
+        isOpen={presenterOpen}
+        onClose={() => setPresenterOpen(false)}
+        title={storyboard?.title || project.title}
+        videoUrl={videoUrl}
+        voiceName={selectedVoice.label}
+        duration={videoDuration || estimatedDuration}
+        projectId={project._id}
+        scenes={scenes.map((s, idx) => ({
+          sequence: s.sequence || idx + 1,
+          title: s.title,
+          narration: s.narration,
+          visualLabel: s.visualLabel,
+        }))}
+      />
     </div>
   );
 }
