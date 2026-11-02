@@ -153,17 +153,22 @@ export function GammaPresenterModal({
             <Link
               href={`/dashboard/project/${projectId}`}
               style={{
-                background: "rgba(255, 255, 255, 0.06)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)",
+                border: "none",
                 borderRadius: "8px",
-                padding: "0.35rem 0.75rem",
-                color: "#E2E8F0",
+                padding: "0.4rem 0.85rem",
+                color: "#FFFFFF",
                 fontSize: "0.8125rem",
-                fontWeight: 600,
+                fontWeight: 700,
                 textDecoration: "none",
+                boxShadow: "0 2px 10px rgba(79, 70, 229, 0.4)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
               }}
             >
-              ✏️ Edit in Studio
+              <span>✏️</span>
+              <span>Edit in Studio</span>
             </Link>
           )}
 

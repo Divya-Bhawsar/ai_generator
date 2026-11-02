@@ -287,7 +287,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "0.5rem",
+                        gap: "0.6rem",
                         paddingTop: "0.85rem",
                         borderTop: "1px solid #E2E8F0",
                       }}
@@ -304,11 +304,22 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                               projectId: project._id,
                             })
                           }
-                          className="gamma-gradient-btn"
                           style={{
                             flex: 1,
                             padding: "0.55rem 0.75rem",
                             fontSize: "0.8125rem",
+                            fontWeight: 700,
+                            borderRadius: "10px",
+                            border: "none",
+                            background: "linear-gradient(135deg, #059669 0%, #10B981 100%)",
+                            color: "#FFFFFF",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.35rem",
+                            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                            transition: "all 0.15s ease",
                           }}
                         >
                           <span>▷</span>
@@ -322,9 +333,9 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                           flex: 1,
                           padding: "0.55rem 0.75rem",
                           borderRadius: "10px",
-                          background: hasVideo ? "#F8FAFC" : "var(--gamma-gradient)",
-                          border: hasVideo ? "1px solid #CBD5E1" : "none",
-                          color: hasVideo ? "#0F172A" : "#FFFFFF",
+                          background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)",
+                          border: "none",
+                          color: "#FFFFFF",
                           fontSize: "0.8125rem",
                           fontWeight: 700,
                           textAlign: "center",
@@ -333,7 +344,8 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                           alignItems: "center",
                           justifyContent: "center",
                           gap: "0.35rem",
-                          boxShadow: hasVideo ? "none" : "0 4px 14px rgba(79, 70, 229, 0.3)",
+                          boxShadow: "0 4px 14px rgba(79, 70, 229, 0.3)",
+                          transition: "all 0.15s ease",
                         }}
                       >
                         <span>✏️</span>

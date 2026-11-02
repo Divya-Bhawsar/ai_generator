@@ -1685,7 +1685,7 @@ export function StoryboardStudio({
           {/* Audience & Style Quick Revision Chips */}
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "1rem", alignItems: "center" }}>
             <span style={{ fontSize: "0.72rem", color: "#334155", fontWeight: 800, textTransform: "uppercase" }}>
-              💡 Quick Adapters:
+              💡 Quick Adapters ({11}):
             </span>
             {[
               { label: "🇮🇳 Hinglish Explanation", prompt: "Rewrite this entire script in natural, engaging conversational Hinglish (Hindi + English mix in Roman script, like top Indian tech and science creators on YouTube and Reels). Keep technical words in English and conversational phrasing in Hindi." },
@@ -1695,6 +1695,10 @@ export function StoryboardStudio({
               { label: "⏱️ Trim to Under 60s", prompt: "Condense this script tightly to under 55 seconds (around 120 words) for rapid short-form reels." },
               { label: "🔬 Technical Deep Dive", prompt: "Make this concise, technical, and data-dense for software engineers and practitioners." },
               { label: "🌟 Real-Life Analogy", prompt: "Ground this in a vivid, relatable everyday real-world analogy." },
+              { label: "💬 Socratic Q&A Dialogue", prompt: "Format this as an engaging dialogue between a curious student asking the core question and an expert delivering punchy insights." },
+              { label: "📊 Add Flowcharts & Metrics", prompt: "Direct Remotion to render step-by-step vector boxes, branching arrows, and concrete comparison metrics." },
+              { label: "✨ Humorous & Witty", prompt: "Add witty relatable humor, funny analogies, and an energetic lighthearted tone." },
+              { label: "🎬 Cinematic Trailer", prompt: "Make the intro hook sound like a suspenseful high-stakes science documentary trailer." },
             ].map((chip) => (
               <button
                 key={chip.label}
