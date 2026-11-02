@@ -91,6 +91,8 @@ export async function synthesizeSceneAudio({
     monica: "en-IN-NeerjaNeural",
     prabhat: "en-IN-PrabhatNeural",
     viraj: "en-IN-PrabhatNeural",
+    madhur: "hi-IN-MadhurNeural",
+    swara: "hi-IN-SwaraNeural",
     christopher: "en-US-ChristopherNeural",
     guy: "en-US-GuyNeural",
     jenny: "en-US-JennyNeural",
@@ -102,7 +104,11 @@ export async function synthesizeSceneAudio({
   const selectedEdgeVoice =
     EDGE_VOICE_MAP[voiceName.toLowerCase()] ||
     EDGE_VOICE_MAP[voiceId.toLowerCase()] ||
-    (/female|monica|neerja|jenny|aria|tara/i.test(voiceName)
+    (/swara/i.test(voiceName)
+      ? "hi-IN-SwaraNeural"
+      : /madhur/i.test(voiceName)
+      ? "hi-IN-MadhurNeural"
+      : /female|monica|neerja|jenny|aria|tara/i.test(voiceName)
       ? "en-IN-NeerjaNeural"
       : "en-IN-PrabhatNeural");
 

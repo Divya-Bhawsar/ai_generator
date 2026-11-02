@@ -55,6 +55,17 @@ const TOPIC_CATEGORIES: CategoryPrompts[] = [
       "What actually happens inside quantum entanglement across space?",
     ],
   },
+  {
+    id: "hinglish",
+    name: "Hinglish Explainer 🇮🇳",
+    icon: "🇮🇳",
+    prompts: [
+      "Binary search tree kaise kaam karta hai step by step Hinglish me samjhao",
+      "Pressure cooker me khana 70% jaldi kyu banta hai? Kitchen science in Hinglish",
+      "Git commit aur branch pointers disk pe kaise store hote hain Hinglish me",
+      "Dopamine kaise hamare focus aur procrastination ko control karta hai in Hinglish",
+    ],
+  },
 ];
 
 const TARGET_AUDIENCES = [

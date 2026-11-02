@@ -20,6 +20,22 @@ const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: str
 
 const VOICES = [
   {
+    id: "madhur",
+    name: "madhur",
+    label: "Madhur (Hinglish 🇮🇳)",
+    description: "Hindi + English Mix · Confident, Natural Male",
+    previewUrl: "/audio/voice-madhur.mp3",
+    tag: "Top Choice for Hindi-English Explainer Reels",
+  },
+  {
+    id: "swara",
+    name: "swara",
+    label: "Swara (Hinglish 🇮🇳)",
+    description: "Hindi + English Mix · Expressive, Warm Female",
+    previewUrl: "/audio/voice-swara.mp3",
+    tag: "Top Choice for Hindi-English Science & Daily Topics",
+  },
+  {
     id: "neerja",
     name: "neerja",
     label: "Neerja",
@@ -1535,6 +1551,7 @@ export function StoryboardStudio({
               💡 Quick Adapters:
             </span>
             {[
+              { label: "🇮🇳 Hinglish Explanation", prompt: "Rewrite this entire script in natural, engaging conversational Hinglish (Hindi + English mix in Roman script, like top Indian tech and science creators on YouTube and Reels). Keep technical words in English and conversational phrasing in Hindi." },
               { label: "🧒 Simplify for Beginners", prompt: "Explain this using fun, playful visual metaphors for kids and beginners with zero jargon." },
               { label: "⚡ High-Energy Hook", prompt: "Make the opening scene hook intensely dramatic, shocking, and impossible to scroll past." },
               { label: "🎓 Step-by-Step Breakdown", prompt: "Walk through concrete numbered steps and clear cause-and-effect with metrics." },

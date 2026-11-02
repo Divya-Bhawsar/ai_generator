@@ -763,6 +763,9 @@ STRICT PEDAGOGICAL & VISUAL DIRECTIVES:
    - "headline": High-impact, concise title for the diagram (under 35 chars).
    - "badge": Category badge (e.g. "CHEMICAL REACTION", "ALGORITHMIC STEP", "FLUID MECHANICS").
    - NEVER use static or generic placeholder text. All metrics, steps, labels, and comparisons MUST directly represent the exact scientific, technical, or practical reality of "${topic}".
+7. LANGUAGE & BILINGUAL (HINGLISH) ADAPTABILITY:
+   - If the topic, prompt, or source notes contain Hindi/Hinglish or request Hinglish, write the spoken narration in natural, engaging conversational Hinglish (Hindi conversational grammar + English technical terms, written in Latin/Roman script e.g. "Sabse pehle hum array ka middle element inspect karte hain...").
+   - Otherwise, write crisp, engaging English.
 
 Return JSON matching the schema.`;
 
