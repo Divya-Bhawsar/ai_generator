@@ -53,6 +53,7 @@ export function InstagramPublishModal({
   const [customToken, setCustomToken] = useState("");
   const [customUsername, setCustomUsername] = useState("");
   const [savingAccount, setSavingAccount] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Load account & scheduled posts
   useEffect(() => {
@@ -640,6 +641,77 @@ export function InstagramPublishModal({
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div style={{ background: "#EEF2FF", padding: "0.85rem 1rem", borderRadius: "10px", border: "1px solid #C7D2FE", fontSize: "0.8125rem", color: "#3730A3", lineHeight: 1.5 }}>
                 ✦ <strong>Zero-Setup Developer Sandbox</strong> is active by default so you can test publishing flows without needing a verified Meta App. To connect a live account, paste your Instagram Professional Account ID and User Access Token below.
+              </div>
+
+              {/* Collapsible Step-by-Step Guide */}
+              <div
+                style={{
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "10px",
+                  background: "#F8FAFC",
+                  overflow: "hidden",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowGuide(!showGuide)}
+                  style={{
+                    width: "100%",
+                    padding: "0.65rem 0.9rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    color: "#4338CA",
+                    textAlign: "left",
+                  }}
+                >
+                  <span>📖 How to get your live Meta Token & Account ID (3 Steps)</span>
+                  <span>{showGuide ? "▲" : "▼"}</span>
+                </button>
+
+                {showGuide && (
+                  <div
+                    style={{
+                      padding: "0.75rem 1rem",
+                      borderTop: "1px solid #E2E8F0",
+                      fontSize: "0.78125rem",
+                      color: "#334155",
+                      lineHeight: 1.6,
+                      background: "#FFFFFF",
+                    }}
+                  >
+                    <ol style={{ margin: "0 0 0.75rem 1.2rem", padding: 0 }}>
+                      <li style={{ marginBottom: "0.4rem" }}>
+                        <strong>Switch Instagram Account:</strong> Open Instagram on your phone → <em>Settings → Account → Switch to Professional Account (Creator or Business)</em>. Connect it to any Facebook Page you manage.
+                      </li>
+                      <li style={{ marginBottom: "0.4rem" }}>
+                        <strong>Meta Developer App:</strong> Go to{" "}
+                        <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" style={{ color: "#4F46E5", textDecoration: "underline" }}>
+                          developers.facebook.com
+                        </a>
+                        {" "}→ Create an App (Type: <em>Business</em>) → Add <strong>Instagram Graph API</strong>.
+                      </li>
+                      <li style={{ marginBottom: "0.4rem" }}>
+                        <strong>Get Token & ID via Explorer:</strong> Open{" "}
+                        <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" style={{ color: "#4F46E5", textDecoration: "underline" }}>
+                          Meta Graph API Explorer
+                        </a>
+                        . Under <em>Permissions</em>, add <code>instagram_content_publish</code>, <code>instagram_basic</code>, and <code>pages_show_list</code>. Click <strong>Generate Access Token</strong>.
+                      </li>
+                      <li>
+                        <strong>Find Account ID:</strong> Run <code>GET me/accounts?fields=instagram_business_account</code>. Copy the <code>instagram_business_account.id</code> (starts with 1784...) and paste it below with your token.
+                      </li>
+                    </ol>
+                    <div style={{ padding: "0.5rem 0.75rem", background: "#FEF3C7", border: "1px solid #FCD34D", borderRadius: "6px", color: "#92400E", fontSize: "0.75rem" }}>
+                      💡 <strong>Localhost Note:</strong> When testing on your computer, Meta requires a public HTTPS URL to download videos. Use a tunnel like <code>ngrok http 3000</code> or test with the built-in Sandbox Mode.
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
