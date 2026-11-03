@@ -32,12 +32,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Determine public video URL
-    const host = req.headers.get("host") || "localhost:3000";
-    const protocol = req.headers.get("x-forwarded-proto") || "http";
-    const publicVideoUrl = project.videoUrl.startsWith("http")
-      ? project.videoUrl
-      : `${protocol}://${host}${project.videoUrl}`;
+    // Determine public video URL (prefer public HTTPS tunnel or configured domain for Meta download)
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").trim();
+    let publicVideoUrl = project.videoUrl;
+    if (!publicVideoUrl.startsWith("http")) {
+      if (appUrl && !appUrl.includes("localhost")) {
+        publicVideoUrl = `${appUrl.replace(/\/$/, "")}${project.videoUrl}`;
+      } else {
+        const host = req.headers.get("host") || "localhost:3000";
+        const protocol = req.headers.get("x-forwarded-proto") || "http";
+        publicVideoUrl = `${protocol}://${host}${project.videoUrl}`;
+      }
+    } else if (publicVideoUrl.includes("localhost") && appUrl && !appUrl.includes("localhost")) {
+      const urlObj = new URL(publicVideoUrl);
+      publicVideoUrl = `${appUrl.replace(/\/$/, "")}${urlObj.pathname}${urlObj.search}`;
+    }
 
     // Get user's connected social account
     const socialAccount = await getSocialAccount(session.userId);

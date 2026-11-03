@@ -57,7 +57,9 @@ export async function publishReelToMetaGraphAPI({
 
         status = statusData.status_code || statusData.status || "IN_PROGRESS";
         if (status === "ERROR" || status === "EXPIRED") {
-          throw new Error(statusData.error?.message || "Instagram media processing failed");
+          console.error("Meta media container failed statusData:", JSON.stringify(statusData, null, 2));
+          const detail = statusData.error?.message || statusData.error_message || statusData.status_message;
+          throw new Error(detail || "Instagram media processing failed on Meta servers. Verify video format and public accessibility.");
         }
       }
 
