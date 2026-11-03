@@ -2,9 +2,10 @@ import Link from "next/link";
 
 type BrandLogoProps = {
   href: string;
-  size?: "small" | "medium" | "large";
+  size?: "small" | "medium" | "large" | "xlarge";
   tagline?: string;
   className?: string;
+  showText?: boolean;
 };
 
 export function BrandLogo({
@@ -12,6 +13,7 @@ export function BrandLogo({
   size = "medium",
   tagline,
   className = "",
+  showText = true,
 }: BrandLogoProps) {
   return (
     <Link
@@ -20,10 +22,12 @@ export function BrandLogo({
       aria-label={href === "/dashboard" ? "VidyaMotion dashboard" : "VidyaMotion home"}
     >
       <span className="brand-logo__symbol" aria-hidden="true" />
-      <span className="brand-logo__name" aria-hidden="true">
-        <span>Vidya</span><span>Motion</span>
-      </span>
-      {tagline ? <span className="brand-logo__tagline">{tagline}</span> : null}
+      {showText && (
+        <span className="brand-logo__name" aria-hidden="true">
+          <span>Vidya</span><span>Motion</span>
+        </span>
+      )}
+      {tagline && showText ? <span className="brand-logo__tagline">{tagline}</span> : null}
     </Link>
   );
 }

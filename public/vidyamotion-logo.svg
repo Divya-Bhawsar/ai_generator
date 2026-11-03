@@ -1,17 +1,165 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 58" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 72" fill="none" width="100%" height="100%">
   <defs>
-    <linearGradient id="vidyamotion-gradient" x1="5" y1="6" x2="43" y2="42" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4F46E5"/>
-      <stop offset=".55" stop-color="#7C3AED"/>
-      <stop offset="1" stop-color="#DB2777"/>
+    <!-- Plate Gradient -->
+    <linearGradient id="vml-plate" x1="16" y1="8" x2="64" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#141829"/>
+      <stop offset="50%" stop-color="#0D1120"/>
+      <stop offset="100%" stop-color="#05070E"/>
     </linearGradient>
+
+    <linearGradient id="vml-rim" x1="8" y1="8" x2="68" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#6366F1" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#EC4899" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <!-- Wing 1: Left Cyan to Indigo -->
+    <linearGradient id="vml-w-left" x1="28" y1="28" x2="62" y2="98" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="25%" stop-color="#38BDF8"/>
+      <stop offset="65%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+
+    <!-- Wing 2: Right Violet to Pink -->
+    <linearGradient id="vml-w-right" x1="58" y1="98" x2="102" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="40%" stop-color="#7C3AED"/>
+      <stop offset="75%" stop-color="#C026D3"/>
+      <stop offset="100%" stop-color="#F43F5E"/>
+    </linearGradient>
+
+    <!-- Play Wedge -->
+    <linearGradient id="vml-wedge" x1="58" y1="46" x2="98" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="50%" stop-color="#F43F5E"/>
+      <stop offset="85%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FDE047"/>
+    </linearGradient>
+
+    <!-- Star Grad -->
+    <linearGradient id="vml-star" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+
+    <!-- Typography Motion Gradient -->
+    <linearGradient id="vml-text-motion" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#DB2777"/>
+    </linearGradient>
+
+    <radialGradient id="vml-ambient" cx="64" cy="66" r="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#EC4899" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#05070E" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="vml-drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#02040A" flood-opacity="0.6"/>
+    </filter>
+
+    <filter id="vml-star-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
   </defs>
-  <g transform="translate(2 5)">
-    <rect x="2.5" y="2.5" width="43" height="43" rx="13" fill="url(#vidyamotion-gradient)"/>
-    <path d="m11.5 13.5 10.9 21.2a1.8 1.8 0 0 0 3.2 0l10.9-21.2" stroke="#fff" stroke-width="4.7" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="m33.2 7.2 1.45 3.55 3.55 1.45-3.55 1.45-1.45 3.55-1.45-3.55-3.55-1.45 3.55-1.45 1.45-3.55Z" fill="#FDBA74"/>
+
+  <style>
+    .vml-title-vidya {
+      fill: #0F172A;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+    }
+    .vml-title-motion {
+      fill: url(#vml-text-motion);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+    }
+    .vml-badge {
+      fill: #64748B;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .vml-title-vidya {
+        fill: #F8FAFC;
+      }
+      .vml-badge {
+        fill: #94A3B8;
+      }
+    }
+  </style>
+
+  <!-- Left Symbol (scaled from 128x128 to 56x56 at x=8, y=8) -->
+  <g transform="translate(8, 8) scale(0.4375)">
+    <!-- Squircle Base Frame -->
+    <rect x="4" y="4" width="120" height="120" rx="32" fill="url(#vml-plate)"/>
+    <rect x="4" y="4" width="120" height="120" rx="32" stroke="url(#vml-rim)" stroke-width="1.3"/>
+    <rect x="5.5" y="5.5" width="117" height="117" rx="30.5" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+    <circle cx="64" cy="66" r="44" fill="url(#vml-ambient)"/>
+
+    <!-- Left Wing -->
+    <path d="M 34.5 30 
+             C 30.5 30, 28 34, 30 38 
+             L 55.5 94.5 
+             C 58 100, 64 100.5, 67 96 
+             L 72 89 
+             L 51 40 
+             C 49.5 36, 46 30, 41.5 30 Z" 
+          fill="url(#vml-w-left)"/>
+
+    <!-- Right Wing -->
+    <path d="M 61 97 
+             C 64.5 101, 70.5 100, 73 95.5 
+             L 99.5 47 
+             C 101.5 43, 99 38, 94.5 38 
+             L 81.5 38 
+             L 66 68 
+             L 56.5 87 
+             L 61 97 Z" 
+          fill="url(#vml-w-right)" 
+          filter="url(#vml-drop)"/>
+
+    <!-- Kinetic Play Wedge -->
+    <path d="M 62 48 
+             L 90.5 64 
+             C 93.5 65.8, 93.5 70.2, 90.5 72 
+             L 62 88 
+             C 58.5 90, 54.5 87.5, 54.5 83.5 
+             L 54.5 52.5 
+             C 54.5 48.5, 58.5 46, 62 48 Z" 
+          fill="url(#vml-wedge)" 
+          filter="url(#vml-drop)"/>
+
+    <path d="M 62 48.5 L 90.5 64.5 L 62 87.5" 
+          stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.45"/>
+
+    <!-- Star -->
+    <g transform="translate(101, 28)" filter="url(#vml-star-glow)">
+      <path d="M 0 -11 Q 1.5 -1.5 11 0 Q 1.5 1.5 0 11 Q -1.5 1.5 -11 0 Q -1.5 -1.5 0 -11 Z" fill="url(#vml-star)"/>
+      <circle cx="0" cy="0" r="2.5" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Micro Sparkle -->
+    <g transform="translate(25, 78)">
+      <path d="M 0 -5 Q 0.7 -0.7 5 0 Q 0.7 0.7 0 5 Q -0.7 0.7 -5 0 Q -0.7 -0.7 0 -5 Z" fill="#00F2FE" opacity="0.85"/>
+    </g>
   </g>
-  <text x="60" y="38" font-family="Manrope, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="28" font-weight="750" letter-spacing="-1.1">
-    <tspan fill="#0F172A">Vidya</tspan><tspan fill="#5B4AE8">Motion</tspan>
-  </text>
+
+  <!-- Wordmark Text Lockup -->
+  <g transform="translate(76, 42)">
+    <text x="0" y="0">
+      <tspan class="vml-title-vidya">Vidya</tspan><tspan class="vml-title-motion">Motion</tspan>
+    </text>
+    <text x="2" y="16" class="vml-badge">AI EXPLAINER STUDIO</text>
+  </g>
 </svg>

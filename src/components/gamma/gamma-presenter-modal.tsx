@@ -121,9 +121,22 @@ export function GammaPresenterModal({
             <span>Exit Present (Esc)</span>
           </button>
 
-          <span style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#FFFFFF" }}>
-            {title}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <span
+              style={{
+                width: 22,
+                height: 22,
+                display: "inline-block",
+                background: 'url("/vidyamotion-symbol.svg") center/contain no-repeat',
+                borderRadius: "6px",
+                flexShrink: 0,
+              }}
+              aria-hidden="true"
+            />
+            <span style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#FFFFFF" }}>
+              {title}
+            </span>
+          </div>
 
           <span
             style={{

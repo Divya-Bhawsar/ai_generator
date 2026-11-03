@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Dark Cosmic Squircle Plate -->
+    <linearGradient id="vms-plate" x1="16" y1="8" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#141829"/>
+      <stop offset="50%" stop-color="#0D1120"/>
+      <stop offset="100%" stop-color="#05070E"/>
+    </linearGradient>
+
+    <!-- Outer Rim Stroke Gradient -->
+    <linearGradient id="vms-rim" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#6366F1" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#EC4899" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <!-- Facet 1: Left Ascending Wing (Wisdom Foundation: Cyan to Indigo) -->
+    <linearGradient id="vms-wing-left" x1="28" y1="28" x2="62" y2="98" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="25%" stop-color="#38BDF8"/>
+      <stop offset="65%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+
+    <!-- Facet 2: Right Dynamic Wing (Kinetic Motion: Violet to Fuchsia) -->
+    <linearGradient id="vms-wing-right" x1="58" y1="98" x2="102" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="40%" stop-color="#7C3AED"/>
+      <stop offset="75%" stop-color="#C026D3"/>
+      <stop offset="100%" stop-color="#F43F5E"/>
+    </linearGradient>
+
+    <!-- Facet 3: Kinetic Play Wedge (Forward Action: Pink to Sunrise Gold) -->
+    <linearGradient id="vms-play-wedge" x1="58" y1="46" x2="98" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="50%" stop-color="#F43F5E"/>
+      <stop offset="85%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FDE047"/>
+    </linearGradient>
+
+    <!-- Vidya Illumination Star -->
+    <linearGradient id="vms-star-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="45%" stop-color="#FFFBEB"/>
+      <stop offset="80%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+
+    <!-- Specular Highlight Sheen -->
+    <linearGradient id="vms-specular" x1="32" y1="28" x2="72" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8"/>
+      <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Atmospheric Radial Glow -->
+    <radialGradient id="vms-ambient" cx="64" cy="66" r="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#EC4899" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#05070E" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Dimensional Drop Shadows -->
+    <filter id="vms-depth-1" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="-1" dy="4" stdDeviation="4" flood-color="#02040A" flood-opacity="0.6"/>
+    </filter>
+
+    <filter id="vms-depth-2" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#02040A" flood-opacity="0.75"/>
+    </filter>
+
+    <filter id="vms-star-bloom" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base Frame -->
+  <rect x="4" y="4" width="120" height="120" rx="32" fill="url(#vms-plate)"/>
+  <rect x="4" y="4" width="120" height="120" rx="32" stroke="url(#vms-rim)" stroke-width="1.3"/>
+  <rect x="5.5" y="5.5" width="117" height="117" rx="30.5" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+
+  <!-- Ambient Energy Core -->
+  <circle cx="64" cy="66" r="44" fill="url(#vms-ambient)"/>
+
+  <!-- Master Mark Group -->
+  <g id="vms-icon">
+    <!-- Left Wing (Vidya Foundation) -->
+    <!-- Sweeps from top-left (34, 30) down to base apex (64, 98) -->
+    <path d="M 34.5 30 
+             C 30.5 30, 28 34, 30 38 
+             L 55.5 94.5 
+             C 58 100, 64 100.5, 67 96 
+             L 72 89 
+             L 51 40 
+             C 49.5 36, 46 30, 41.5 30 
+             Z" 
+          fill="url(#vms-wing-left)"/>
+
+    <!-- Left Wing Specular Edge -->
+    <path d="M 34.5 30.5 L 41.5 30.5 L 51 40 L 71 87" 
+          stroke="url(#vms-specular)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+
+    <!-- Right Wing (Motion Play Vector) -->
+    <!-- Ascends from base apex towards top right, overlapping left wing -->
+    <path d="M 61 97 
+             C 64.5 101, 70.5 100, 73 95.5 
+             L 99.5 47 
+             C 101.5 43, 99 38, 94.5 38 
+             L 81.5 38 
+             L 66 68 
+             L 56.5 87 
+             L 61 97 Z" 
+          fill="url(#vms-wing-right)" 
+          filter="url(#vms-depth-1)"/>
+
+    <!-- Kinetic Play Wedge (Forward Action / Action Spark) -->
+    <!-- Forms the forward-pointing play chevron intersecting the right wing -->
+    <path d="M 62 48 
+             L 90.5 64 
+             C 93.5 65.8, 93.5 70.2, 90.5 72 
+             L 62 88 
+             C 58.5 90, 54.5 87.5, 54.5 83.5 
+             L 54.5 52.5 
+             C 54.5 48.5, 58.5 46, 62 48 Z" 
+          fill="url(#vms-play-wedge)" 
+          filter="url(#vms-depth-2)"/>
+
+    <!-- Play Wedge Specular Rim -->
+    <path d="M 62 48.5 L 90.5 64.5 L 62 87.5" 
+          stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.45"/>
+
+    <!-- Vidya Illumination Star (The Beacon of Knowledge) -->
+    <g transform="translate(101, 28)" filter="url(#vms-star-bloom)">
+      <path d="M 0 -11 Q 1.5 -1.5 11 0 Q 1.5 1.5 0 11 Q -1.5 1.5 -11 0 Q -1.5 -1.5 0 -11 Z" fill="url(#vms-star-grad)"/>
+      <circle cx="0" cy="0" r="2.5" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Secondary Micro Sparkle -->
+    <g transform="translate(25, 78)">
+      <path d="M 0 -5 Q 0.7 -0.7 5 0 Q 0.7 0.7 0 5 Q -0.7 0.7 -5 0 Q -0.7 -0.7 0 -5 Z" fill="#00F2FE" opacity="0.85"/>
+      <circle cx="0" cy="0" r="1.2" fill="#FFFFFF"/>
+    </g>
+  </g>
+</svg>
