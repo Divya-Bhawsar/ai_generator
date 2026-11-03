@@ -6,6 +6,7 @@ import { ProjectRecord, StoryboardRecord, SceneRecord } from "@/lib/db/projects"
 import { cleanSvg } from "@/lib/video/cleanSvg";
 import { GammaPresenterModal } from "./gamma/gamma-presenter-modal";
 import { SocialPackageCard } from "./social-package-card";
+import { InstagramPublishModal } from "./instagram-publish-modal";
 import {
   BACKGROUND_MUSIC_TRACKS,
   type BackgroundMusicTrack,
@@ -153,6 +154,7 @@ export function StoryboardStudio({
   const [renderStage, setRenderStage] = useState("");
   const [videoUrl, setVideoUrl] = useState<string | null>(initialProject.videoUrl || null);
   const [videoDuration, setVideoDuration] = useState<number | null>(initialProject.durationSeconds || null);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
 
   // Total words & estimated duration
   const totalWords = scenes.reduce((acc, s) => acc + s.narration.trim().split(/\s+/).filter(Boolean).length, 0);
@@ -1025,14 +1027,15 @@ export function StoryboardStudio({
             >
               <div>
                 <div style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#FFFFFF" }}>
-                  Instagram Reels Publishing (Milestone F07)
+                  Instagram Reels Publishing (Meta Graph API v21.0)
                 </div>
                 <div style={{ fontSize: "0.75rem", color: "#94A3B8", marginTop: "0.15rem" }}>
-                  Direct auto-upload to your Instagram Creator / Business account.
+                  1-click publish or schedule to your Instagram Creator / Business account.
                 </div>
               </div>
               <button
-                onClick={() => alert("Ready for Milestone F07: Instagram Connect & Auto-Publishing!")}
+                type="button"
+                onClick={() => setPublishModalOpen(true)}
                 style={{
                   background: "linear-gradient(45deg, #F58529, #DD2A7B, #8134AF)",
                   color: "#FFFFFF",
@@ -1045,7 +1048,7 @@ export function StoryboardStudio({
                   boxShadow: "0 2px 8px rgba(221, 42, 123, 0.3)",
                 }}
               >
-                Post to Instagram ↗
+                Publish to Instagram ↗
               </button>
             </div>
           </div>
@@ -1059,6 +1062,7 @@ export function StoryboardStudio({
           initialPackage={project.socialPackage}
           topic={project.topic}
           title={storyboard?.title || project.title}
+          onOpenPublish={() => setPublishModalOpen(true)}
         />
       )}
 
@@ -2388,6 +2392,17 @@ export function StoryboardStudio({
           narration: s.narration,
           visualLabel: s.visualLabel,
         }))}
+      />
+
+      {/* Instagram Reels Publishing & Scheduling Modal */}
+      <InstagramPublishModal
+        isOpen={publishModalOpen}
+        onClose={() => setPublishModalOpen(false)}
+        projectId={project._id}
+        projectTitle={storyboard?.title || project.title}
+        videoUrl={videoUrl}
+        caption={project.socialPackage?.fullCaption}
+        initialReelUrl={(project as any).instagramReelUrl}
       />
     </div>
   );

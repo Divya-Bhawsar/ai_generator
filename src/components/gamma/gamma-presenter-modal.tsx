@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { InstagramPublishModal } from "../instagram-publish-modal";
 
 export interface PresenterScene {
   sequence: number;
@@ -42,6 +43,7 @@ export function GammaPresenterModal({
   const [activeSceneIndex, setActiveSceneIndex] = useState(0);
   const [showNotesDrawer, setShowNotesDrawer] = useState(false);
   const [copiedCaption, setCopiedCaption] = useState(false);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -205,18 +207,41 @@ export function GammaPresenterModal({
           )}
 
           {videoUrl && (
-            <a
-              href={videoUrl}
-              download={`${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.mp4`}
-              className="gamma-gradient-btn"
-              style={{
-                padding: "0.4rem 0.95rem",
-                fontSize: "0.8125rem",
-                textDecoration: "none",
-              }}
-            >
-              Export MP4 ⬇
-            </a>
+            <>
+              <a
+                href={videoUrl}
+                download={`${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.mp4`}
+                className="gamma-gradient-btn"
+                style={{
+                  padding: "0.4rem 0.95rem",
+                  fontSize: "0.8125rem",
+                  textDecoration: "none",
+                }}
+              >
+                Export MP4 ⬇
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setPublishModalOpen(true)}
+                style={{
+                  background: "linear-gradient(45deg, #F58529, #DD2A7B, #8134AF)",
+                  color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "0.4rem 0.95rem",
+                  fontSize: "0.8125rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 10px rgba(221, 42, 123, 0.35)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                }}
+              >
+                <span>Publish Reel 🚀</span>
+              </button>
+            </>
           )}
         </div>
       </header>
@@ -409,6 +434,16 @@ export function GammaPresenterModal({
           </div>
         </footer>
       )}
+
+      {/* Instagram Publish & Schedule Modal */}
+      <InstagramPublishModal
+        isOpen={publishModalOpen}
+        onClose={() => setPublishModalOpen(false)}
+        projectId={projectId || ""}
+        projectTitle={title}
+        videoUrl={videoUrl}
+        caption={socialPackage?.fullCaption}
+      />
     </div>
   );
 }

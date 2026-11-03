@@ -27,8 +27,8 @@ export async function GET(
   try {
     const scenes = storyboard?.scenes || [];
     const generated = await generateSocialPackageAI(
-      project.topic,
-      storyboard?.title || project.title,
+      project.topic || project.title || "Educational Topic",
+      storyboard?.title || project.title || "VidyaMotion Explainer",
       scenes,
       project.targetAudience || "general"
     );
@@ -36,6 +36,7 @@ export async function GET(
     await saveSocialPackage(session.userId, id, generated);
     return NextResponse.json({ socialPackage: generated });
   } catch (err: unknown) {
+    console.error("GET social package error:", err);
     const msg = err instanceof Error ? err.message : "Failed to generate social package";
     return NextResponse.json({ error: msg }, { status: 500 });
   }

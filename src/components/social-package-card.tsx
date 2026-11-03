@@ -8,6 +8,7 @@ interface SocialPackageCardProps {
   initialPackage?: SocialPackage | null;
   topic: string;
   title: string;
+  onOpenPublish?: () => void;
 }
 
 export function SocialPackageCard({
@@ -15,6 +16,7 @@ export function SocialPackageCard({
   initialPackage,
   topic,
   title,
+  onOpenPublish,
 }: SocialPackageCardProps) {
   const [socialPackage, setSocialPackage] = useState<SocialPackage | null>(
     initialPackage || null
@@ -233,6 +235,29 @@ export function SocialPackageCard({
           >
             <span>{copied ? "✓ Copied to Clipboard!" : "📋 Copy Full Caption"}</span>
           </button>
+
+          {onOpenPublish && (
+            <button
+              type="button"
+              onClick={onOpenPublish}
+              style={{
+                background: "linear-gradient(45deg, #F58529, #DD2A7B, #8134AF)",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: "10px",
+                padding: "0.45rem 0.95rem",
+                fontSize: "0.8125rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 2px 10px rgba(221, 42, 123, 0.3)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+              }}
+            >
+              <span>Publish Reel 🚀</span>
+            </button>
+          )}
         </div>
       </div>
 

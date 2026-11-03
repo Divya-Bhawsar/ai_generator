@@ -63,11 +63,11 @@ ${formattedHashtags}`;
 }
 
 export function synthesizeFallbackSocialPackage(
-  topic: string,
-  title: string,
-  scenes: SceneRecord[]
+  topic: string = "",
+  title: string = "",
+  scenes: SceneRecord[] = []
 ): SocialPackage {
-  const cleanTopic = topic.trim().replace(/[.?]+$/, "");
+  const cleanTopic = (topic || title || "Educational Topic").trim().replace(/[.?]+$/, "");
   const lower = cleanTopic.toLowerCase();
 
   let hook = `Ever wondered how ${cleanTopic} actually works in real life? Here is the complete breakdown! 💡`;
@@ -112,14 +112,16 @@ export function synthesizeFallbackSocialPackage(
 }
 
 export async function generateSocialPackageAI(
-  topic: string,
-  title: string,
-  scenes: SceneRecord[],
+  topic: string = "",
+  title: string = "",
+  scenes: SceneRecord[] = [],
   targetAudience: string = "general"
 ): Promise<SocialPackage> {
+  const safeTopic = (topic || title || "Educational Topic").trim();
+  const safeTitle = (title || topic || "VidyaMotion Explainer").trim();
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return synthesizeFallbackSocialPackage(topic, title, scenes);
+    return synthesizeFallbackSocialPackage(safeTopic, safeTitle, scenes);
   }
 
   const scenesContext = scenes
