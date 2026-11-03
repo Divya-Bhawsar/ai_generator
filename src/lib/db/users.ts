@@ -51,29 +51,27 @@ export async function createUser(data: {
   const name = (typeof data.name === "string" && data.name.trim()) || normalizedEmail.split("@")[0];
 
   if (isMongoConfigured()) {
-    const db = await getDatabase();
-    if (!db) {
-      throw new Error("Unable to connect to the database. Please verify your connection.");
-    }
-
-    await ensureUserIndexes(db);
-
-    const doc = {
-      email: normalizedEmail,
-      passwordHash,
-      name,
-      createdAt: now,
-      updatedAt: now,
-    };
-
     try {
-      const result = await db.collection("users").insertOne(doc);
-      return {
-        id: result.insertedId.toString(),
-        email: normalizedEmail,
-        name,
-        createdAt: now,
-      };
+      const db = await getDatabase();
+      if (db) {
+        await ensureUserIndexes(db);
+
+        const doc = {
+          email: normalizedEmail,
+          passwordHash,
+          name,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const result = await db.collection("users").insertOne(doc);
+        return {
+          id: result.insertedId.toString(),
+          email: normalizedEmail,
+          name,
+          createdAt: now,
+        };
+      }
     } catch (err: unknown) {
       if (
         typeof err === "object" &&
@@ -83,7 +81,7 @@ export async function createUser(data: {
       ) {
         throw new Error("An account with this email already exists.");
       }
-      throw err;
+      console.warn("MongoDB createUser error, falling back to memory:", err);
     }
   }
 
@@ -111,22 +109,25 @@ export async function findUserByEmail(email: string): Promise<UserRecord | null>
   const normalizedEmail = email.trim().toLowerCase();
 
   if (isMongoConfigured()) {
-    const db = await getDatabase();
-    if (!db) {
-      throw new Error("Database connection unavailable.");
+    try {
+      const db = await getDatabase();
+      if (db) {
+        const doc = await db.collection("users").findOne({ email: normalizedEmail });
+        if (doc) {
+          return {
+            _id: doc._id.toString(),
+            email: doc.email,
+            passwordHash: doc.passwordHash,
+            name: doc.name || doc.email.split("@")[0],
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
+          };
+        }
+        return null;
+      }
+    } catch (err) {
+      console.warn("MongoDB findUserByEmail error, falling back to memory:", err);
     }
-    const doc = await db.collection("users").findOne({ email: normalizedEmail });
-    if (doc) {
-      return {
-        _id: doc._id.toString(),
-        email: doc.email,
-        passwordHash: doc.passwordHash,
-        name: doc.name || doc.email.split("@")[0],
-        createdAt: doc.createdAt,
-        updatedAt: doc.updatedAt,
-      };
-    }
-    return null;
   }
 
   return memoryUsers.get(normalizedEmail) || null;
@@ -134,27 +135,30 @@ export async function findUserByEmail(email: string): Promise<UserRecord | null>
 
 export async function findUserById(id: string): Promise<UserProfile | null> {
   if (isMongoConfigured()) {
-    const db = await getDatabase();
-    if (!db) {
-      throw new Error("Database connection unavailable.");
-    }
-    let query: Record<string, unknown> = {};
-    if (ObjectId.isValid(id)) {
-      query = { _id: new ObjectId(id) };
-    } else {
-      query = { _id: id };
-    }
+    try {
+      const db = await getDatabase();
+      if (db) {
+        let query: Record<string, unknown> = {};
+        if (ObjectId.isValid(id)) {
+          query = { _id: new ObjectId(id) };
+        } else {
+          query = { _id: id };
+        }
 
-    const doc = await db.collection("users").findOne(query);
-    if (doc) {
-      return {
-        id: doc._id.toString(),
-        email: doc.email,
-        name: doc.name || doc.email.split("@")[0],
-        createdAt: doc.createdAt,
-      };
+        const doc = await db.collection("users").findOne(query);
+        if (doc) {
+          return {
+            id: doc._id.toString(),
+            email: doc.email,
+            name: doc.name || doc.email.split("@")[0],
+            createdAt: doc.createdAt,
+          };
+        }
+        return null;
+      }
+    } catch (err) {
+      console.warn("MongoDB findUserById error, falling back to memory:", err);
     }
-    return null;
   }
 
   for (const user of memoryUsers.values()) {
