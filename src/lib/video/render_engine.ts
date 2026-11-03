@@ -21,6 +21,7 @@ export interface RenderJobParams {
   voiceId?: string;
   voiceName?: string;
   musicId?: string;
+  aspectRatio?: "9:16" | "16:9" | "1:1";
   outputMp4Path: string;
   statusFilePath: string;
   apiKey?: string;
@@ -34,6 +35,7 @@ export function updateRenderStatus(
     stage: string;
     videoUrl?: string;
     duration?: number;
+    aspectRatio?: string;
     error?: string;
   }
 ) {
@@ -48,6 +50,7 @@ export function updateRenderStatus(
           stage: data.stage,
           videoUrl: data.videoUrl || "",
           duration: data.duration || 0,
+          aspectRatio: data.aspectRatio || "9:16",
           error: data.error || "",
           updatedAt: new Date().toISOString(),
         },
@@ -67,6 +70,7 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     voiceId = "Q1NHvGuV9SzxtiSnVDEH",
     voiceName = "viraj",
     musicId = "lofi",
+    aspectRatio = "9:16",
     outputMp4Path,
     statusFilePath,
     apiKey = process.env.ELEVENLABS_API_KEY || "",
@@ -127,7 +131,8 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       storyboard.title || "VidyaMotion Explainer",
       rawScenes,
       speechMap,
-      musicId
+      musicId,
+      aspectRatio
     );
 
     // Save timeline.json for debugging and inspector
@@ -163,10 +168,18 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     const cpuCores = os.cpus()?.length || 4;
     const renderConcurrency = Math.min(8, Math.max(4, cpuCores - 1));
 
+    const resolutionMap: Record<string, string> = {
+      "9:16": "1080x1920 (Vertical)",
+      "16:9": "1920x1080 (Landscape)",
+      "1:1": "1080x1080 (Square)",
+    };
+    const resLabel = resolutionMap[aspectRatio] || "1080x1920";
+
     updateRenderStatus(statusFilePath, {
       status: "rendering",
       progress: 45,
-      stage: `Rendering 1080x1920 30fps MP4 video on ${renderConcurrency} CPU cores...`,
+      stage: `Rendering ${resLabel} 30fps MP4 video on ${renderConcurrency} CPU cores...`,
+      aspectRatio,
     });
 
     const tempPartialMp4 = path.join(projectDir, "output.partial.mp4");
@@ -237,6 +250,7 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       stage: "Ready for playback",
       videoUrl: publicUrl,
       duration: durationSeconds,
+      aspectRatio,
     });
 
     return publicUrl;

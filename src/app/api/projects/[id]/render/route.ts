@@ -30,6 +30,7 @@ export async function POST(
   const voiceId = body.voiceId || project.voiceId || "Q1NHvGuV9SzxtiSnVDEH";
   const voiceName = body.voiceName || project.voiceName || "viraj";
   const musicId = body.musicId || (project as any).musicId || "lofi";
+  const aspectRatio = body.aspectRatio || (project as any).aspectRatio || "9:16";
 
   let activeStoryboard = storyboard;
 
@@ -61,6 +62,7 @@ export async function POST(
     stage: `Starting render with ${voiceName}...`,
     videoUrl: "",
     duration: 0,
+    aspectRatio,
     error: "",
   };
   fs.writeFileSync(statusPath, JSON.stringify(initialStatus, null, 2), "utf-8");
@@ -80,6 +82,7 @@ export async function POST(
             voiceId,
             voiceName,
             musicId,
+            aspectRatio,
             updatedAt: new Date(),
           },
         });
@@ -100,6 +103,7 @@ export async function POST(
         "--voice-id", voiceId,
         "--voice-name", voiceName,
         "--music-id", musicId,
+        "--aspect-ratio", aspectRatio,
         "--storyboard-file", storyboardPath,
         "--output-mp4", outputMp4Path,
         "--status-file", statusPath,
@@ -111,6 +115,7 @@ export async function POST(
         "--voice-id", voiceId,
         "--voice-name", voiceName,
         "--music-id", musicId,
+        "--aspect-ratio", aspectRatio,
         "--storyboard-file", storyboardPath,
         "--output-mp4", outputMp4Path,
         "--status-file", statusPath,

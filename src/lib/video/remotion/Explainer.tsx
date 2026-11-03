@@ -267,10 +267,12 @@ function SceneView({
   scene,
   index,
   total,
+  aspectRatio = "9:16",
 }: {
   scene: TimedScene;
   index: number;
   total: number;
+  aspectRatio?: "9:16" | "16:9" | "1:1";
 }) {
   const f = useCurrentFrame();
 
@@ -281,10 +283,10 @@ function SceneView({
   const titleOffset = (1 - titleFade) * 18;
 
   // Animated ambient lighting coordinates
-  const orb1X = 140 + Math.sin(f / 45) * 60;
-  const orb1Y = 280 + Math.cos(f / 50) * 50;
-  const orb2X = 920 + Math.cos(f / 40) * 50;
-  const orb2Y = 1420 + Math.sin(f / 48) * 60;
+  const orb1X = (aspectRatio === "16:9" ? 280 : 140) + Math.sin(f / 45) * 60;
+  const orb1Y = (aspectRatio === "16:9" ? 180 : 280) + Math.cos(f / 50) * 50;
+  const orb2X = (aspectRatio === "16:9" ? 1640 : 920) + Math.cos(f / 40) * 50;
+  const orb2Y = (aspectRatio === "16:9" ? 820 : 1420) + Math.sin(f / 48) * 60;
 
   // Video progress fraction
   const sceneProgress = interpolate(f, [0, scene.frames || 1], [0, 100], {
@@ -292,21 +294,13 @@ function SceneView({
   });
   const overallProgress = Math.min(100, Math.max(0, ((index + sceneProgress / 100) / Math.max(1, total)) * 100));
 
-  return (
-    <AbsoluteFill
-      style={{
-        background: "linear-gradient(180deg, #070913 0%, #0B1020 40%, #0D162B 75%, #070A14 100%)",
-        color: "#FFFFFF",
-        fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-        padding: "70px 60px 50px",
-        boxSizing: "border-box",
-        overflow: "hidden",
-      }}
-    >
+  // Common Background Lighting & Texture
+  const renderBackgroundAtmosphere = () => (
+    <>
       {/* Audio element if provided */}
       {scene.audioFile && <Audio src={staticFile(scene.audioFile)} />}
 
-      {/* Atmospheric Ambient Lighting Aura 1 (Top-Left Electric Indigo) */}
+      {/* Atmospheric Ambient Lighting Aura 1 */}
       <div
         style={{
           position: "absolute",
@@ -321,7 +315,7 @@ function SceneView({
         }}
       />
 
-      {/* Atmospheric Ambient Lighting Aura 2 (Bottom-Right Cyber Cyan) */}
+      {/* Atmospheric Ambient Lighting Aura 2 */}
       <div
         style={{
           position: "absolute",
@@ -337,6 +331,551 @@ function SceneView({
       />
 
       {/* Technological Subtle Background Grid Texture */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Precision Corner Tech Crosshairs */}
+      <div style={{ position: "absolute", top: 32, left: 32, color: "rgba(255, 255, 255, 0.15)", fontSize: 16, fontWeight: 300, pointerEvents: "none" }}>+</div>
+      <div style={{ position: "absolute", top: 32, right: 32, color: "rgba(255, 255, 255, 0.15)", fontSize: 16, fontWeight: 300, pointerEvents: "none" }}>+</div>
+      <div style={{ position: "absolute", bottom: 32, left: 32, color: "rgba(255, 255, 255, 0.15)", fontSize: 16, fontWeight: 300, pointerEvents: "none" }}>+</div>
+      <div style={{ position: "absolute", bottom: 32, right: 32, color: "rgba(255, 255, 255, 0.15)", fontSize: 16, fontWeight: 300, pointerEvents: "none" }}>+</div>
+    </>
+  );
+
+  // Common Progress Footer
+  const renderProgressFooter = (bottomOffset = 40, horizontalPadding = 60) => (
+    <div
+      style={{
+        position: "absolute",
+        bottom: bottomOffset,
+        left: horizontalPadding,
+        right: horizontalPadding,
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        zIndex: 10,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: 7,
+          borderRadius: 4,
+          background: "rgba(255, 255, 255, 0.1)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: `${overallProgress}%`,
+            height: "100%",
+            borderRadius: 4,
+            background: "linear-gradient(90deg, #4F46E5 0%, #7C3AED 40%, #EC4899 80%, #38BDF8 100%)",
+            boxShadow: "0 0 14px rgba(99, 102, 241, 0.8)",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontSize: 15,
+          fontWeight: 700,
+          color: "#94A3B8",
+          letterSpacing: 2,
+        }}
+      >
+        <span>✦ VIDYAMOTION EXPLAINER</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {Array.from({ length: total }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                width: i === index ? 32 : 8,
+                height: 6,
+                borderRadius: 3,
+                background:
+                  i === index
+                    ? "#818CF8"
+                    : i < index
+                    ? "rgba(129, 140, 248, 0.4)"
+                    : "rgba(255, 255, 255, 0.15)",
+                boxShadow: i === index ? "0 0 10px #818CF8" : "none",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ==========================================
+  // FORMAT 1: 16:9 WIDESCREEN CINEMA LAYOUT
+  // ==========================================
+  if (aspectRatio === "16:9") {
+    return (
+      <AbsoluteFill
+        style={{
+          background: "linear-gradient(180deg, #070913 0%, #0B1020 40%, #0D162B 75%, #070A14 100%)",
+          color: "#FFFFFF",
+          fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+          padding: "36px 60px 24px",
+          boxSizing: "border-box",
+          overflow: "hidden",
+        }}
+      >
+        {renderBackgroundAtmosphere()}
+
+        {/* Top Header: Scene counter, title, and kicker */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            zIndex: 10,
+            height: 64,
+          }}
+        >
+          {/* Left Glowing Scene Counter */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "6px 18px",
+              borderRadius: 100,
+              background: "rgba(99, 102, 241, 0.14)",
+              border: "1px solid rgba(129, 140, 248, 0.35)",
+            }}
+          >
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "#818CF8",
+                boxShadow: `0 0 8px #818CF8`,
+              }}
+            />
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#C7D2FE", letterSpacing: 2 }}>
+              SCENE {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+            </span>
+          </div>
+
+          {/* Center Main Title */}
+          <div
+            style={{
+              flex: 1,
+              textAlign: "center",
+              padding: "0 24px",
+              opacity: titleFade,
+              transform: `translateY(${titleOffset}px)`,
+            }}
+          >
+            <h1
+              style={{
+                fontSize: 38,
+                lineHeight: 1.15,
+                letterSpacing: "-1px",
+                margin: 0,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                textShadow: "0 4px 20px rgba(0, 0, 0, 0.8)",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {scene.title}
+            </h1>
+          </div>
+
+          {/* Right Kicker */}
+          <div
+            style={{
+              padding: "6px 18px",
+              borderRadius: 100,
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "#94A3B8",
+              fontSize: 14,
+              fontWeight: 600,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+            }}
+          >
+            ✦ {scene.kicker || "EXPLAINER"}
+          </div>
+        </div>
+
+        {/* 16:9 Split Content Stage */}
+        <div
+          style={{
+            marginTop: 18,
+            display: "flex",
+            gap: 40,
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            height: 820,
+            zIndex: 10,
+          }}
+        >
+          {/* Left Column: Visual Motion Stage (1040 x 800) */}
+          <div
+            style={{
+              width: 1040,
+              height: 800,
+              borderRadius: 28,
+              background: "linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 30, 0.95) 100%)",
+              backdropFilter: "blur(28px)",
+              WebkitBackdropFilter: "blur(28px)",
+              border: "1.5px solid rgba(255, 255, 255, 0.12)",
+              boxShadow: "0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.2)",
+              padding: "20px 24px",
+              boxSizing: "border-box",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: fade(f, 4, 14),
+            }}
+          >
+            <Diagram scene={scene} />
+          </div>
+
+          {/* Right Column: Narrative Insight & Kinetic Caption HUD (720 x 800) */}
+          <div
+            style={{
+              width: 720,
+              height: 800,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxSizing: "border-box",
+            }}
+          >
+            {/* Top Insight Card */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)",
+                border: "1.5px solid rgba(129, 140, 248, 0.25)",
+                borderRadius: 24,
+                padding: "28px 32px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#38BDF8", letterSpacing: 2 }}>
+                  KEY TAKEAWAY
+                </span>
+                <span style={{ fontSize: 13, color: "#94A3B8" }}>
+                  ~{Math.round(scene.frames / 30)}s
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: 24, color: "#E2E8F0", lineHeight: 1.5, fontWeight: 500 }}>
+                {scene.narration}
+              </p>
+            </div>
+
+            {/* Keyword Pills */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", padding: "10px 0" }}>
+              {scene.labels.map((label, i) => (
+                <div
+                  key={i}
+                  style={{
+                    border: "1px solid rgba(129, 140, 248, 0.28)",
+                    borderRadius: 100,
+                    padding: "8px 18px",
+                    fontSize: 16,
+                    fontWeight: 600,
+                    background: "rgba(30, 41, 59, 0.65)",
+                    color: "#E2E8F0",
+                    opacity: fade(f, Math.min(scene.frames - 10, scene.cueFrame + i * 5)),
+                  }}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* Dynamic Karaoke Caption HUD in Right Column */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(20, 27, 45, 0.98) 100%)",
+                border: "1.5px solid rgba(129, 140, 248, 0.38)",
+                borderRadius: 24,
+                padding: "24px 28px",
+                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.25)",
+                display: "flex",
+                alignItems: "center",
+                gap: 18,
+                minHeight: 160,
+              }}
+            >
+              {/* Soundwave bars */}
+              <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                {[0, 1, 2, 3].map((barIdx) => {
+                  const barHeight = 12 + Math.abs(Math.sin((f + barIdx * 8) / 3)) * 24;
+                  return (
+                    <div
+                      key={barIdx}
+                      style={{
+                        width: 4,
+                        height: barHeight,
+                        borderRadius: 3,
+                        background: "linear-gradient(180deg, #38BDF8 0%, #6366F1 100%)",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 32,
+                  fontWeight: 800,
+                  lineHeight: 1.3,
+                  color: "#FFFFFF",
+                  textAlign: "center",
+                  flex: 1,
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                {caption
+                  ? renderKineticCaption(caption.text, scene.accentWords)
+                  : renderKineticCaption(scene.narration.slice(0, 80), scene.accentWords)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {renderProgressFooter(26, 60)}
+      </AbsoluteFill>
+    );
+  }
+
+  // ==========================================
+  // FORMAT 2: 1:1 SQUARE FEED LAYOUT (1080x1080)
+  // ==========================================
+  if (aspectRatio === "1:1") {
+    return (
+      <AbsoluteFill
+        style={{
+          background: "linear-gradient(180deg, #070913 0%, #0B1020 40%, #0D162B 75%, #070A14 100%)",
+          color: "#FFFFFF",
+          fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+          padding: "40px 48px 30px",
+          boxSizing: "border-box",
+          overflow: "hidden",
+        }}
+      >
+        {renderBackgroundAtmosphere()}
+
+        {/* Top Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "6px 16px",
+              borderRadius: 100,
+              background: "rgba(99, 102, 241, 0.14)",
+              border: "1px solid rgba(129, 140, 248, 0.35)",
+            }}
+          >
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#818CF8" }} />
+            <span style={{ fontSize: 14, fontWeight: 700, color: "#C7D2FE", letterSpacing: 2 }}>
+              SCENE {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+            </span>
+          </div>
+
+          <div
+            style={{
+              padding: "6px 16px",
+              borderRadius: 100,
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "#94A3B8",
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+            }}
+          >
+            ✦ {scene.kicker || "EXPLAINER"}
+          </div>
+        </div>
+
+        {/* Title */}
+        <div
+          style={{
+            marginTop: 14,
+            height: 70,
+            display: "flex",
+            alignItems: "center",
+            opacity: titleFade,
+            transform: `translateY(${titleOffset}px)`,
+            zIndex: 10,
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 40,
+              lineHeight: 1.15,
+              letterSpacing: "-1px",
+              margin: 0,
+              fontWeight: 800,
+              color: "#FFFFFF",
+              textShadow: "0 4px 20px rgba(0, 0, 0, 0.8)",
+            }}
+          >
+            {scene.title}
+          </h1>
+        </div>
+
+        {/* Square Visual Stage (980 x 580) */}
+        <div
+          style={{
+            marginTop: 12,
+            width: 984,
+            height: 580,
+            borderRadius: 28,
+            background: "linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 30, 0.95) 100%)",
+            backdropFilter: "blur(28px)",
+            WebkitBackdropFilter: "blur(28px)",
+            border: "1.5px solid rgba(255, 255, 255, 0.12)",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.2)",
+            padding: "16px 20px",
+            boxSizing: "border-box",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: fade(f, 4, 14),
+            zIndex: 10,
+          }}
+        >
+          <Diagram scene={scene} />
+        </div>
+
+        {/* Square Floating Caption HUD */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 85,
+            left: 48,
+            right: 48,
+            minHeight: 120,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 20,
+          }}
+        >
+          {caption && (
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(20, 27, 45, 0.98) 100%)",
+                border: "1.5px solid rgba(129, 140, 248, 0.38)",
+                borderRadius: 22,
+                padding: "18px 30px",
+                width: "100%",
+                maxWidth: 980,
+                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.25)",
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                {[0, 1, 2, 3].map((barIdx) => {
+                  const barHeight = 10 + Math.abs(Math.sin((f + barIdx * 8) / 3)) * 20;
+                  return (
+                    <div
+                      key={barIdx}
+                      style={{
+                        width: 4,
+                        height: barHeight,
+                        borderRadius: 3,
+                        background: "linear-gradient(180deg, #38BDF8 0%, #6366F1 100%)",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <div
+                style={{
+                  fontSize: 32,
+                  fontWeight: 800,
+                  lineHeight: 1.25,
+                  textAlign: "center",
+                  flex: 1,
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                {renderKineticCaption(caption.text, scene.accentWords)}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {renderProgressFooter(24, 48)}
+      </AbsoluteFill>
+    );
+  }
+
+  // ==========================================
+  // FORMAT 3: 9:16 VERTICAL REEL (1080x1920 Default)
+  // ==========================================
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundColor: "#050814",
+        color: "#FFFFFF",
+        fontFamily:
+          "-apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', Roboto, 'Segoe UI', sans-serif",
+        padding: "60px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        overflow: "hidden",
+      }}
+    >
+      {/* Dynamic Ambient Background Canvas */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 50% 25%, rgba(99, 102, 241, 0.22) 0%, rgba(15, 23, 42, 0) 70%), radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.15) 0%, rgba(15, 23, 42, 0) 60%), radial-gradient(ellipse at 20% 70%, rgba(56, 189, 248, 0.16) 0%, rgba(15, 23, 42, 0) 65%)",
+          filter: "blur(60px)",
+          transform: `scale(${1 + Math.sin(f / 20) * 0.04})`,
+        }}
+      />
+
+      {/* Cyber Blueprint Grid Mesh Overlay */}
       <div
         style={{
           position: "absolute",
@@ -685,6 +1224,7 @@ export function calculateDuckedVolume({
 
 export function Explainer({ timeline }: { timeline: Timeline }) {
   const bgMusic = timeline.backgroundMusic;
+  const aspectRatio = timeline.aspectRatio || "9:16";
 
   return (
     <AbsoluteFill style={{ background: "#070913" }}>
@@ -708,7 +1248,12 @@ export function Explainer({ timeline }: { timeline: Timeline }) {
       {/* Visual Scenes & Voiceover Audio */}
       {timeline.scenes.map((s, i) => (
         <Sequence key={s.id} from={s.start} durationInFrames={s.frames}>
-          <SceneView scene={s} index={i} total={timeline.scenes.length} />
+          <SceneView
+            scene={s}
+            index={i}
+            total={timeline.scenes.length}
+            aspectRatio={aspectRatio}
+          />
         </Sequence>
       ))}
     </AbsoluteFill>

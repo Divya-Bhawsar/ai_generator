@@ -193,10 +193,13 @@ export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
   },
 ];
 
+export type AspectRatio = "9:16" | "16:9" | "1:1";
+
 export interface Timeline {
   title: string;
   fps: number;
   frames: number;
+  aspectRatio?: AspectRatio;
   scenes: TimedScene[];
   backgroundMusic?: BackgroundMusicTrack;
   speechSegments?: SpeechSegment[];

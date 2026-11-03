@@ -10,7 +10,50 @@ import { InstagramPublishModal } from "./instagram-publish-modal";
 import {
   BACKGROUND_MUSIC_TRACKS,
   type BackgroundMusicTrack,
+  type AspectRatio,
 } from "@/lib/video/remotion/contracts";
+
+export const ASPECT_RATIO_OPTIONS: Array<{
+  id: AspectRatio;
+  label: string;
+  sublabel: string;
+  ratioBadge: string;
+  resolution: string;
+  icon: string;
+  platforms: string;
+  tag: string;
+}> = [
+  {
+    id: "9:16",
+    label: "Vertical Reel",
+    sublabel: "Mobile Fullscreen",
+    ratioBadge: "9:16",
+    resolution: "1080 × 1920",
+    icon: "📱",
+    platforms: "Instagram Reels · Shorts · TikTok",
+    tag: "High Retention",
+  },
+  {
+    id: "16:9",
+    label: "Widescreen Cinema",
+    sublabel: "Desktop & YouTube",
+    ratioBadge: "16:9",
+    resolution: "1920 × 1080",
+    icon: "🖥️",
+    platforms: "YouTube · Gamma · Classrooms",
+    tag: "Cinema Split View",
+  },
+  {
+    id: "1:1",
+    label: "Square Feed",
+    sublabel: "Social Feed Centered",
+    ratioBadge: "1:1",
+    resolution: "1080 × 1080",
+    icon: "⏹️",
+    platforms: "LinkedIn · X / Twitter · Feeds",
+    tag: "Square Balanced",
+  },
+];
 
 const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: string; icon: string }> = {
   hook: { bg: "#FEF2F2", text: "#DC2626", border: "#FCA5A5", icon: "🎯" },
@@ -152,6 +195,7 @@ export function StoryboardStudio({
   const [rendering, setRendering] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
   const [renderStage, setRenderStage] = useState("");
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(initialProject.aspectRatio || "9:16");
   const [videoUrl, setVideoUrl] = useState<string | null>(initialProject.videoUrl || null);
   const [videoDuration, setVideoDuration] = useState<number | null>(initialProject.durationSeconds || null);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
@@ -170,10 +214,16 @@ export function StoryboardStudio({
           if (data.status === "ready" && data.videoUrl) {
             setVideoUrl(data.videoUrl);
             setVideoDuration(data.duration);
+            if (data.aspectRatio) {
+              setSelectedAspectRatio(data.aspectRatio);
+            }
           } else if (data.status === "rendering") {
             setRendering(true);
             setRenderProgress(data.progress || 10);
             setRenderStage(data.stage || "Rendering...");
+            if (data.aspectRatio) {
+              setSelectedAspectRatio(data.aspectRatio);
+            }
           }
         }
       } catch {
@@ -199,6 +249,9 @@ export function StoryboardStudio({
             setRendering(false);
             setVideoUrl(data.videoUrl);
             setVideoDuration(data.duration);
+            if (data.aspectRatio) {
+              setSelectedAspectRatio(data.aspectRatio);
+            }
             clearInterval(interval);
           } else if (data.status === "failed") {
             setRendering(false);
@@ -263,7 +316,8 @@ export function StoryboardStudio({
   async function handleStartRender() {
     setRendering(true);
     setRenderProgress(5);
-    setRenderStage(`Preparing video render with ${selectedVoice.label} & ${selectedMusic.name}...`);
+    const aspectOpt = ASPECT_RATIO_OPTIONS.find((a) => a.id === selectedAspectRatio);
+    setRenderStage(`Preparing ${aspectOpt?.label || "1080x1920"} video render with ${selectedVoice.label} & ${selectedMusic.name}...`);
     setError(null);
     setVideoUrl(null);
 
@@ -275,6 +329,7 @@ export function StoryboardStudio({
           voiceId: selectedVoice.id,
           voiceName: selectedVoice.name,
           musicId: selectedMusic.id,
+          aspectRatio: selectedAspectRatio,
           scenes: scenes,
         }),
       });
@@ -718,7 +773,7 @@ export function StoryboardStudio({
                 }}
               >
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#059669", display: "inline-block" }} />
-                1080x1920 Video Ready
+                {selectedAspectRatio === "16:9" ? "1920x1080 Widescreen" : selectedAspectRatio === "1:1" ? "1080x1080 Square" : "1080x1920 Reel"} Ready
               </span>
             )}
 
@@ -906,7 +961,7 @@ export function StoryboardStudio({
         </div>
       )}
 
-      {/* COMPLETED VIDEO PREVIEW PLAYER (1080x1920) */}
+      {/* COMPLETED VIDEO PREVIEW PLAYER (Multi-Format Responsive) */}
       {videoUrl && (
         <div
           className="video-player-grid"
@@ -918,12 +973,12 @@ export function StoryboardStudio({
             border: "1px solid rgba(255, 255, 255, 0.1)",
           }}
         >
-          {/* Vertical 9:16 Video Player Frame */}
+          {/* Dynamic Video Player Frame */}
           <div
             style={{
               width: "100%",
-              maxWidth: "320px",
-              aspectRatio: "9/16",
+              maxWidth: selectedAspectRatio === "16:9" ? "560px" : selectedAspectRatio === "1:1" ? "420px" : "320px",
+              aspectRatio: selectedAspectRatio === "16:9" ? "16/9" : selectedAspectRatio === "1:1" ? "1/1" : "9/16",
               borderRadius: "18px",
               overflow: "hidden",
               boxShadow: "0 16px 40px rgba(0,0,0,0.6)",
@@ -956,20 +1011,20 @@ export function StoryboardStudio({
                   borderRadius: "20px",
                 }}
               >
-                ● 1080x1920 VERTICAL REEL READY
+                ● {selectedAspectRatio === "16:9" ? "1920x1080 WIDESCREEN CINEMA READY" : selectedAspectRatio === "1:1" ? "1080x1080 SQUARE FEED READY" : "1080x1920 VERTICAL REEL READY"}
               </span>
               <h2 style={{ fontSize: "1.85rem", fontWeight: 800, margin: "0.6rem 0 0.35rem", color: "#FFFFFF", letterSpacing: "-0.02em" }}>
                 {storyboard?.title || project.title}
               </h2>
               <p style={{ fontSize: "0.9375rem", color: "#94A3B8", margin: 0, lineHeight: 1.6 }}>
-                Rendered with neural voiceover ({selectedVoice.label}), background soundtrack ({selectedMusic.name} with smart audio ducking), kinetic word-by-word captions, and topic-specific dynamic motion visuals ({videoDuration || estimatedDuration}s).
+                Rendered with neural voiceover ({selectedVoice.label}), background soundtrack ({selectedMusic.name} with smart audio ducking), kinetic word-by-word captions, and topic-specific dynamic motion visuals ({videoDuration || estimatedDuration}s) in <strong>{selectedAspectRatio}</strong> layout.
               </p>
             </div>
 
             <div style={{ display: "flex", gap: "0.85rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
               <a
                 href={videoUrl}
-                download={`${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.mp4`}
+                download={`${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${selectedAspectRatio.replace(":", "x")}.mp4`}
                 className="button"
                 style={{
                   padding: "0.85rem 1.75rem",
@@ -984,7 +1039,7 @@ export function StoryboardStudio({
                   boxShadow: "0 4px 15px rgba(69, 214, 181, 0.3)",
                 }}
               >
-                Download 1080x1920 MP4 ⬇
+                Download {selectedAspectRatio === "16:9" ? "1920x1080" : selectedAspectRatio === "1:1" ? "1080x1080" : "1080x1920"} MP4 ⬇
               </a>
 
               <button
@@ -1979,10 +2034,89 @@ export function StoryboardStudio({
             </div>
           </div>
 
+          {/* ASPECT RATIO & RESOLUTION SELECTOR (Milestone F17 / PRD §17 Multi-Format Video Engine) */}
+          <div style={{ marginTop: "2rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.85rem", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: 0, color: "#0F172A", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span>📐</span> Video Aspect Ratio & Canvas Format
+                </h3>
+                <p style={{ fontSize: "0.85rem", color: "#64748B", margin: "0.25rem 0 0" }}>
+                  Choose your delivery format. Kinetic layout, vector stage, and animated captions auto-adapt seamlessly.
+                </p>
+              </div>
+              <span style={{ fontSize: "0.75rem", background: "#ECFDF5", color: "#059669", padding: "0.25rem 0.65rem", borderRadius: "12px", fontWeight: 700, border: "1px solid #A7F3D0" }}>
+                Multi-Format Engine Active ✨
+              </span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: "0.85rem" }}>
+              {ASPECT_RATIO_OPTIONS.map((opt) => {
+                const isSelected = selectedAspectRatio === opt.id;
+                return (
+                  <div
+                    key={opt.id}
+                    onClick={() => setSelectedAspectRatio(opt.id)}
+                    style={{
+                      border: `2px solid ${isSelected ? "#4F46E5" : "#E2E8F0"}`,
+                      background: isSelected ? "#EEF2FF" : "#FFFFFF",
+                      borderRadius: "14px",
+                      padding: "1rem 1.15rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      transition: "all 0.15s ease",
+                      boxShadow: isSelected ? "0 6px 20px rgba(79, 70, 229, 0.12)" : "none",
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          <span style={{ fontSize: "1.3rem" }}>{opt.icon}</span>
+                          <div>
+                            <div style={{ fontWeight: 800, color: "#0F172A", fontSize: "0.95rem" }}>{opt.label}</div>
+                            <div style={{ fontSize: "0.75rem", color: "#64748B" }}>{opt.resolution}</div>
+                          </div>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            fontWeight: 800,
+                            padding: "0.2rem 0.5rem",
+                            borderRadius: "8px",
+                            background: isSelected ? "#4F46E5" : "#F1F5F9",
+                            color: isSelected ? "#FFFFFF" : "#475569",
+                          }}
+                        >
+                          {opt.ratioBadge}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "#334155", marginTop: "0.6rem", lineHeight: 1.4 }}>
+                        {opt.platforms}
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: "0.75rem", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #E2E8F0", paddingTop: "0.5rem" }}>
+                      <span style={{ fontSize: "0.7rem", color: "#4338CA", fontWeight: 700 }}>
+                        {opt.tag}
+                      </span>
+                      {isSelected && (
+                        <span style={{ fontSize: "0.75rem", color: "#4F46E5", fontWeight: 800 }}>
+                          ✓ Selected
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Render Action Button */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #E2E8F0", paddingTop: "1.5rem", marginTop: "0.5rem", flexWrap: "wrap", gap: "1rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #E2E8F0", paddingTop: "1.5rem", marginTop: "1rem", flexWrap: "wrap", gap: "1rem" }}>
             <div style={{ fontSize: "0.875rem", color: "#334155" }}>
-              Outputs vertical <strong>1080x1920 MP4</strong> with dynamic vector motion graphics, neural narration, and synchronized captions.
+              Outputs <strong>{selectedAspectRatio === "16:9" ? "1920x1080 Widescreen" : selectedAspectRatio === "1:1" ? "1080x1080 Square" : "1080x1920 Vertical"} MP4</strong> with dynamic vector motion graphics, neural narration, and synchronized captions.
             </div>
             <button
               onClick={handleStartRender}
@@ -1997,7 +2131,7 @@ export function StoryboardStudio({
                 borderRadius: "12px",
               }}
             >
-              <span>Generate Reel with {selectedVoice.label} & {selectedMusic.name} 🎬</span>
+              <span>Generate {selectedAspectRatio === "16:9" ? "16:9 Widescreen" : selectedAspectRatio === "1:1" ? "1:1 Square" : "Vertical Reel"} with {selectedVoice.label} 🎬</span>
               <span>→</span>
             </button>
           </div>
@@ -2017,7 +2151,7 @@ export function StoryboardStudio({
                 background: pacingStatus.color,
               }}
             />
-            <span>{scenes.length} Scenes · ~{estimatedDuration}s</span>
+            <span>{scenes.length} Scenes · ~{estimatedDuration}s ({selectedAspectRatio})</span>
           </div>
 
           <div style={{ width: 1, height: 20, background: "rgba(255, 255, 255, 0.2)" }} />
@@ -2063,7 +2197,7 @@ export function StoryboardStudio({
               gap: "0.4rem",
             }}
           >
-            <span>Render Reel 🎬</span>
+            <span>Render {selectedAspectRatio === "16:9" ? "16:9" : selectedAspectRatio === "1:1" ? "1:1" : "Reel"} 🎬</span>
           </button>
         </div>
       )}

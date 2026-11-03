@@ -9,6 +9,7 @@ async function main() {
       "voice-id": { type: "string" },
       "voice-name": { type: "string" },
       "music-id": { type: "string" },
+      "aspect-ratio": { type: "string" },
       "storyboard-file": { type: "string" },
       "output-mp4": { type: "string" },
       "status-file": { type: "string" },
@@ -36,6 +37,7 @@ async function main() {
     voiceId: values["voice-id"] || "Q1NHvGuV9SzxtiSnVDEH",
     voiceName: values["voice-name"] || "viraj",
     musicId: values["music-id"] || "lofi",
+    aspectRatio: (values["aspect-ratio"] as "9:16" | "16:9" | "1:1") || "9:16",
     outputMp4Path: outputMp4,
     statusFilePath: statusFile,
   });

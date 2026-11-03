@@ -32,6 +32,7 @@ export interface ProjectRecord {
   voiceId?: string;
   voiceName?: string;
   musicId?: string;
+  aspectRatio?: "9:16" | "16:9" | "1:1";
   videoUrl?: string;
   durationSeconds?: number;
   socialPackage?: SocialPackage;

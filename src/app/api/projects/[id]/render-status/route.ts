@@ -45,6 +45,7 @@ export async function GET(
               status: "ready",
               videoUrl: data.videoUrl,
               durationSeconds: data.duration,
+              ...(data.aspectRatio ? { aspectRatio: data.aspectRatio } : {}),
               updatedAt: new Date(),
             },
           });

@@ -8,6 +8,7 @@ import {
   type Timeline,
   type SpeechSegment,
   type BackgroundMusicTrack,
+  type AspectRatio,
 } from "./remotion/contracts";
 
 export interface SpeechResult {
@@ -98,7 +99,8 @@ export function compileTimeline(
   title: string,
   rawScenes: Array<Record<string, any>>,
   speechMap: Record<string, SpeechResult>,
-  musicId: string = "lofi"
+  musicId: string = "lofi",
+  aspectRatio: AspectRatio = "9:16"
 ): Timeline {
   let globalFrame = 0;
 
@@ -180,6 +182,7 @@ export function compileTimeline(
     title,
     fps: FPS,
     frames: globalFrame,
+    aspectRatio,
     scenes: timedScenes,
     backgroundMusic: selectedTrack.id !== "none" ? selectedTrack : undefined,
     speechSegments,
