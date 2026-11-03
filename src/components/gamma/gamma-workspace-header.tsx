@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SignOutButton } from "../sign-out-button";
+import { BrandLogo } from "@/components/brand-logo";
 
 interface GammaWorkspaceHeaderProps {
   userName: string;
@@ -38,36 +39,7 @@ export function GammaWorkspaceHeader({
     >
       {/* Left: Brand + Workspace Selector */}
       <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-        <Link
-          href="/dashboard"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            textDecoration: "none",
-            color: "#0F172A",
-            fontWeight: 800,
-            fontSize: "1.05rem",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          <span
-            style={{
-              width: "28px",
-              height: "28px",
-              borderRadius: "8px",
-              background: "var(--gamma-gradient)",
-              display: "grid",
-              placeItems: "center",
-              fontSize: "14px",
-              color: "#FFFFFF",
-              boxShadow: "0 2px 10px rgba(79, 70, 229, 0.3)",
-            }}
-          >
-            ✦
-          </span>
-          <span>VidyaMotion</span>
-        </Link>
+        <BrandLogo href="/dashboard" size="medium" />
 
         <span className="gamma-workspace-pill" style={{ color: "#CBD5E1", fontSize: "1rem" }}>/</span>
 

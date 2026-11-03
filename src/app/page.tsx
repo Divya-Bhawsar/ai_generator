@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BrandLogo } from "@/components/brand-logo";
 
 interface ShowcaseCard {
   id: string;
@@ -241,36 +242,7 @@ export default function HomePage() {
           boxShadow: "0 1px 3px rgba(15, 23, 42, 0.05)",
         }}
       >
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.6rem",
-            textDecoration: "none",
-            color: "#0F172A",
-            fontWeight: 800,
-            fontSize: "1.15rem",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          <span
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "8px",
-              background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
-              display: "grid",
-              placeItems: "center",
-              fontSize: "15px",
-              color: "#FFFFFF",
-              boxShadow: "0 2px 10px rgba(79, 70, 229, 0.35)",
-            }}
-          >
-            ✦
-          </span>
-          <span>VidyaMotion</span>
-        </Link>
+        <BrandLogo href="/" size="large" />
 
         {/* Center Nav */}
         <nav
@@ -1130,26 +1102,12 @@ export default function HomePage() {
             gap: "1.5rem",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-            <span
-              style={{
-                width: "26px",
-                height: "26px",
-                borderRadius: "6px",
-                background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)",
-                display: "grid",
-                placeItems: "center",
-                fontSize: "13px",
-                color: "#FFFFFF",
-              }}
-            >
-              ✦
-            </span>
-            <span style={{ fontWeight: 800, color: "#0F172A", fontSize: "1rem" }}>VidyaMotion</span>
-            <span style={{ color: "#64748B", fontSize: "0.8125rem", marginLeft: "0.5rem" }}>
-              Educational motion decks made clear.
-            </span>
-          </div>
+          <BrandLogo
+            href="/"
+            size="small"
+            className="footer-brand-logo"
+            tagline="Educational motion decks made clear."
+          />
 
           <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", fontSize: "0.85rem", color: "#64748B" }}>
             <Link href="/dashboard" style={{ color: "#334155", textDecoration: "none", fontWeight: 600 }}>

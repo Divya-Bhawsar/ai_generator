@@ -1,7 +1,7 @@
 # VidyaMotion — Project Status
 
 **Status:** Active development  
-**Updated:** 2026-10-31  
+**Updated:** 2026-11-03
 **Source of truth:** This file tracks implementation only. Product scope is defined by [PRD.md](PRD.md); architecture and contracts by [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md), [API_DESIGN.md](API_DESIGN.md), [DATABASE_DESIGN.md](DATABASE_DESIGN.md), and [PIPELINE_DESIGN.md](PIPELINE_DESIGN.md).
 
 ## Repository workflow
@@ -49,6 +49,7 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 - Implemented a responsive public homepage with product navigation, a hero, a three-frame binary-search storyboard illustration, the three-step workflow, V1 capability summary, example topics, and a final call to action.
 - Kept binary-search illustration data internally consistent: array `[12, 24, 31, 42, 56, 73, 88]`, inspect midpoint `42`, narrow to `[56, 73, 88]`, find `73` at index 5.
 - Added a root README linking the product and engineering source documents.
+- Created a custom VidyaMotion vector symbol and wordmark; shared branding now uses the same mark on the homepage, auth frame, workspace header, and footer.
 
 ## Implemented in F01
 
@@ -91,6 +92,7 @@ The web scaffold and approved public homepage are in place. This milestone adds 
 | 2026-10-31 | F01 auth & database hardening | Removed unused `@clerk/nextjs`, resolved proxy infinite redirect loop with cryptographic JWT validation, eliminated silent in-memory fallback on MongoDB failure, cached DB indexes, normalized URI handling, hardened production secrets, added dedicated `GET /api/auth/me`. `npx tsc --noEmit` and `npm run build` passed with 0 errors. |
 | 2026-10-31 | F05 & F06 Scene & Voice Dynamic Re-rendering | Fixed video update staleness: 1) Client now transmits modified scenes in render payload; 2) `POST /api/projects/[id]/render` auto-persists scenes before worker starts; 3) Audio cache keyed by SHA256 of `voiceId` + `narration` text; 4) Graceful neural voice fallback (`Tara`/`Aman`) when ElevenLabs free quota is exhausted; 5) Dynamic cache-busting timestamp (`?v=...`) on output MP4 and `key={videoUrl}` on React player; 6) Added full inline scene title and visual cue editing in `StoryboardStudio`. |
 | 2026-10-31 | F05 & F06 Scene Pacing & Visual Continuity Fix | Fixed speech cut-off and visual fragmentation: 1) Resolved 25fps input / 30fps output framerate mismatch that truncated 17% of every scene audio; 2) Added 0.35s natural breathing padding (`apad`) to scene ends so narrator sentences finish 100% in full; 3) Replaced disjointed colors with unified brand identity (Electric Cyan / Midnight Slate); 4) Added persistent topic banner and narrative segmented progress stepper across all scenes; 5) Rendered 74.6s continuous, cohesive reel. |
+| 2026-11-03 | Brand identity | Added editable vector assets `public/vidyamotion-logo.svg` and `public/vidyamotion-symbol.svg`; unified product logo usage through `src/components/brand-logo.tsx`. |
 
 ## Development rules
 

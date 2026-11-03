@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 
 type AuthFrameProps = {
   title: string;
@@ -10,10 +10,7 @@ type AuthFrameProps = {
 export function AuthFrame({ title, description, children, footer }: AuthFrameProps) {
   return (
     <main className="auth-shell">
-      <Link className="wordmark auth-wordmark" href="/" aria-label="VidyaMotion home">
-        <span className="wordmark-mark" aria-hidden="true">V</span>
-        <span>VidyaMotion</span>
-      </Link>
+      <BrandLogo href="/" size="medium" className="auth-wordmark" />
 
       <div className="auth-content">
         <section className="auth-story" aria-label="About VidyaMotion">
