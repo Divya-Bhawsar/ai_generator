@@ -182,7 +182,7 @@ export function StoryboardStudio({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const voiceSectionRef = useRef<HTMLDivElement | null>(null);
 
-  // Background Music & Audio Ducking State
+  // Background Music State
   const initialMusic =
     BACKGROUND_MUSIC_TRACKS.find(
       (m) => m.id === ((initialProject as any).musicId || "lofi")
@@ -1017,7 +1017,7 @@ export function StoryboardStudio({
                 {storyboard?.title || project.title}
               </h2>
               <p style={{ fontSize: "0.9375rem", color: "#94A3B8", margin: 0, lineHeight: 1.6 }}>
-                Rendered with neural voiceover ({selectedVoice.label}), background soundtrack ({selectedMusic.name} with smart audio ducking), kinetic word-by-word captions, and topic-specific dynamic motion visuals ({videoDuration || estimatedDuration}s) in <strong>{selectedAspectRatio}</strong> layout.
+                Rendered with neural voiceover ({selectedVoice.label}), background soundtrack ({selectedMusic.name}), kinetic word-by-word captions, and topic-specific dynamic motion visuals ({videoDuration || estimatedDuration}s) in <strong>{selectedAspectRatio}</strong> layout.
               </p>
             </div>
 
@@ -1937,22 +1937,14 @@ export function StoryboardStudio({
             })}
           </div>
 
-          {/* Background Soundtrack Selection with Audio Ducking */}
+          {/* Background Soundtrack Selection */}
           <div style={{ marginTop: "1rem", borderTop: "1px solid #E2E8F0", paddingTop: "1.5rem" }}>
             <div style={{ marginBottom: "1rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", color: "#4F46E5", letterSpacing: "0.06em" }}>
-                  ✦ SMART AUDIO DUCKING
-                </span>
-                <span style={{ fontSize: "0.6875rem", background: "#ECFDF5", color: "#065F46", border: "1px solid #A7F3D0", padding: "0.15rem 0.55rem", borderRadius: "10px", fontWeight: 700 }}>
-                  Auto-Ducks -22 dB during speech
-                </span>
-              </div>
               <h4 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0F172A", margin: "0.3rem 0 0", letterSpacing: "-0.015em" }}>
                 Background Soundtrack
               </h4>
               <p style={{ fontSize: "0.875rem", color: "#334155", margin: "0.25rem 0 0" }}>
-                Curated royalty-free soundtracks. The engine automatically ducks the music during narration and swells it during pauses and transitions.
+                Curated royalty-free soundtracks. Plays seamlessly behind the voiceover with smooth master fade in and out.
               </p>
             </div>
 

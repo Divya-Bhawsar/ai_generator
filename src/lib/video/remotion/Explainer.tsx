@@ -1179,18 +1179,16 @@ function SceneView({
   );
 }
 
-export function calculateDuckedVolume({
+export function calculateMusicVolume({
   currentFrame,
   totalFrames,
-  speechSegments,
-  baseVolume = 0.22,
-  duckVolume = 0.05,
+  baseVolume = 0.10,
 }: {
   currentFrame: number;
   totalFrames: number;
-  speechSegments: Array<{ startFrame: number; endFrame: number }>;
   baseVolume?: number;
   duckVolume?: number;
+  speechSegments?: Array<{ startFrame: number; endFrame: number }>;
 }): number {
   if (baseVolume <= 0) return 0;
 
@@ -1199,28 +1197,11 @@ export function calculateDuckedVolume({
   const masterFadeOut = Math.min(1, Math.max(0, (totalFrames - currentFrame) / 24));
   const masterEnvelope = masterFadeIn * masterFadeOut;
 
-  if (masterEnvelope <= 0) return 0;
-
-  // Crossfade transition time: 10 frames (~0.33s)
-  const FADE_FRAMES = 10;
-  let minDuckFactor = 1.0;
-
-  for (const seg of speechSegments) {
-    if (currentFrame >= seg.startFrame - FADE_FRAMES && currentFrame < seg.startFrame) {
-      const progress = (seg.startFrame - currentFrame) / FADE_FRAMES;
-      minDuckFactor = Math.min(minDuckFactor, progress);
-    } else if (currentFrame >= seg.startFrame && currentFrame <= seg.endFrame) {
-      minDuckFactor = 0.0;
-      break;
-    } else if (currentFrame > seg.endFrame && currentFrame <= seg.endFrame + FADE_FRAMES) {
-      const progress = (currentFrame - seg.endFrame) / FADE_FRAMES;
-      minDuckFactor = Math.min(minDuckFactor, progress);
-    }
-  }
-
-  const vol = duckVolume + (baseVolume - duckVolume) * minDuckFactor;
-  return vol * masterEnvelope;
+  // Constant balanced background volume without speech ducking
+  return baseVolume * masterEnvelope;
 }
+
+export const calculateDuckedVolume = calculateMusicVolume;
 
 export function Explainer({ timeline }: { timeline: Timeline }) {
   const bgMusic = timeline.backgroundMusic;
@@ -1228,18 +1209,16 @@ export function Explainer({ timeline }: { timeline: Timeline }) {
 
   return (
     <AbsoluteFill style={{ background: "#070913" }}>
-      {/* Background Music with Smart Audio Ducking */}
+      {/* Background Music (Consistent Balance with Master Fade In/Out) */}
       {bgMusic && bgMusic.audioFile && (
         <Audio
           src={staticFile(bgMusic.audioFile)}
           loop
           volume={(f) =>
-            calculateDuckedVolume({
+            calculateMusicVolume({
               currentFrame: f,
               totalFrames: timeline.frames,
-              speechSegments: timeline.speechSegments || [],
               baseVolume: bgMusic.baseVolume,
-              duckVolume: bgMusic.duckVolume,
             })
           }
         />

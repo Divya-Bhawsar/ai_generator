@@ -477,7 +477,7 @@ export function SocialPackageCard({
             </div>
             <div>
               <div style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#FFFFFF" }}>vidyamotion.reels</div>
-              <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>Original Audio · Smart Audio Ducked</div>
+              <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>Original Audio · Voice & Music Track</div>
             </div>
           </div>
 

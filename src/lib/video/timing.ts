@@ -161,7 +161,7 @@ export function compileTimeline(
     return timedScene;
   });
 
-  // Calculate exact speech activity intervals for Remotion Audio Ducking
+  // Speech activity intervals for scene timeline
   const speechSegments: SpeechSegment[] = timedScenes.map((scene, idx) => {
     const rawScene = rawScenes[idx];
     const id = rawScene?.id || rawScene?.sceneId || `scene-${idx + 1}`;

@@ -124,8 +124,8 @@ export interface BackgroundMusicTrack {
   icon: string;
   audioFile: string;
   previewUrl: string;
-  baseVolume: number; // Volume when no speech is playing (e.g. 0.22, ~-13dB)
-  duckVolume: number; // Volume during active speech (e.g. 0.05, ~-24dB)
+  baseVolume: number; // Constant background volume level (e.g. 0.10)
+  duckVolume?: number;
   description: string;
   tag: string;
 }
@@ -138,8 +138,7 @@ export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
     icon: "🎧",
     audioFile: "audio/music/music-lofi.mp3",
     previewUrl: "/audio/music/music-lofi.mp3",
-    baseVolume: 0.22,
-    duckVolume: 0.05,
+    baseVolume: 0.10,
     description: "Warm Rhodes electric piano, sub-bass & soft vinyl boom-bap rhythm",
     tag: "✦ Recommended for All Explainer Topics",
   },
@@ -150,8 +149,7 @@ export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
     icon: "⚡",
     audioFile: "audio/music/music-tech.mp3",
     previewUrl: "/audio/music/music-tech.mp3",
-    baseVolume: 0.20,
-    duckVolume: 0.05,
+    baseVolume: 0.09,
     description: "Minimalist digital synth arpeggios with crisp electronic clicks",
     tag: "Top Choice for Coding, DSA & Architecture",
   },
@@ -162,8 +160,7 @@ export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
     icon: "🌌",
     audioFile: "audio/music/music-ambient.mp3",
     previewUrl: "/audio/music/music-ambient.mp3",
-    baseVolume: 0.24,
-    duckVolume: 0.06,
+    baseVolume: 0.10,
     description: "Expansive ethereal strings, evolving drone pads & deep space atmosphere",
     tag: "Great for Science, Physics & Nature",
   },
@@ -174,8 +171,7 @@ export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
     icon: "🎬",
     audioFile: "audio/music/music-cinematic.mp3",
     previewUrl: "/audio/music/music-cinematic.mp3",
-    baseVolume: 0.22,
-    duckVolume: 0.05,
+    baseVolume: 0.09,
     description: "Dramatic sub-bass pulse & suspense strings with heart-rate thump",
     tag: "Great for Hooks, Paradoxes & Life Hacks",
   },
@@ -187,7 +183,6 @@ export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
     audioFile: "",
     previewUrl: "",
     baseVolume: 0,
-    duckVolume: 0,
     description: "Pure studio neural voiceover without background soundtrack",
     tag: "Pure Voice Only",
   },
