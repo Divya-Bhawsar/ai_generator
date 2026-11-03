@@ -112,11 +112,94 @@ export interface TimedScene {
   accentWords?: string[];
 }
 
+export interface SpeechSegment {
+  startFrame: number;
+  endFrame: number;
+}
+
+export interface BackgroundMusicTrack {
+  id: "lofi" | "tech" | "ambient" | "cinematic" | "none";
+  name: string;
+  genre: string;
+  icon: string;
+  audioFile: string;
+  previewUrl: string;
+  baseVolume: number; // Volume when no speech is playing (e.g. 0.22, ~-13dB)
+  duckVolume: number; // Volume during active speech (e.g. 0.05, ~-24dB)
+  description: string;
+  tag: string;
+}
+
+export const BACKGROUND_MUSIC_TRACKS: BackgroundMusicTrack[] = [
+  {
+    id: "lofi",
+    name: "Lofi Study Beats",
+    genre: "Lofi Hip-Hop",
+    icon: "🎧",
+    audioFile: "audio/music/music-lofi.mp3",
+    previewUrl: "/audio/music/music-lofi.mp3",
+    baseVolume: 0.22,
+    duckVolume: 0.05,
+    description: "Warm Rhodes electric piano, sub-bass & soft vinyl boom-bap rhythm",
+    tag: "✦ Recommended for All Explainer Topics",
+  },
+  {
+    id: "tech",
+    name: "Tech Flow Arpeggio",
+    genre: "Modern Tech",
+    icon: "⚡",
+    audioFile: "audio/music/music-tech.mp3",
+    previewUrl: "/audio/music/music-tech.mp3",
+    baseVolume: 0.20,
+    duckVolume: 0.05,
+    description: "Minimalist digital synth arpeggios with crisp electronic clicks",
+    tag: "Top Choice for Coding, DSA & Architecture",
+  },
+  {
+    id: "ambient",
+    name: "Documentary Ambient",
+    genre: "Cinematic Ambient",
+    icon: "🌌",
+    audioFile: "audio/music/music-ambient.mp3",
+    previewUrl: "/audio/music/music-ambient.mp3",
+    baseVolume: 0.24,
+    duckVolume: 0.06,
+    description: "Expansive ethereal strings, evolving drone pads & deep space atmosphere",
+    tag: "Great for Science, Physics & Nature",
+  },
+  {
+    id: "cinematic",
+    name: "Cinematic Mystery",
+    genre: "Tension & Suspense",
+    icon: "🎬",
+    audioFile: "audio/music/music-cinematic.mp3",
+    previewUrl: "/audio/music/music-cinematic.mp3",
+    baseVolume: 0.22,
+    duckVolume: 0.05,
+    description: "Dramatic sub-bass pulse & suspense strings with heart-rate thump",
+    tag: "Great for Hooks, Paradoxes & Life Hacks",
+  },
+  {
+    id: "none",
+    name: "No Music (Voice Only)",
+    genre: "Acapella",
+    icon: "🔇",
+    audioFile: "",
+    previewUrl: "",
+    baseVolume: 0,
+    duckVolume: 0,
+    description: "Pure studio neural voiceover without background soundtrack",
+    tag: "Pure Voice Only",
+  },
+];
+
 export interface Timeline {
   title: string;
   fps: number;
   frames: number;
   scenes: TimedScene[];
+  backgroundMusic?: BackgroundMusicTrack;
+  speechSegments?: SpeechSegment[];
 }
 
 export function cueOffset(text: string, phrase: string, occurrence = 1): number {

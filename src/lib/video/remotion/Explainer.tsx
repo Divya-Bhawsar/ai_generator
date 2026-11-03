@@ -640,9 +640,72 @@ function SceneView({
   );
 }
 
+export function calculateDuckedVolume({
+  currentFrame,
+  totalFrames,
+  speechSegments,
+  baseVolume = 0.22,
+  duckVolume = 0.05,
+}: {
+  currentFrame: number;
+  totalFrames: number;
+  speechSegments: Array<{ startFrame: number; endFrame: number }>;
+  baseVolume?: number;
+  duckVolume?: number;
+}): number {
+  if (baseVolume <= 0) return 0;
+
+  // Master Fade In (first 15 frames) & Fade Out (last 24 frames)
+  const masterFadeIn = Math.min(1, Math.max(0, currentFrame / 15));
+  const masterFadeOut = Math.min(1, Math.max(0, (totalFrames - currentFrame) / 24));
+  const masterEnvelope = masterFadeIn * masterFadeOut;
+
+  if (masterEnvelope <= 0) return 0;
+
+  // Crossfade transition time: 10 frames (~0.33s)
+  const FADE_FRAMES = 10;
+  let minDuckFactor = 1.0;
+
+  for (const seg of speechSegments) {
+    if (currentFrame >= seg.startFrame - FADE_FRAMES && currentFrame < seg.startFrame) {
+      const progress = (seg.startFrame - currentFrame) / FADE_FRAMES;
+      minDuckFactor = Math.min(minDuckFactor, progress);
+    } else if (currentFrame >= seg.startFrame && currentFrame <= seg.endFrame) {
+      minDuckFactor = 0.0;
+      break;
+    } else if (currentFrame > seg.endFrame && currentFrame <= seg.endFrame + FADE_FRAMES) {
+      const progress = (currentFrame - seg.endFrame) / FADE_FRAMES;
+      minDuckFactor = Math.min(minDuckFactor, progress);
+    }
+  }
+
+  const vol = duckVolume + (baseVolume - duckVolume) * minDuckFactor;
+  return vol * masterEnvelope;
+}
+
 export function Explainer({ timeline }: { timeline: Timeline }) {
+  const bgMusic = timeline.backgroundMusic;
+
   return (
     <AbsoluteFill style={{ background: "#070913" }}>
+      {/* Background Music with Smart Audio Ducking */}
+      {bgMusic && bgMusic.audioFile && (
+        <Audio
+          src={staticFile(bgMusic.audioFile)}
+          loop
+          volume={(f) =>
+            calculateDuckedVolume({
+              currentFrame: f,
+              totalFrames: timeline.frames,
+              speechSegments: timeline.speechSegments || [],
+              baseVolume: bgMusic.baseVolume,
+              duckVolume: bgMusic.duckVolume,
+            })
+          }
+        />
+      )}
+
+      {/* Visual Scenes & Voiceover Audio */}
       {timeline.scenes.map((s, i) => (
         <Sequence key={s.id} from={s.start} durationInFrames={s.frames}>
           <SceneView scene={s} index={i} total={timeline.scenes.length} />

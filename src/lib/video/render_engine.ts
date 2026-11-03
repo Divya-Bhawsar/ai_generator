@@ -20,6 +20,7 @@ export interface RenderJobParams {
   };
   voiceId?: string;
   voiceName?: string;
+  musicId?: string;
   outputMp4Path: string;
   statusFilePath: string;
   apiKey?: string;
@@ -65,6 +66,7 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     storyboard,
     voiceId = "Q1NHvGuV9SzxtiSnVDEH",
     voiceName = "viraj",
+    musicId = "lofi",
     outputMp4Path,
     statusFilePath,
     apiKey = process.env.ELEVENLABS_API_KEY || "",
@@ -124,7 +126,8 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     const timeline: Timeline = compileTimeline(
       storyboard.title || "VidyaMotion Explainer",
       rawScenes,
-      speechMap
+      speechMap,
+      musicId
     );
 
     // Save timeline.json for debugging and inspector

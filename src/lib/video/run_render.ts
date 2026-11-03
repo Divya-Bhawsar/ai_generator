@@ -8,6 +8,7 @@ async function main() {
       "project-id": { type: "string" },
       "voice-id": { type: "string" },
       "voice-name": { type: "string" },
+      "music-id": { type: "string" },
       "storyboard-file": { type: "string" },
       "output-mp4": { type: "string" },
       "status-file": { type: "string" },
@@ -34,6 +35,7 @@ async function main() {
     storyboard,
     voiceId: values["voice-id"] || "Q1NHvGuV9SzxtiSnVDEH",
     voiceName: values["voice-name"] || "viraj",
+    musicId: values["music-id"] || "lofi",
     outputMp4Path: outputMp4,
     statusFilePath: statusFile,
   });

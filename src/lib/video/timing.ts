@@ -1,10 +1,13 @@
 import {
   FPS,
   cueOffset,
+  BACKGROUND_MUSIC_TRACKS,
   type Alignment,
   type Caption,
   type TimedScene,
   type Timeline,
+  type SpeechSegment,
+  type BackgroundMusicTrack,
 } from "./remotion/contracts";
 
 export interface SpeechResult {
@@ -94,7 +97,8 @@ export function syntheticAlignment(text: string, duration: number): Alignment {
 export function compileTimeline(
   title: string,
   rawScenes: Array<Record<string, any>>,
-  speechMap: Record<string, SpeechResult>
+  speechMap: Record<string, SpeechResult>,
+  musicId: string = "lofi"
 ): Timeline {
   let globalFrame = 0;
 
@@ -155,10 +159,29 @@ export function compileTimeline(
     return timedScene;
   });
 
+  // Calculate exact speech activity intervals for Remotion Audio Ducking
+  const speechSegments: SpeechSegment[] = timedScenes.map((scene, idx) => {
+    const rawScene = rawScenes[idx];
+    const id = rawScene?.id || rawScene?.sceneId || `scene-${idx + 1}`;
+    const speech = speechMap[id];
+    const durSec = speech?.duration || Math.max(1, scene.frames / FPS - 0.4);
+    return {
+      startFrame: scene.start,
+      endFrame: Math.min(scene.start + scene.frames, scene.start + Math.floor(durSec * FPS)),
+    };
+  });
+
+  // Pick selected background track
+  const selectedTrack =
+    BACKGROUND_MUSIC_TRACKS.find((m) => m.id === musicId) ||
+    BACKGROUND_MUSIC_TRACKS[0];
+
   return {
     title,
     fps: FPS,
     frames: globalFrame,
     scenes: timedScenes,
+    backgroundMusic: selectedTrack.id !== "none" ? selectedTrack : undefined,
+    speechSegments,
   };
 }

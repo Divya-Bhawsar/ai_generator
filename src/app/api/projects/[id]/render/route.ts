@@ -29,6 +29,7 @@ export async function POST(
   const body = await req.json().catch(() => ({}));
   const voiceId = body.voiceId || project.voiceId || "Q1NHvGuV9SzxtiSnVDEH";
   const voiceName = body.voiceName || project.voiceName || "viraj";
+  const musicId = body.musicId || (project as any).musicId || "lofi";
 
   let activeStoryboard = storyboard;
 
@@ -78,6 +79,7 @@ export async function POST(
             status: "rendering",
             voiceId,
             voiceName,
+            musicId,
             updatedAt: new Date(),
           },
         });
@@ -97,6 +99,7 @@ export async function POST(
         "--project-id", id,
         "--voice-id", voiceId,
         "--voice-name", voiceName,
+        "--music-id", musicId,
         "--storyboard-file", storyboardPath,
         "--output-mp4", outputMp4Path,
         "--status-file", statusPath,
@@ -107,6 +110,7 @@ export async function POST(
         "--project-id", id,
         "--voice-id", voiceId,
         "--voice-name", voiceName,
+        "--music-id", musicId,
         "--storyboard-file", storyboardPath,
         "--output-mp4", outputMp4Path,
         "--status-file", statusPath,

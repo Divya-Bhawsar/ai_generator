@@ -5,6 +5,10 @@ import Link from "next/link";
 import { ProjectRecord, StoryboardRecord, SceneRecord } from "@/lib/db/projects";
 import { cleanSvg } from "@/lib/video/cleanSvg";
 import { GammaPresenterModal } from "./gamma/gamma-presenter-modal";
+import {
+  BACKGROUND_MUSIC_TRACKS,
+  type BackgroundMusicTrack,
+} from "@/lib/video/remotion/contracts";
 
 const VISUAL_TYPE_COLORS: Record<string, { bg: string; text: string; border: string; icon: string }> = {
   hook: { bg: "#FEF2F2", text: "#DC2626", border: "#FCA5A5", icon: "🎯" },
@@ -133,6 +137,15 @@ export function StoryboardStudio({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const voiceSectionRef = useRef<HTMLDivElement | null>(null);
 
+  // Background Music & Audio Ducking State
+  const initialMusic =
+    BACKGROUND_MUSIC_TRACKS.find(
+      (m) => m.id === ((initialProject as any).musicId || "lofi")
+    ) || BACKGROUND_MUSIC_TRACKS[0];
+  const [selectedMusic, setSelectedMusic] = useState<BackgroundMusicTrack>(initialMusic);
+  const [playingMusic, setPlayingMusic] = useState<string | null>(null);
+  const musicAudioRef = useRef<HTMLAudioElement | null>(null);
+
   // Render State
   const [rendering, setRendering] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
@@ -208,6 +221,10 @@ export function StoryboardStudio({
     if (audioRef.current) {
       audioRef.current.pause();
     }
+    if (musicAudioRef.current) {
+      musicAudioRef.current.pause();
+      setPlayingMusic(null);
+    }
 
     const audio = new Audio(voice.previewUrl);
     audioRef.current = audio;
@@ -216,10 +233,34 @@ export function StoryboardStudio({
     audio.onended = () => setPlayingVoice(null);
   }
 
+  function playMusicPreview(track: BackgroundMusicTrack) {
+    if (!track.previewUrl) return;
+    if (playingMusic === track.id && musicAudioRef.current) {
+      musicAudioRef.current.pause();
+      setPlayingMusic(null);
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setPlayingVoice(null);
+    }
+    if (musicAudioRef.current) {
+      musicAudioRef.current.pause();
+    }
+
+    const audio = new Audio(track.previewUrl);
+    musicAudioRef.current = audio;
+    audio.volume = 0.45;
+    setPlayingMusic(track.id);
+    audio.play().catch(() => setPlayingMusic(null));
+    audio.onended = () => setPlayingMusic(null);
+  }
+
   async function handleStartRender() {
     setRendering(true);
     setRenderProgress(5);
-    setRenderStage(`Preparing video render with ${selectedVoice.label}...`);
+    setRenderStage(`Preparing video render with ${selectedVoice.label} & ${selectedMusic.name}...`);
     setError(null);
     setVideoUrl(null);
 
@@ -230,6 +271,7 @@ export function StoryboardStudio({
         body: JSON.stringify({
           voiceId: selectedVoice.id,
           voiceName: selectedVoice.name,
+          musicId: selectedMusic.id,
           scenes: scenes,
         }),
       });
@@ -838,7 +880,7 @@ export function StoryboardStudio({
               </div>
             </div>
             <span style={{ fontSize: "0.8125rem", color: "#4338CA", fontWeight: 700, background: "#EEF2FF", padding: "0.3rem 0.75rem", borderRadius: "20px" }}>
-              Voice: {selectedVoice.label} · 1080x1920 MP4
+              Voice: {selectedVoice.label} · 🎵 {selectedMusic.name}
             </span>
           </div>
 
@@ -917,7 +959,7 @@ export function StoryboardStudio({
                 {storyboard?.title || project.title}
               </h2>
               <p style={{ fontSize: "0.9375rem", color: "#94A3B8", margin: 0, lineHeight: 1.6 }}>
-                Rendered with neural voiceover ({selectedVoice.label}), kinetic word-by-word captions, and topic-specific dynamic motion visuals ({videoDuration || estimatedDuration}s).
+                Rendered with neural voiceover ({selectedVoice.label}), background soundtrack ({selectedMusic.name} with smart audio ducking), kinetic word-by-word captions, and topic-specific dynamic motion visuals ({videoDuration || estimatedDuration}s).
               </p>
             </div>
 
@@ -1825,6 +1867,103 @@ export function StoryboardStudio({
             })}
           </div>
 
+          {/* Background Soundtrack Selection with Audio Ducking */}
+          <div style={{ marginTop: "1rem", borderTop: "1px solid #E2E8F0", paddingTop: "1.5rem" }}>
+            <div style={{ marginBottom: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", color: "#4F46E5", letterSpacing: "0.06em" }}>
+                  ✦ SMART AUDIO DUCKING
+                </span>
+                <span style={{ fontSize: "0.6875rem", background: "#ECFDF5", color: "#065F46", border: "1px solid #A7F3D0", padding: "0.15rem 0.55rem", borderRadius: "10px", fontWeight: 700 }}>
+                  Auto-Ducks -22 dB during speech
+                </span>
+              </div>
+              <h4 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0F172A", margin: "0.3rem 0 0", letterSpacing: "-0.015em" }}>
+                Background Soundtrack
+              </h4>
+              <p style={{ fontSize: "0.875rem", color: "#334155", margin: "0.25rem 0 0" }}>
+                Curated royalty-free soundtracks. The engine automatically ducks the music during narration and swells it during pauses and transitions.
+              </p>
+            </div>
+
+            <div className="voice-selection-grid">
+              {BACKGROUND_MUSIC_TRACKS.map((m) => {
+                const isSelected = selectedMusic.id === m.id;
+                const isPlaying = playingMusic === m.id;
+
+                return (
+                  <div
+                    key={m.id}
+                    onClick={() => setSelectedMusic(m)}
+                    className="interactive-card"
+                    style={{
+                      border: `2px solid ${isSelected ? "#4F46E5" : "#E2E8F0"}`,
+                      background: isSelected ? "#EEF2FF" : "#FFFFFF",
+                      borderRadius: "14px",
+                      padding: "1.15rem 1.25rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      boxShadow: isSelected ? "0 6px 20px rgba(79, 70, 229, 0.12)" : "none",
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span style={{ fontSize: "1.2rem" }}>{m.icon}</span>
+                        <span style={{ fontWeight: 800, color: "#0F172A", fontSize: "1.05rem" }}>{m.name}</span>
+                        {isSelected && (
+                          <span style={{ fontSize: "0.7rem", background: "#4F46E5", color: "#FFF", padding: "0.15rem 0.5rem", borderRadius: "10px", fontWeight: 700 }}>
+                            Selected
+                          </span>
+                        )}
+                        {/* Animated Equalizer Wave while playing */}
+                        {isPlaying && (
+                          <div style={{ display: "flex", alignItems: "center", gap: "3px", height: "16px", marginLeft: "0.25rem" }}>
+                            <span className="equalizer-bar" />
+                            <span className="equalizer-bar" />
+                            <span className="equalizer-bar" />
+                            <span className="equalizer-bar" />
+                            <span className="equalizer-bar" />
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "0.8125rem", color: "#334155", marginTop: "0.25rem" }}>{m.description}</div>
+                      <div style={{ fontSize: "0.72rem", color: "#4338CA", fontWeight: 700, marginTop: "0.35rem" }}>{m.tag}</div>
+                    </div>
+
+                    {m.previewUrl && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playMusicPreview(m);
+                        }}
+                        style={{
+                          background: isPlaying ? "#EF4444" : "#F8FAFC",
+                          color: isPlaying ? "#FFFFFF" : "#0F172A",
+                          border: "1px solid #CBD5E1",
+                          borderRadius: "20px",
+                          padding: "0.45rem 0.95rem",
+                          fontSize: "0.8125rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.35rem",
+                          transition: "all 0.15s ease",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span>{isPlaying ? "⏹ Pause" : "▶ Preview"}</span>
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Render Action Button */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #E2E8F0", paddingTop: "1.5rem", marginTop: "0.5rem", flexWrap: "wrap", gap: "1rem" }}>
             <div style={{ fontSize: "0.875rem", color: "#334155" }}>
@@ -1843,7 +1982,7 @@ export function StoryboardStudio({
                 borderRadius: "12px",
               }}
             >
-              <span>Generate Reel with {selectedVoice.label} 🎬</span>
+              <span>Generate Reel with {selectedVoice.label} & {selectedMusic.name} 🎬</span>
               <span>→</span>
             </button>
           </div>
