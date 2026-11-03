@@ -19,6 +19,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
     duration?: number;
     projectId?: string;
     scenes?: PresenterScene[];
+    socialPackage?: any;
   } | null>(null);
 
   const filtered = projects.filter((p) => {
@@ -303,6 +304,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
                               voiceName: project.voiceName || "Edge Neural",
                               duration: project.durationSeconds || 60,
                               projectId: project._id,
+                              socialPackage: project.socialPackage,
                             })
                           }
                           style={{
@@ -371,6 +373,7 @@ export function GammaProjectGrid({ projects }: GammaProjectGridProps) {
           voiceName={presentingProject.voiceName}
           duration={presentingProject.duration}
           projectId={presentingProject.projectId}
+          socialPackage={presentingProject.socialPackage}
           scenes={presentingProject.scenes}
         />
       )}

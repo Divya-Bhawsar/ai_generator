@@ -20,6 +20,10 @@ interface GammaPresenterModalProps {
   duration?: number;
   projectId?: string;
   scenes?: PresenterScene[];
+  socialPackage?: {
+    fullCaption?: string;
+    hashtags?: string[];
+  } | null;
 }
 
 export function GammaPresenterModal({
@@ -31,11 +35,13 @@ export function GammaPresenterModal({
   duration = 60,
   projectId,
   scenes = [],
+  socialPackage,
 }: GammaPresenterModalProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [activeSceneIndex, setActiveSceneIndex] = useState(0);
   const [showNotesDrawer, setShowNotesDrawer] = useState(false);
+  const [copiedCaption, setCopiedCaption] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -132,6 +138,32 @@ export function GammaPresenterModal({
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {socialPackage?.fullCaption && (
+            <button
+              type="button"
+              onClick={() => {
+                if (socialPackage?.fullCaption) {
+                  navigator.clipboard.writeText(socialPackage.fullCaption);
+                  setCopiedCaption(true);
+                  setTimeout(() => setCopiedCaption(false), 2500);
+                }
+              }}
+              style={{
+                background: copiedCaption ? "#10B981" : "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "8px",
+                padding: "0.35rem 0.75rem",
+                color: copiedCaption ? "#FFFFFF" : "#E2E8F0",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <span>{copiedCaption ? "✓ Copied Caption!" : "📋 Copy Caption"}</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setShowNotesDrawer((prev) => !prev)}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ProjectRecord, StoryboardRecord, SceneRecord } from "@/lib/db/projects";
 import { cleanSvg } from "@/lib/video/cleanSvg";
 import { GammaPresenterModal } from "./gamma/gamma-presenter-modal";
+import { SocialPackageCard } from "./social-package-card";
 import {
   BACKGROUND_MUSIC_TRACKS,
   type BackgroundMusicTrack,
@@ -1049,6 +1050,16 @@ export function StoryboardStudio({
             </div>
           </div>
         </div>
+      )}
+
+      {/* AI Social Package Generator (Instagram Caption & Hashtags) */}
+      {scenes.length > 0 && (
+        <SocialPackageCard
+          projectId={project._id}
+          initialPackage={project.socialPackage}
+          topic={project.topic}
+          title={storyboard?.title || project.title}
+        />
       )}
 
       {/* Empty State when no storyboard exists yet */}
@@ -2370,6 +2381,7 @@ export function StoryboardStudio({
         voiceName={selectedVoice.label}
         duration={videoDuration || estimatedDuration}
         projectId={project._id}
+        socialPackage={project.socialPackage}
         scenes={scenes.map((s, idx) => ({
           sequence: s.sequence || idx + 1,
           title: s.title,

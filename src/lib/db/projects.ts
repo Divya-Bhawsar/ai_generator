@@ -12,6 +12,15 @@ export type ProjectStatus =
   | "ready"
   | "failed";
 
+export interface SocialPackage {
+  hook: string;
+  takeaways: string[];
+  callToAction: string;
+  hashtags: string[];
+  fullCaption: string;
+  generatedAt?: string;
+}
+
 export interface ProjectRecord {
   _id: string;
   ownerId: string;
@@ -22,8 +31,10 @@ export interface ProjectRecord {
   currentVersion: number;
   voiceId?: string;
   voiceName?: string;
+  musicId?: string;
   videoUrl?: string;
   durationSeconds?: number;
+  socialPackage?: SocialPackage;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -400,6 +411,46 @@ export async function updateProjectAudience(
     return true;
   }
   return false;
+}
+
+export async function saveSocialPackage(
+  ownerId: string,
+  projectId: string,
+  socialPackage: SocialPackage
+): Promise<ProjectRecord | null> {
+  const now = new Date();
+  if (isMongoConfigured()) {
+    try {
+      const db = await getDatabase();
+      if (db) {
+        let q: Record<string, unknown> = { ownerId };
+        if (ObjectId.isValid(projectId)) q._id = new ObjectId(projectId);
+        else q._id = projectId;
+
+        await db.collection("projects").updateOne(q, {
+          $set: { socialPackage, updatedAt: now },
+        });
+
+        const doc = await db.collection("projects").findOne(q);
+        if (doc) {
+          return {
+            ...doc,
+            _id: doc._id.toString(),
+          } as ProjectRecord;
+        }
+      }
+    } catch (err) {
+      console.warn("MongoDB saveSocialPackage error, using memory fallback:", err);
+    }
+  }
+
+  const project = memoryProjects.get(projectId);
+  if (project && project.ownerId === ownerId) {
+    project.socialPackage = socialPackage;
+    project.updatedAt = now;
+    return project;
+  }
+  return null;
 }
 
 export async function deleteProject(
