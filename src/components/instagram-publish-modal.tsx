@@ -54,11 +54,32 @@ export function InstagramPublishModal({
   const [customUsername, setCustomUsername] = useState("");
   const [savingAccount, setSavingAccount] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [oauthStatus, setOauthStatus] = useState<{
+    isOAuthConfigured: boolean;
+    appId?: string;
+    redirectUri: string;
+    appUrl?: string;
+  } | null>(null);
+  const [oauthSetupOpen, setOauthSetupOpen] = useState(false);
 
   // Load account & scheduled posts
   useEffect(() => {
     if (!isOpen) return;
     setError(null);
+
+    // Check URL parameters for OAuth redirect callbacks
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("instagram_connected")) {
+        setActiveTab("settings");
+      } else if (urlParams.get("oauth_error")) {
+        setError(`OAuth Error: ${decodeURIComponent(urlParams.get("oauth_error") || "")}`);
+        setActiveTab("settings");
+      } else if (urlParams.get("oauth_warning")) {
+        setError(`Warning: ${decodeURIComponent(urlParams.get("oauth_warning") || "")}`);
+        setActiveTab("settings");
+      }
+    }
 
     // Default scheduled date: tomorrow at 6:00 PM
     const tomorrow = new Date();
@@ -77,6 +98,11 @@ export function InstagramPublishModal({
           setCustomUsername(data.account.accountUsername || "");
         }
       })
+      .catch(() => {});
+
+    fetch("/api/instagram/oauth/status")
+      .then((r) => r.json())
+      .then((data) => setOauthStatus(data))
       .catch(() => {});
 
     fetchScheduled();
@@ -639,11 +665,164 @@ export function InstagramPublishModal({
           {/* TAB 3: ACCOUNT & API SETTINGS */}
           {activeTab === "settings" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ background: "#EEF2FF", padding: "0.85rem 1rem", borderRadius: "10px", border: "1px solid #C7D2FE", fontSize: "0.8125rem", color: "#3730A3", lineHeight: 1.5 }}>
-                ✦ <strong>Zero-Setup Developer Sandbox</strong> is active by default so you can test publishing flows without needing a verified Meta App. To connect a live account, paste your Instagram Professional Account ID and User Access Token below.
+              {/* Account Status Badge */}
+              <div
+                style={{
+                  background: account?.isSandbox ? "#EEF2FF" : "#ECFDF5",
+                  padding: "0.85rem 1rem",
+                  borderRadius: "10px",
+                  border: account?.isSandbox ? "1px solid #C7D2FE" : "1px solid #A7F3D0",
+                  fontSize: "0.8125rem",
+                  color: account?.isSandbox ? "#3730A3" : "#065F46",
+                  lineHeight: 1.5,
+                }}
+              >
+                {account?.isSandbox ? (
+                  <span>
+                    ✦ <strong>Zero-Setup Developer Sandbox</strong> is active. You can test complete publishing flows right now. To connect your live Instagram account with real Meta Graph API, choose an option below.
+                  </span>
+                ) : (
+                  <span>
+                    ✓ <strong>Live Meta Graph API Connected!</strong> Publishing will post actual Reels directly to <strong>@{account?.accountUsername}</strong>.
+                  </span>
+                )}
               </div>
 
-              {/* Collapsible Step-by-Step Guide */}
+              {/* METHOD 1: 1-CLICK LIVE OAUTH CONNECT */}
+              <div
+                style={{
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, #FAF5FF 0%, #EEF2FF 100%)",
+                  border: "1.5px solid #DDD6FE",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.6rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ fontSize: "1.2rem" }}>⚡</span>
+                    <strong style={{ fontSize: "0.9rem", color: "#4C1D95" }}>
+                      Option 1: 1-Click Live Connect (OAuth 2.0)
+                    </strong>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.6875rem",
+                      fontWeight: 700,
+                      padding: "0.2rem 0.5rem",
+                      borderRadius: "6px",
+                      background: oauthStatus?.isOAuthConfigured ? "#D1FAE5" : "#FEF3C7",
+                      color: oauthStatus?.isOAuthConfigured ? "#065F46" : "#92400E",
+                    }}
+                  >
+                    {oauthStatus?.isOAuthConfigured ? "Meta App Configured" : "Credentials Needed"}
+                  </span>
+                </div>
+
+                <p style={{ margin: 0, fontSize: "0.78125rem", color: "#6B21A8", lineHeight: 1.5 }}>
+                  Authorizes directly via Facebook & Instagram dialog. VidyaMotion automatically retrieves your long-lived 60-day token and Instagram Account ID.
+                </p>
+
+                {oauthStatus?.isOAuthConfigured ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const returnTo = typeof window !== "undefined" ? window.location.pathname : "/dashboard";
+                      window.location.href = `/api/instagram/oauth/connect?returnTo=${encodeURIComponent(returnTo)}`;
+                    }}
+                    style={{
+                      background: "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: "8px",
+                      padding: "0.65rem 1rem",
+                      fontWeight: 700,
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      boxShadow: "0 2px 6px rgba(139, 92, 246, 0.3)",
+                      marginTop: "0.3rem",
+                    }}
+                  >
+                    <span>Connect with Instagram & Facebook</span>
+                    <span>➔</span>
+                  </button>
+                ) : (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setOauthSetupOpen(!oauthSetupOpen)}
+                      style={{
+                        background: "#7C3AED",
+                        color: "#FFFFFF",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "0.65rem 1rem",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                        width: "100%",
+                        marginTop: "0.3rem",
+                      }}
+                    >
+                      <span>⚙️ Set up Meta App Credentials ({oauthSetupOpen ? "Close Guide" : "View 2-Min Setup"})</span>
+                    </button>
+
+                    {oauthSetupOpen && (
+                      <div
+                        style={{
+                          marginTop: "0.75rem",
+                          padding: "0.85rem",
+                          background: "#FFFFFF",
+                          border: "1px solid #E9D5FF",
+                          borderRadius: "8px",
+                          fontSize: "0.78125rem",
+                          color: "#374151",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        <strong style={{ color: "#4C1D95", display: "block", marginBottom: "0.4rem" }}>
+                          To enable 1-Click Live Connect:
+                        </strong>
+                        <ol style={{ margin: "0 0 0.6rem 1.2rem", padding: 0 }}>
+                          <li>Open <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" style={{ color: "#7C3AED", textDecoration: "underline" }}>developers.facebook.com</a> → Create an App (Type: <em>Business</em>).</li>
+                          <li>In <em>App Settings → Basic</em>: Copy your <strong>App ID</strong> and <strong>App Secret</strong>.</li>
+                          <li>In <em>Facebook Login for Business → Settings → Valid OAuth Redirect URIs</em>, add:
+                            <code style={{ display: "block", background: "#F3F4F6", padding: "0.2rem 0.4rem", borderRadius: "4px", margin: "0.3rem 0", color: "#111827", wordBreak: "break-all" }}>
+                              {oauthStatus?.redirectUri || "http://localhost:3000/api/instagram/oauth/callback"}
+                            </code>
+                          </li>
+                          <li>Add these keys to your <code>.env.local</code> file:
+                            <pre style={{ background: "#1E1B4B", color: "#E0E7FF", padding: "0.5rem", borderRadius: "6px", fontSize: "0.72rem", overflowX: "auto", margin: "0.3rem 0" }}>
+                              {`META_APP_ID=your_app_id\nMETA_APP_SECRET=your_app_secret\nNEXT_PUBLIC_APP_URL=${oauthStatus?.appUrl || "http://localhost:3000"}`}
+                            </pre>
+                          </li>
+                        </ol>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* OR DIVIDER */}
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "0.25rem 0" }}>
+                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
+                <span style={{ fontSize: "0.72rem", color: "#94A3B8", fontWeight: 700, letterSpacing: "0.05em" }}>
+                  OR OPTION 2: PASTE TOKENS MANUALLY
+                </span>
+                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
+              </div>
+
+              {/* Collapsible Step-by-Step Guide for Manual Tokens */}
               <div
                 style={{
                   border: "1px solid #E2E8F0",
@@ -670,7 +849,7 @@ export function InstagramPublishModal({
                     textAlign: "left",
                   }}
                 >
-                  <span>📖 How to get your live Meta Token & Account ID (3 Steps)</span>
+                  <span>📖 How to generate a quick Graph API Explorer Token (3 Steps)</span>
                   <span>{showGuide ? "▲" : "▼"}</span>
                 </button>
 
@@ -690,30 +869,24 @@ export function InstagramPublishModal({
                         <strong>Switch Instagram Account:</strong> Open Instagram on your phone → <em>Settings → Account → Switch to Professional Account (Creator or Business)</em>. Connect it to any Facebook Page you manage.
                       </li>
                       <li style={{ marginBottom: "0.4rem" }}>
-                        <strong>Meta Developer App:</strong> Go to{" "}
-                        <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" style={{ color: "#4F46E5", textDecoration: "underline" }}>
-                          developers.facebook.com
-                        </a>
-                        {" "}→ Create an App (Type: <em>Business</em>) → Add <strong>Instagram Graph API</strong>.
-                      </li>
-                      <li style={{ marginBottom: "0.4rem" }}>
-                        <strong>Get Token & ID via Explorer:</strong> Open{" "}
+                        <strong>Open Graph API Explorer:</strong> Go to{" "}
                         <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" style={{ color: "#4F46E5", textDecoration: "underline" }}>
                           Meta Graph API Explorer
                         </a>
                         . Under <em>Permissions</em>, add <code>instagram_content_publish</code>, <code>instagram_basic</code>, and <code>pages_show_list</code>. Click <strong>Generate Access Token</strong>.
                       </li>
                       <li>
-                        <strong>Find Account ID:</strong> Run <code>GET me/accounts?fields=instagram_business_account</code>. Copy the <code>instagram_business_account.id</code> (starts with 1784...) and paste it below with your token.
+                        <strong>Find Account ID:</strong> Run <code>GET me/accounts?fields=instagram_business_account</code>. Copy the <code>instagram_business_account.id</code> (starts with 1784...) and paste below with your token.
                       </li>
                     </ol>
                     <div style={{ padding: "0.5rem 0.75rem", background: "#FEF3C7", border: "1px solid #FCD34D", borderRadius: "6px", color: "#92400E", fontSize: "0.75rem" }}>
-                      💡 <strong>Localhost Note:</strong> When testing on your computer, Meta requires a public HTTPS URL to download videos. Use a tunnel like <code>ngrok http 3000</code> or test with the built-in Sandbox Mode.
+                      💡 <strong>Localhost Tunneling:</strong> Meta requires a public HTTPS URL to download videos. Run <code>npx cloudflared tunnel --url http://localhost:3000</code> or use Sandbox Mode.
                     </div>
                   </div>
                 )}
               </div>
 
+              {/* Manual Input Fields */}
               <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
                 <label style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#0F172A" }}>
                   Instagram Handle:
