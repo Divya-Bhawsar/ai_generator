@@ -297,9 +297,6 @@ function SceneView({
   // Common Background Lighting & Texture
   const renderBackgroundAtmosphere = () => (
     <>
-      {/* Audio element if provided */}
-      {scene.audioFile && <Audio src={staticFile(scene.audioFile)} />}
-
       {/* Atmospheric Ambient Lighting Aura 1 */}
       <div
         style={{
@@ -1187,6 +1184,8 @@ export function Explainer({ timeline }: { timeline: Timeline }) {
       {/* Visual Scenes & Pure Narrative Voiceover Audio */}
       {timeline.scenes.map((s, i) => (
         <Sequence key={s.id} from={s.start} durationInFrames={s.frames}>
+          {/* Scene Narrative Voiceover Audio */}
+          {s.audioFile && <Audio src={staticFile(s.audioFile)} />}
           <SceneView
             scene={s}
             index={i}
