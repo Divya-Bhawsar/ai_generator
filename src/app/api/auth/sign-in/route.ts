@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateUser } from "@/lib/db/users";
-import { createSession } from "@/lib/auth";
+import { findUserByEmail } from "@/lib/db/users";
+import { createSession, verifyPassword } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,26 +28,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await authenticateUser(email.trim(), password);
-    if (!user) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = await findUserByEmail(normalizedEmail);
+
+    if (!existingUser) {
       return NextResponse.json(
-        { error: "Invalid email or password." },
+        {
+          error:
+            "No account found with this email. Please click 'Create an account' below to register first.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const isValid = await verifyPassword(password, existingUser.passwordHash);
+    if (!isValid) {
+      return NextResponse.json(
+        { error: "Incorrect password. Please check your password and try again." },
         { status: 401 }
       );
     }
 
     await createSession({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
+      userId: existingUser._id,
+      email: existingUser.email,
+      name: existingUser.name,
     });
 
     return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+        id: existingUser._id,
+        email: existingUser.email,
+        name: existingUser.name,
       },
     });
   } catch (err: unknown) {
