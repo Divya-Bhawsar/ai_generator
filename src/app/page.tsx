@@ -231,15 +231,18 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
       style={{
         background: "#FFFFFF",
         border: isHovered ? `1.5px solid ${item.accent}` : "1.5px solid #E2E8F0",
-        borderRadius: "22px",
+        borderRadius: "26px",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        maxWidth: "340px",
+        width: "100%",
+        margin: "0 auto",
         boxShadow: isHovered
-          ? `0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 0 25px ${item.accent}20`
-          : "0 4px 18px -2px rgba(15, 23, 42, 0.06)",
+          ? `0 24px 50px -12px rgba(15, 23, 42, 0.16), 0 0 25px ${item.accent}25`
+          : "0 6px 20px -3px rgba(15, 23, 42, 0.07)",
         transform: isHovered ? "translateY(-6px)" : "translateY(0)",
-        transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: "all 0.28s cubic-bezier(0.16, 1, 0.3, 1)",
         position: "relative",
       }}
     >
@@ -255,154 +258,216 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
         }}
       />
 
-      {/* Video Container (16:9 Aspect Ratio) */}
-      <div
-        onClick={togglePlay}
-        style={{
-          position: "relative",
-          aspectRatio: "16/9",
-          background: "#090D16",
-          cursor: "pointer",
-          overflow: "hidden",
-        }}
-      >
-        <video
-          ref={videoRef}
-          src={item.videoUrl}
-          muted
-          playsInline
-          preload="metadata"
-          loop
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            display: "block",
-            transition: "transform 0.35s ease",
-            transform: isHovered ? "scale(1.025)" : "scale(1)",
-          }}
-        />
-
-        {/* Center Floating Play Indicator Pill */}
+      {/* Phone Stage Wrapper with bezel */}
+      <div style={{ padding: "0.85rem 0.85rem 0" }}>
+        {/* Vertical Phone Screen (9:16 Aspect Ratio) */}
         <div
+          onClick={togglePlay}
           style={{
-            position: "absolute",
-            inset: 0,
-            display: "grid",
-            placeItems: "center",
-            pointerEvents: "none",
-            transition: "opacity 0.2s ease",
-            opacity: isPlaying ? 0 : 1,
-            background: isPlaying ? "transparent" : "rgba(15, 23, 42, 0.25)",
+            position: "relative",
+            aspectRatio: "9/16",
+            background: "#090D16",
+            cursor: "pointer",
+            overflow: "hidden",
+            borderRadius: "20px",
+            border: "4px solid #0F172A",
+            boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.1)",
           }}
         >
+          {/* Top Dynamic Island Notch */}
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.94)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              color: "#0F172A",
-              borderRadius: "50px",
-              padding: "0.55rem 1.15rem",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.45rem",
-              fontWeight: 800,
-              fontSize: "0.8125rem",
-              boxShadow: "0 8px 25px rgba(0, 0, 0, 0.25)",
-              border: "1px solid rgba(255, 255, 255, 0.8)",
-            }}
-          >
-            <span style={{ color: item.accent, fontSize: "0.95rem" }}>▶</span>
-            <span>Hover to Play</span>
-          </div>
-        </div>
-
-        {/* Top-Left Category Badge */}
-        <span
-          style={{
-            position: "absolute",
-            top: "12px",
-            left: "12px",
-            fontSize: "0.6875rem",
-            fontWeight: 800,
-            letterSpacing: "0.06em",
-            background: "rgba(15, 23, 42, 0.85)",
-            color: "#FFFFFF",
-            padding: "0.25rem 0.6rem",
-            borderRadius: "8px",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            border: "1px solid rgba(255, 255, 255, 0.15)",
-          }}
-        >
-          {item.category}
-        </span>
-
-        {/* Top-Right Duration Badge */}
-        <span
-          style={{
-            position: "absolute",
-            top: "12px",
-            right: "12px",
-            fontSize: "0.72rem",
-            fontWeight: 700,
-            background: "rgba(15, 23, 42, 0.85)",
-            color: "#FFFFFF",
-            padding: "0.25rem 0.55rem",
-            borderRadius: "8px",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            border: "1px solid rgba(255, 255, 255, 0.15)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.3rem",
-          }}
-        >
-          <span>⏱</span>
-          <span>{item.duration}</span>
-        </span>
-
-        {/* Bottom-Right Live Indicator when playing */}
-        {isPlaying && (
-          <span
-            style={{
               position: "absolute",
-              bottom: "12px",
-              right: "12px",
-              fontSize: "0.6875rem",
-              fontWeight: 700,
-              background: "#10B981",
-              color: "#FFFFFF",
-              padding: "0.2rem 0.55rem",
-              borderRadius: "6px",
-              boxShadow: "0 2px 8px rgba(16, 185, 129, 0.4)",
-              display: "inline-flex",
+              top: "8px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "56px",
+              height: "14px",
+              background: "#000000",
+              borderRadius: "10px",
+              zIndex: 20,
+              display: "flex",
               alignItems: "center",
-              gap: "0.35rem",
+              justifyContent: "flex-end",
+              paddingRight: "7px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.6)",
+              pointerEvents: "none",
             }}
           >
             <span
               style={{
-                width: "6px",
-                height: "6px",
+                width: "5px",
+                height: "5px",
                 borderRadius: "50%",
-                background: "#FFFFFF",
+                background: "#1E293B",
                 display: "inline-block",
               }}
             />
-            <span>PLAYING</span>
+          </div>
+
+          <video
+            ref={videoRef}
+            src={item.videoUrl}
+            muted
+            playsInline
+            preload="metadata"
+            loop
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+              transition: "transform 0.35s ease",
+              transform: isHovered ? "scale(1.025)" : "scale(1)",
+            }}
+          />
+
+          {/* Center Floating Play Indicator Pill */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "grid",
+              placeItems: "center",
+              pointerEvents: "none",
+              transition: "opacity 0.2s ease",
+              opacity: isPlaying ? 0 : 1,
+              background: isPlaying ? "transparent" : "rgba(15, 23, 42, 0.3)",
+              zIndex: 10,
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.94)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                color: "#0F172A",
+                borderRadius: "50px",
+                padding: "0.55rem 1.15rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.45rem",
+                fontWeight: 800,
+                fontSize: "0.8125rem",
+                boxShadow: "0 8px 25px rgba(0, 0, 0, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.8)",
+              }}
+            >
+              <span style={{ color: item.accent, fontSize: "0.95rem" }}>▶</span>
+              <span>Hover to Play</span>
+            </div>
+          </div>
+
+          {/* Top-Left Category Badge */}
+          <span
+            style={{
+              position: "absolute",
+              top: "12px",
+              left: "10px",
+              fontSize: "0.625rem",
+              fontWeight: 800,
+              letterSpacing: "0.06em",
+              background: "rgba(15, 23, 42, 0.85)",
+              color: "#FFFFFF",
+              padding: "0.22rem 0.55rem",
+              borderRadius: "6px",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              zIndex: 15,
+            }}
+          >
+            {item.category}
           </span>
-        )}
+
+          {/* Top-Right Duration Badge */}
+          <span
+            style={{
+              position: "absolute",
+              top: "12px",
+              right: "10px",
+              fontSize: "0.6875rem",
+              fontWeight: 700,
+              background: "rgba(15, 23, 42, 0.85)",
+              color: "#FFFFFF",
+              padding: "0.22rem 0.5rem",
+              borderRadius: "6px",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.25rem",
+              zIndex: 15,
+            }}
+          >
+            <span>⏱</span>
+            <span>{item.duration}</span>
+          </span>
+
+          {/* Bottom-Left 9:16 Format Tag */}
+          <span
+            style={{
+              position: "absolute",
+              bottom: "10px",
+              left: "10px",
+              fontSize: "0.625rem",
+              fontWeight: 700,
+              background: "rgba(15, 23, 42, 0.75)",
+              color: "#E2E8F0",
+              padding: "0.18rem 0.45rem",
+              borderRadius: "5px",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              zIndex: 15,
+            }}
+          >
+            9:16 Vertical Reel
+          </span>
+
+          {/* Bottom-Right Live Indicator when playing */}
+          {isPlaying && (
+            <span
+              style={{
+                position: "absolute",
+                bottom: "10px",
+                right: "10px",
+                fontSize: "0.625rem",
+                fontWeight: 800,
+                background: "#10B981",
+                color: "#FFFFFF",
+                padding: "0.18rem 0.45rem",
+                borderRadius: "5px",
+                boxShadow: "0 2px 8px rgba(16, 185, 129, 0.4)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.3rem",
+                zIndex: 15,
+              }}
+            >
+              <span
+                style={{
+                  width: "5px",
+                  height: "5px",
+                  borderRadius: "50%",
+                  background: "#FFFFFF",
+                  display: "inline-block",
+                }}
+              />
+              <span>PLAYING</span>
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Card Content Details */}
       <div
         style={{
-          padding: "1.4rem 1.45rem",
+          padding: "1.15rem 1.25rem 1.25rem",
           display: "flex",
           flexDirection: "column",
-          gap: "0.65rem",
+          gap: "0.55rem",
           flex: 1,
         }}
       >
@@ -416,7 +481,7 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
               background: item.badgeBg,
               border: `1px solid ${item.badgeBorder}`,
               borderRadius: "8px",
-              padding: "0.22rem 0.6rem",
+              padding: "0.2rem 0.55rem",
               display: "inline-flex",
               alignItems: "center",
               gap: "0.35rem",
@@ -426,18 +491,18 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
             <span>{item.voice}</span>
           </span>
 
-          <span style={{ fontSize: "0.72rem", color: "#64748B", fontWeight: 600 }}>
-            1080p MP4
+          <span style={{ fontSize: "0.6875rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>
+            1080×1920
           </span>
         </div>
 
         {/* Title */}
         <h3
           style={{
-            fontSize: "1.15rem",
+            fontSize: "1.05rem",
             fontWeight: 800,
             color: "#0F172A",
-            margin: "0.15rem 0 0",
+            margin: "0.1rem 0 0",
             letterSpacing: "-0.015em",
             lineHeight: 1.3,
           }}
@@ -448,10 +513,10 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
         {/* Topic Description */}
         <p
           style={{
-            fontSize: "0.875rem",
+            fontSize: "0.8125rem",
             color: "#475569",
             margin: 0,
-            lineHeight: 1.55,
+            lineHeight: 1.5,
             flex: 1,
           }}
         >
@@ -459,7 +524,7 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
         </p>
 
         {/* Tags Row */}
-        <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", marginTop: "0.25rem" }}>
+        <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap", marginTop: "0.15rem" }}>
           {item.tags.map((tag, tIdx) => (
             <span
               key={tIdx}
@@ -468,7 +533,7 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
                 color: "#64748B",
                 background: "#F1F5F9",
                 borderRadius: "6px",
-                padding: "0.18rem 0.5rem",
+                padding: "0.15rem 0.45rem",
                 fontWeight: 600,
               }}
             >
@@ -478,16 +543,16 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
         </div>
 
         {/* Action Button */}
-        <div style={{ marginTop: "0.85rem", paddingTop: "0.85rem", borderTop: "1px solid #F1F5F9" }}>
+        <div style={{ marginTop: "0.65rem", paddingTop: "0.65rem", borderTop: "1px solid #F1F5F9" }}>
           <Link
             href={`/dashboard?topic=${encodeURIComponent(item.prompt)}`}
             style={{
               width: "100%",
-              padding: "0.68rem 0",
-              borderRadius: "11px",
+              padding: "0.65rem 0",
+              borderRadius: "10px",
               background: isHovered ? item.accent : "#F8FAFC",
               color: isHovered ? "#FFFFFF" : "#0F172A",
-              fontSize: "0.84375rem",
+              fontSize: "0.8125rem",
               fontWeight: 700,
               textDecoration: "none",
               textAlign: "center",
@@ -501,7 +566,7 @@ function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
             }}
           >
             <span>Open in Creator Studio</span>
-            <span style={{ fontSize: "1rem" }}>→</span>
+            <span style={{ fontSize: "0.95rem" }}>→</span>
           </Link>
         </div>
       </div>
@@ -1262,10 +1327,10 @@ export default function HomePage() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                Explore live animated explainer decks
+                Explore live 9:16 vertical explainer reels
               </h2>
               <p style={{ color: "#64748B", fontSize: "0.95rem", margin: "0.35rem 0 0" }}>
-                Hover over any video to preview real-time neural audio and Remotion graphics.
+                Hover over any vertical reel frame to preview real-time neural audio and Remotion motion graphics.
               </p>
             </div>
 
@@ -1291,12 +1356,15 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Symmetrically Balanced 3-Video Trio Showcase */}
+          {/* Symmetrically Balanced 3-Video Vertical Phone Showcase */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))",
-              gap: "1.75rem",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
+              gap: "2rem",
+              maxWidth: "1140px",
+              margin: "0 auto",
+              justifyContent: "center",
             }}
           >
             {SHOWCASE_TRIO.map((item) => (
