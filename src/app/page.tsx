@@ -124,6 +124,391 @@ const BENTO_FEATURES = [
   },
 ];
 
+interface ShowcaseVideoItem {
+  id: string;
+  category: string;
+  title: string;
+  topic: string;
+  prompt: string;
+  videoUrl: string;
+  duration: string;
+  voice: string;
+  accent: string;
+  badgeBg: string;
+  badgeBorder: string;
+  badgeText: string;
+  tags: string[];
+}
+
+const SHOWCASE_TRIO: ShowcaseVideoItem[] = [
+  {
+    id: "memory-hierarchy",
+    category: "COMPUTER ARCHITECTURE",
+    title: "Computer Memory Hierarchy",
+    topic: "Registers vs L1/L2 Cache vs RAM vs NVMe SSD: Latency and bandwidth bottlenecks explained visually.",
+    prompt: "Computer Memory: Registers vs L1/L2 Cache vs RAM vs SSD",
+    videoUrl: "/videos/6ae8a6752f03352ee47aeafd.mp4",
+    duration: "58s",
+    voice: "Madhur (Hinglish 🇮🇳)",
+    accent: "#4F46E5",
+    badgeBg: "#EEF2FF",
+    badgeBorder: "#C7D2FE",
+    badgeText: "#4338CA",
+    tags: ["Hardware Ladder", "Kinetic Subtitles"],
+  },
+  {
+    id: "besan-ladoo",
+    category: "FOOD SCIENCE & CHEMISTRY",
+    title: "Science of Besan Ladoo",
+    topic: "The molecular chemistry behind roasting chickpea flour: Maillard reactions and the lipid matrix.",
+    prompt: "Molecular food chemistry of Besan Ladoo: Maillard reaction and ghee",
+    videoUrl: "/videos/6ae626b3333adce4e02df89d.mp4",
+    duration: "64s",
+    voice: "Swara (Hinglish 🇮🇳)",
+    accent: "#D97706",
+    badgeBg: "#FFFBEB",
+    badgeBorder: "#FDE68A",
+    badgeText: "#B45309",
+    tags: ["Chemical Equations", "Dual-Language Vocals"],
+  },
+  {
+    id: "binary-search",
+    category: "ALGORITHMS & DATA STRUCTURES",
+    title: "Binary Search in O(log n)",
+    topic: "Why checking the middle element halves the search space and effortlessly scales to billions of items.",
+    prompt: "How Binary Search cuts search time from O(N) to O(log n)",
+    videoUrl: "/videos/test_binary_search_remotion.mp4",
+    duration: "48s",
+    voice: "Christopher (English 🇺🇸)",
+    accent: "#059669",
+    badgeBg: "#ECFDF5",
+    badgeBorder: "#A7F3D0",
+    badgeText: "#065F46",
+    tags: ["Logarithmic Trees", "Dynamic Vectors"],
+  },
+];
+
+function ShowcaseVideoCard({ item }: { item: ShowcaseVideoItem }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  function handleMouseEnter() {
+    setIsHovered(true);
+    if (videoRef.current) {
+      videoRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
+    }
+  }
+
+  function handleMouseLeave() {
+    setIsHovered(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  }
+
+  function togglePlay() {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  }
+
+  return (
+    <div
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        background: "#FFFFFF",
+        border: isHovered ? `1.5px solid ${item.accent}` : "1.5px solid #E2E8F0",
+        borderRadius: "22px",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: isHovered
+          ? `0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 0 25px ${item.accent}20`
+          : "0 4px 18px -2px rgba(15, 23, 42, 0.06)",
+        transform: isHovered ? "translateY(-6px)" : "translateY(0)",
+        transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+        position: "relative",
+      }}
+    >
+      {/* Top Ambient Glow Line */}
+      <div
+        style={{
+          height: "3px",
+          width: "100%",
+          background: isHovered
+            ? `linear-gradient(90deg, ${item.accent}, #EC4899)`
+            : "transparent",
+          transition: "background 0.25s ease",
+        }}
+      />
+
+      {/* Video Container (16:9 Aspect Ratio) */}
+      <div
+        onClick={togglePlay}
+        style={{
+          position: "relative",
+          aspectRatio: "16/9",
+          background: "#090D16",
+          cursor: "pointer",
+          overflow: "hidden",
+        }}
+      >
+        <video
+          ref={videoRef}
+          src={item.videoUrl}
+          muted
+          playsInline
+          preload="metadata"
+          loop
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            transition: "transform 0.35s ease",
+            transform: isHovered ? "scale(1.025)" : "scale(1)",
+          }}
+        />
+
+        {/* Center Floating Play Indicator Pill */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "grid",
+            placeItems: "center",
+            pointerEvents: "none",
+            transition: "opacity 0.2s ease",
+            opacity: isPlaying ? 0 : 1,
+            background: isPlaying ? "transparent" : "rgba(15, 23, 42, 0.25)",
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.94)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              color: "#0F172A",
+              borderRadius: "50px",
+              padding: "0.55rem 1.15rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.45rem",
+              fontWeight: 800,
+              fontSize: "0.8125rem",
+              boxShadow: "0 8px 25px rgba(0, 0, 0, 0.25)",
+              border: "1px solid rgba(255, 255, 255, 0.8)",
+            }}
+          >
+            <span style={{ color: item.accent, fontSize: "0.95rem" }}>▶</span>
+            <span>Hover to Play</span>
+          </div>
+        </div>
+
+        {/* Top-Left Category Badge */}
+        <span
+          style={{
+            position: "absolute",
+            top: "12px",
+            left: "12px",
+            fontSize: "0.6875rem",
+            fontWeight: 800,
+            letterSpacing: "0.06em",
+            background: "rgba(15, 23, 42, 0.85)",
+            color: "#FFFFFF",
+            padding: "0.25rem 0.6rem",
+            borderRadius: "8px",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.15)",
+          }}
+        >
+          {item.category}
+        </span>
+
+        {/* Top-Right Duration Badge */}
+        <span
+          style={{
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            background: "rgba(15, 23, 42, 0.85)",
+            color: "#FFFFFF",
+            padding: "0.25rem 0.55rem",
+            borderRadius: "8px",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.15)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.3rem",
+          }}
+        >
+          <span>⏱</span>
+          <span>{item.duration}</span>
+        </span>
+
+        {/* Bottom-Right Live Indicator when playing */}
+        {isPlaying && (
+          <span
+            style={{
+              position: "absolute",
+              bottom: "12px",
+              right: "12px",
+              fontSize: "0.6875rem",
+              fontWeight: 700,
+              background: "#10B981",
+              color: "#FFFFFF",
+              padding: "0.2rem 0.55rem",
+              borderRadius: "6px",
+              boxShadow: "0 2px 8px rgba(16, 185, 129, 0.4)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+            }}
+          >
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                background: "#FFFFFF",
+                display: "inline-block",
+              }}
+            />
+            <span>PLAYING</span>
+          </span>
+        )}
+      </div>
+
+      {/* Card Content Details */}
+      <div
+        style={{
+          padding: "1.4rem 1.45rem",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.65rem",
+          flex: 1,
+        }}
+      >
+        {/* Voice & Speaker Row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+          <span
+            style={{
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              color: item.badgeText,
+              background: item.badgeBg,
+              border: `1px solid ${item.badgeBorder}`,
+              borderRadius: "8px",
+              padding: "0.22rem 0.6rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+            }}
+          >
+            <span>🎙️</span>
+            <span>{item.voice}</span>
+          </span>
+
+          <span style={{ fontSize: "0.72rem", color: "#64748B", fontWeight: 600 }}>
+            1080p MP4
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3
+          style={{
+            fontSize: "1.15rem",
+            fontWeight: 800,
+            color: "#0F172A",
+            margin: "0.15rem 0 0",
+            letterSpacing: "-0.015em",
+            lineHeight: 1.3,
+          }}
+        >
+          {item.title}
+        </h3>
+
+        {/* Topic Description */}
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "#475569",
+            margin: 0,
+            lineHeight: 1.55,
+            flex: 1,
+          }}
+        >
+          {item.topic}
+        </p>
+
+        {/* Tags Row */}
+        <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", marginTop: "0.25rem" }}>
+          {item.tags.map((tag, tIdx) => (
+            <span
+              key={tIdx}
+              style={{
+                fontSize: "0.6875rem",
+                color: "#64748B",
+                background: "#F1F5F9",
+                borderRadius: "6px",
+                padding: "0.18rem 0.5rem",
+                fontWeight: 600,
+              }}
+            >
+              ✦ {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Action Button */}
+        <div style={{ marginTop: "0.85rem", paddingTop: "0.85rem", borderTop: "1px solid #F1F5F9" }}>
+          <Link
+            href={`/dashboard?topic=${encodeURIComponent(item.prompt)}`}
+            style={{
+              width: "100%",
+              padding: "0.68rem 0",
+              borderRadius: "11px",
+              background: isHovered ? item.accent : "#F8FAFC",
+              color: isHovered ? "#FFFFFF" : "#0F172A",
+              fontSize: "0.84375rem",
+              fontWeight: 700,
+              textDecoration: "none",
+              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.45rem",
+              border: isHovered ? `1px solid ${item.accent}` : "1px solid #CBD5E1",
+              boxShadow: isHovered ? `0 4px 14px ${item.accent}35` : "none",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <span>Open in Creator Studio</span>
+            <span style={{ fontSize: "1rem" }}>→</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [activeCardIndex, setActiveCardIndex] = useState(0);
@@ -846,14 +1231,42 @@ export default function HomePage() {
 
         {/* FEATURED DECKS GALLERY */}
         <section id="examples" style={{ marginBottom: "6rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              flexWrap: "wrap",
+              gap: "1.25rem",
+              marginBottom: "2.25rem",
+            }}
+          >
             <div>
-              <span style={{ fontSize: "0.78125rem", color: "#4F46E5", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <span
+                style={{
+                  fontSize: "0.78125rem",
+                  color: "#4F46E5",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
                 ✦ CURATED PRESENTATION SHOWCASE
               </span>
-              <h2 style={{ fontSize: "1.85rem", fontWeight: 800, color: "#0F172A", margin: "0.35rem 0 0" }}>
+              <h2
+                style={{
+                  fontSize: "clamp(1.75rem, 3vw, 2.25rem)",
+                  fontWeight: 800,
+                  color: "#0F172A",
+                  margin: "0.35rem 0 0",
+                  letterSpacing: "-0.02em",
+                }}
+              >
                 Explore live animated explainer decks
               </h2>
+              <p style={{ color: "#64748B", fontSize: "0.95rem", margin: "0.35rem 0 0" }}>
+                Hover over any video to preview real-time neural audio and Remotion graphics.
+              </p>
             </div>
 
             <Link
@@ -865,126 +1278,29 @@ export default function HomePage() {
                 textDecoration: "none",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "0.4rem",
+                gap: "0.45rem",
+                background: "#EEF2FF",
+                border: "1px solid #C7D2FE",
+                padding: "0.55rem 1.15rem",
+                borderRadius: "10px",
+                transition: "all 0.15s ease",
               }}
             >
-              Open Creator Studio →
+              <span>Open Creator Studio</span>
+              <span>→</span>
             </Link>
           </div>
 
+          {/* Symmetrically Balanced 3-Video Trio Showcase */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "1.25rem",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))",
+              gap: "1.75rem",
             }}
           >
-            {[
-              {
-                title: "Computer Memory Hierarchy",
-                topic: "Registers vs L1/L2 Cache vs RAM vs NVMe SSD",
-                videoUrl: "/videos/6ae8a6752f03352ee47aeafd.mp4",
-                duration: "58s",
-                voice: "Madhur (Hinglish 🇮🇳)",
-              },
-              {
-                title: "Science of Besan Ladoo",
-                topic: "Maillard reaction and lipid matrix during roasting",
-                videoUrl: "/videos/6ae626b3333adce4e02df89d.mp4",
-                duration: "64s",
-                voice: "Swara (Hinglish 🇮🇳)",
-              },
-              {
-                title: "Binary Search in O(log n)",
-                topic: "Logarithmic midpoint pivot in sorted arrays",
-                videoUrl: "/videos/test_binary_search_remotion.mp4",
-                duration: "48s",
-                voice: "Christopher (English 🇺🇸)",
-              },
-              {
-                title: "Why Wings Have Curved Tips",
-                topic: "Bernoulli lift pressure and wingtip vortex drag",
-                videoUrl: "/videos/test_airplane_flight_remotion.mp4",
-                duration: "52s",
-                voice: "Jenny (English 🇺🇸)",
-              },
-            ].map((deck, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: "#FFFFFF",
-                  border: "1.5px solid #E2E8F0",
-                  borderRadius: "18px",
-                  overflow: "hidden",
-                  display: "flex",
-                  flexDirection: "column",
-                  boxShadow: "0 4px 16px -2px rgba(15, 23, 42, 0.05)",
-                }}
-              >
-                <div style={{ position: "relative", aspectRatio: "16/9", background: "#000" }}>
-                  <video
-                    src={deck.videoUrl}
-                    muted
-                    playsInline
-                    preload="metadata"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onMouseOver={(e) => e.currentTarget.play().catch(() => {})}
-                    onMouseOut={(e) => {
-                      e.currentTarget.pause();
-                      e.currentTarget.currentTime = 0;
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      bottom: "8px",
-                      right: "8px",
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      background: "rgba(0,0,0,0.75)",
-                      color: "#FFFFFF",
-                      padding: "0.2rem 0.5rem",
-                      borderRadius: "6px",
-                      backdropFilter: "blur(4px)",
-                    }}
-                  >
-                    ⏱️ {deck.duration}
-                  </span>
-                </div>
-
-                <div style={{ padding: "1.15rem", display: "flex", flexDirection: "column", gap: "0.4rem", flex: 1 }}>
-                  <span style={{ fontSize: "0.72rem", color: "#4F46E5", fontWeight: 700 }}>
-                    {deck.voice}
-                  </span>
-                  <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
-                    {deck.title}
-                  </h3>
-                  <p style={{ fontSize: "0.85rem", color: "#475569", margin: 0, lineHeight: 1.5 }}>
-                    {deck.topic}
-                  </p>
-
-                  <div style={{ marginTop: "auto", paddingTop: "0.85rem" }}>
-                    <Link
-                      href="/dashboard"
-                      style={{
-                        width: "100%",
-                        padding: "0.6rem 0",
-                        borderRadius: "10px",
-                        background: "#F8FAFC",
-                        color: "#0F172A",
-                        fontSize: "0.8125rem",
-                        fontWeight: 700,
-                        textDecoration: "none",
-                        textAlign: "center",
-                        display: "block",
-                        border: "1px solid #CBD5E1",
-                      }}
-                    >
-                      Open in Studio →
-                    </Link>
-                  </div>
-                </div>
-              </div>
+            {SHOWCASE_TRIO.map((item) => (
+              <ShowcaseVideoCard key={item.id} item={item} />
             ))}
           </div>
         </section>

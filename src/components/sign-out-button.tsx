@@ -13,10 +13,10 @@ export function SignOutButton() {
     setError(null);
     try {
       await fetch("/api/auth/sign-out", { method: "POST" });
-      // Hard redirect to /sign-in so that all session cookies and caches are completely cleared
-      window.location.href = "/sign-in";
+      // Hard redirect to landing page (/) so that all session cookies and caches are completely cleared
+      window.location.href = "/";
     } catch {
-      window.location.href = "/sign-in";
+      window.location.href = "/";
     }
   }
 
