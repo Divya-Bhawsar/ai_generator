@@ -225,7 +225,7 @@ export function InstagramPublishModal({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save account settings");
       setAccount(data.account);
-      alert("Instagram Account Settings Saved!");
+      alert(data.message || "Instagram Account Settings Saved!");
       setActiveTab("publish");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error saving account");
@@ -428,8 +428,46 @@ export function InstagramPublishModal({
           )}
 
           {error && (
-            <div style={{ padding: "0.75rem 1rem", background: "#FEE2E2", color: "#991B1B", borderRadius: "10px", fontSize: "0.85rem", border: "1px solid #FCA5A5" }}>
-              {error}
+            <div
+              style={{
+                padding: "0.85rem 1.15rem",
+                background: "#FEF2F2",
+                color: "#991B1B",
+                borderRadius: "12px",
+                fontSize: "0.85rem",
+                border: "1px solid #FCA5A5",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span style={{ fontSize: "1.1rem" }}>⚠️</span>
+                <div style={{ flex: 1, fontWeight: 500, lineHeight: 1.45 }}>{error}</div>
+              </div>
+              {(error.toLowerCase().includes("expired") || error.toLowerCase().includes("token")) && (
+                <div style={{ borderTop: "1px solid #FECACA", paddingTop: "0.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+                  <span style={{ fontSize: "0.78125rem", color: "#7F1D1D" }}>
+                    Your Meta token expired. Paste a fresh token to automatically convert it to a 60-day or permanent token.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("settings")}
+                    style={{
+                      background: "#DC2626",
+                      color: "#FFF",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.35rem 0.85rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Update Token in Settings ⚙
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
