@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
@@ -57,10 +57,14 @@ export async function createSession(payload: SessionPayload): Promise<string> {
     .setExpirationTime("30d")
     .sign(getJwtSecret());
 
+  const headersList = await headers().catch(() => null);
+  const forwardedProto = headersList?.get("x-forwarded-proto") || "";
+  const isHttps = forwardedProto === "https" || process.env.NODE_ENV === "production";
+
   const cookieStore = await cookies();
   cookieStore.set(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isHttps,
     sameSite: "lax",
     path: "/",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -70,10 +74,14 @@ export async function createSession(payload: SessionPayload): Promise<string> {
 }
 
 export async function destroySession(): Promise<void> {
+  const headersList = await headers().catch(() => null);
+  const forwardedProto = headersList?.get("x-forwarded-proto") || "";
+  const isHttps = forwardedProto === "https" || process.env.NODE_ENV === "production";
+
   const cookieStore = await cookies();
   cookieStore.set(AUTH_COOKIE_NAME, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isHttps,
     sameSite: "lax",
     path: "/",
     maxAge: 0,

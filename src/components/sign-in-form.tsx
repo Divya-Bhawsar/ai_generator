@@ -33,8 +33,7 @@ export function SignInForm() {
         throw new Error(data.error || "Invalid email or password.");
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      window.location.href = "/dashboard";
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(msg);
@@ -43,7 +42,13 @@ export function SignInForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <form
+      action="#"
+      method="POST"
+      onSubmit={handleSubmit}
+      className="auth-form"
+      style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+    >
       {error && (
         <div
           role="alert"

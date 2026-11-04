@@ -45,8 +45,7 @@ export function SignUpForm() {
         throw new Error(data.error || "Failed to create account.");
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      window.location.href = "/dashboard";
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(msg);
@@ -55,7 +54,13 @@ export function SignUpForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <form
+      action="#"
+      method="POST"
+      onSubmit={handleSubmit}
+      className="auth-form"
+      style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+    >
       {error && (
         <div
           role="alert"
