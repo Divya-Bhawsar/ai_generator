@@ -1179,52 +1179,12 @@ function SceneView({
   );
 }
 
-export function calculateMusicVolume({
-  currentFrame,
-  totalFrames,
-  baseVolume = 0.10,
-}: {
-  currentFrame: number;
-  totalFrames: number;
-  baseVolume?: number;
-  duckVolume?: number;
-  speechSegments?: Array<{ startFrame: number; endFrame: number }>;
-}): number {
-  if (baseVolume <= 0) return 0;
-
-  // Master Fade In (first 15 frames) & Fade Out (last 24 frames)
-  const masterFadeIn = Math.min(1, Math.max(0, currentFrame / 15));
-  const masterFadeOut = Math.min(1, Math.max(0, (totalFrames - currentFrame) / 24));
-  const masterEnvelope = masterFadeIn * masterFadeOut;
-
-  // Constant balanced background volume without speech ducking
-  return baseVolume * masterEnvelope;
-}
-
-export const calculateDuckedVolume = calculateMusicVolume;
-
 export function Explainer({ timeline }: { timeline: Timeline }) {
-  const bgMusic = timeline.backgroundMusic;
   const aspectRatio = timeline.aspectRatio || "9:16";
 
   return (
     <AbsoluteFill style={{ background: "#070913" }}>
-      {/* Background Music (Consistent Balance with Master Fade In/Out) */}
-      {bgMusic && bgMusic.audioFile && (
-        <Audio
-          src={staticFile(bgMusic.audioFile)}
-          loop
-          volume={(f) =>
-            calculateMusicVolume({
-              currentFrame: f,
-              totalFrames: timeline.frames,
-              baseVolume: bgMusic.baseVolume,
-            })
-          }
-        />
-      )}
-
-      {/* Visual Scenes & Voiceover Audio */}
+      {/* Visual Scenes & Pure Narrative Voiceover Audio */}
       {timeline.scenes.map((s, i) => (
         <Sequence key={s.id} from={s.start} durationInFrames={s.frames}>
           <SceneView

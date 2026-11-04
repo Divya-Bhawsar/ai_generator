@@ -99,9 +99,15 @@ export function compileTimeline(
   title: string,
   rawScenes: Array<Record<string, any>>,
   speechMap: Record<string, SpeechResult>,
-  musicId: string = "lofi",
-  aspectRatio: AspectRatio = "9:16"
+  aspectRatioOrMusicId?: AspectRatio | string,
+  maybeAspectRatio?: AspectRatio
 ): Timeline {
+  let aspectRatio: AspectRatio = "9:16";
+  if (aspectRatioOrMusicId === "9:16" || aspectRatioOrMusicId === "16:9" || aspectRatioOrMusicId === "1:1") {
+    aspectRatio = aspectRatioOrMusicId;
+  } else if (maybeAspectRatio) {
+    aspectRatio = maybeAspectRatio;
+  }
   let globalFrame = 0;
 
   const timedScenes: TimedScene[] = rawScenes.map((scene, idx) => {
@@ -173,18 +179,12 @@ export function compileTimeline(
     };
   });
 
-  // Pick selected background track
-  const selectedTrack =
-    BACKGROUND_MUSIC_TRACKS.find((m) => m.id === musicId) ||
-    BACKGROUND_MUSIC_TRACKS[0];
-
   return {
     title,
     fps: FPS,
     frames: globalFrame,
     aspectRatio,
     scenes: timedScenes,
-    backgroundMusic: selectedTrack.id !== "none" ? selectedTrack : undefined,
     speechSegments,
   };
 }

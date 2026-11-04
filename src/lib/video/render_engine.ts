@@ -131,7 +131,6 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       storyboard.title || "VidyaMotion Explainer",
       rawScenes,
       speechMap,
-      musicId,
       aspectRatio
     );
 
