@@ -151,6 +151,7 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     const serveUrl = await bundle({
       entryPoint,
       publicDir: path.join(process.cwd(), "public"),
+      enableCaching: true,
     });
 
     const browserExecutable = fs.existsSync(CHROME_PATH) ? CHROME_PATH : undefined;
@@ -163,9 +164,10 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       browserExecutable,
     });
 
-    // 4. Render Final MP4 Media with Multi-Core Concurrency
+    // 4. Render Final MP4 Media with Multi-Core Concurrency & Hardware Acceleration
     const cpuCores = os.cpus()?.length || 4;
-    const renderConcurrency = Math.min(8, Math.max(4, cpuCores - 1));
+    // On 8GB Macs, 4 parallel workers prevents virtual memory swapping and maximizes throughput
+    const renderConcurrency = Math.min(4, Math.max(2, Math.floor(cpuCores / 2)));
 
     const resolutionMap: Record<string, string> = {
       "9:16": "1080x1920 (Vertical)",
@@ -177,7 +179,7 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
     updateRenderStatus(statusFilePath, {
       status: "rendering",
       progress: 45,
-      stage: `Rendering ${resLabel} 30fps MP4 video on ${renderConcurrency} CPU cores...`,
+      stage: `Rendering ${resLabel} 30fps MP4 (Turbo Mode on ${renderConcurrency} workers)...`,
       aspectRatio,
     });
 
@@ -191,9 +193,16 @@ export async function runRemotionRenderJob(params: RenderJobParams): Promise<str
       codec: "h264",
       audioCodec: "aac",
       pixelFormat: "yuv420p",
+      imageFormat: "jpeg",
+      jpegQuality: 88,
+      x264Preset: "veryfast",
+      hardwareAcceleration: "if-possible",
+      chromiumOptions: {
+        gl: "angle",
+      },
       outputLocation: tempPartialMp4,
       concurrency: renderConcurrency,
-      crf: 22,
+      videoBitrate: "4.5M",
       onProgress: ({ progress }) => {
         const renderProgress = Math.round(45 + progress * 50);
         updateRenderStatus(statusFilePath, {

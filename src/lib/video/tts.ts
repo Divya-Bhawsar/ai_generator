@@ -51,6 +51,14 @@ export async function probeDuration(filePath: string): Promise<number> {
   }
 }
 
+function saveMetaCache(metaPath: string, data: { text: string; voiceId: string; voiceName?: string; duration: number; alignment: any; isSynthetic?: boolean }) {
+  try {
+    fs.writeFileSync(metaPath, JSON.stringify(data, null, 2), "utf-8");
+  } catch {
+    // ignore
+  }
+}
+
 export async function synthesizeSceneAudio({
   text,
   voiceId,
@@ -65,6 +73,28 @@ export async function synthesizeSceneAudio({
   apiKey?: string;
 }): Promise<SpeechResult> {
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
+
+  // Instant Cache Check: If audio & metadata already exist for this text and voice, reuse instantly
+  const metaPath = `${destPath}.meta.json`;
+  if (fs.existsSync(destPath) && fs.existsSync(metaPath)) {
+    try {
+      const meta = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+      if (
+        meta.text === text &&
+        (meta.voiceId === voiceId || meta.voiceName === voiceName) &&
+        meta.duration > 0.5
+      ) {
+        return {
+          duration: meta.duration,
+          alignment: meta.alignment || syntheticAlignment(text, meta.duration),
+          audioFile: destPath,
+          isSynthetic: Boolean(meta.isSynthetic),
+        };
+      }
+    } catch {
+      // Fallback to synthesizing
+    }
+  }
 
   const normalizedVoiceId = (voiceId || "").toLowerCase();
   const normalizedVoiceName = (voiceName || "").toLowerCase();
@@ -120,12 +150,14 @@ export async function synthesizeSceneAudio({
           const buffer = Buffer.from(data.audio_base64, "base64");
           fs.writeFileSync(destPath, buffer);
           const duration = await probeDuration(destPath);
-          return {
+          const result = {
             duration,
             alignment: data.alignment as Alignment,
             audioFile: destPath,
             isSynthetic: false,
           };
+          saveMetaCache(metaPath, { text, voiceId, voiceName, ...result });
+          return result;
         }
       } else {
         const errText = await res.text().catch(() => "");
@@ -169,12 +201,14 @@ export async function synthesizeSceneAudio({
 
     const duration = await probeDuration(destPath);
     if (duration > 0.5) {
-      return {
+      const result = {
         duration,
         alignment: syntheticAlignment(text, duration),
         audioFile: destPath,
         isSynthetic: false,
       };
+      saveMetaCache(metaPath, { text, voiceId, voiceName, ...result });
+      return result;
     }
   } catch (err) {
     console.warn(`Edge Neural TTS (${selectedEdgeVoice}) failed with ${pythonBin}, trying macOS voice fallback:`, err);
@@ -229,12 +263,14 @@ export async function synthesizeSceneAudio({
     }
 
     const duration = await probeDuration(destPath);
-    return {
+    const result = {
       duration: duration || Math.max(5.0, text.split(/\s+/).length / 2.5),
       alignment: syntheticAlignment(text, duration),
       audioFile: destPath,
       isSynthetic: true,
     };
+    saveMetaCache(metaPath, { text, voiceId, voiceName, ...result });
+    return result;
   } catch (err) {
     console.warn("System TTS failed, using audio tone generator fallback:", err);
   }
