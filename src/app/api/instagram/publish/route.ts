@@ -32,20 +32,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Determine public video URL (prefer public HTTPS tunnel or configured domain for Meta download)
+    // Determine public video URL (prefer active HTTPS tunnel host or configured domain for Meta download)
+    const host = req.headers.get("host") || "";
+    const protocol = req.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").trim();
+
+    let baseUrl = "";
+    if (host && !host.includes("localhost") && !host.includes("127.0.0.1")) {
+      baseUrl = `${protocol}://${host}`;
+    } else if (appUrl && !appUrl.includes("localhost") && !appUrl.includes("127.0.0.1")) {
+      baseUrl = appUrl.replace(/\/$/, "");
+    } else {
+      baseUrl = `http://localhost:3000`;
+    }
+
     let publicVideoUrl = project.videoUrl;
     if (!publicVideoUrl.startsWith("http")) {
-      if (appUrl && !appUrl.includes("localhost")) {
-        publicVideoUrl = `${appUrl.replace(/\/$/, "")}${project.videoUrl}`;
-      } else {
-        const host = req.headers.get("host") || "localhost:3000";
-        const protocol = req.headers.get("x-forwarded-proto") || "http";
-        publicVideoUrl = `${protocol}://${host}${project.videoUrl}`;
-      }
-    } else if (publicVideoUrl.includes("localhost") && appUrl && !appUrl.includes("localhost")) {
+      publicVideoUrl = `${baseUrl}${project.videoUrl}`;
+    } else if ((publicVideoUrl.includes("localhost") || publicVideoUrl.includes("127.0.0.1")) && !baseUrl.includes("localhost")) {
       const urlObj = new URL(publicVideoUrl);
-      publicVideoUrl = `${appUrl.replace(/\/$/, "")}${urlObj.pathname}${urlObj.search}`;
+      publicVideoUrl = `${baseUrl}${urlObj.pathname}${urlObj.search}`;
     }
 
     // Get user's connected social account

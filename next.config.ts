@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     "10.139.32.175:3000",
     "10.139.32.175",
     "jack-responding-alot-aruba.trycloudflare.com",
+    "issues-talks-peaceful-handbook.trycloudflare.com",
     "*.trycloudflare.com",
   ],
 };

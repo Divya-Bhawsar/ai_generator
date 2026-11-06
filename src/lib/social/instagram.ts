@@ -58,7 +58,11 @@ export async function publishReelToMetaGraphAPI({
         status = statusData.status_code || statusData.status || "IN_PROGRESS";
         if (status === "ERROR" || status === "EXPIRED") {
           console.error("Meta media container failed statusData:", JSON.stringify(statusData, null, 2));
-          const detail = statusData.error?.message || statusData.error_message || statusData.status_message;
+          const rawStatus = typeof statusData.status === "string" && statusData.status.startsWith("Error:") ? statusData.status : undefined;
+          let detail = statusData.error?.message || statusData.error_message || statusData.status_message || rawStatus;
+          if (detail && detail.includes("2207077")) {
+            detail = "Meta servers failed to download the video file (Error 2207077). The public tunnel URL may have expired or timed out during Meta's fetch. Please ensure your public tunnel is running.";
+          }
           throw new Error(detail || "Instagram media processing failed on Meta servers. Verify video format and public accessibility.");
         }
       }
