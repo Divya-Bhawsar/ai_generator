@@ -35,6 +35,11 @@ export function InstagramPublishModal({
   const [publishedUrl, setPublishedUrl] = useState<string | null>(initialReelUrl || null);
   const [error, setError] = useState<string | null>(null);
 
+  // Caption state
+  const [editableCaption, setEditableCaption] = useState<string>(caption || "");
+  const [loadingCaption, setLoadingCaption] = useState(false);
+  const [pasteFeedback, setPasteFeedback] = useState<string | null>(null);
+
   // Scheduling state
   const [scheduledDate, setScheduledDate] = useState<string>("");
   const [scheduling, setScheduling] = useState(false);
@@ -108,6 +113,74 @@ export function InstagramPublishModal({
     fetchScheduled();
   }, [isOpen]);
 
+  // Synchronize or auto-load caption
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (caption && caption.trim()) {
+      setEditableCaption(caption);
+    } else {
+      // Auto-load caption from project's AI Social Package if empty
+      setLoadingCaption(true);
+      fetch(`/api/projects/${projectId}/social`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.socialPackage?.fullCaption) {
+            setEditableCaption(data.socialPackage.fullCaption);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoadingCaption(false));
+    }
+  }, [isOpen, caption, projectId]);
+
+  async function handlePasteClipboard() {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          setEditableCaption(text.trim());
+          setPasteFeedback("Pasted from clipboard!");
+          setTimeout(() => setPasteFeedback(null), 2500);
+          return;
+        }
+      }
+      const promptText = prompt("Paste your caption here:");
+      if (promptText && promptText.trim()) {
+        setEditableCaption(promptText.trim());
+        setPasteFeedback("Caption updated!");
+        setTimeout(() => setPasteFeedback(null), 2500);
+      }
+    } catch {
+      const promptText = prompt("Paste your caption here:");
+      if (promptText && promptText.trim()) {
+        setEditableCaption(promptText.trim());
+        setPasteFeedback("Caption updated!");
+        setTimeout(() => setPasteFeedback(null), 2500);
+      }
+    }
+  }
+
+  async function handleLoadAiCaption() {
+    setLoadingCaption(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/social`);
+      const data = await res.json();
+      if (data.socialPackage?.fullCaption) {
+        setEditableCaption(data.socialPackage.fullCaption);
+        setPasteFeedback("Loaded AI Caption!");
+        setTimeout(() => setPasteFeedback(null), 2500);
+      } else {
+        setError("No generated AI caption found. Generate one in the AI Social Package section.");
+      }
+    } catch {
+      setError("Failed to load AI caption.");
+    } finally {
+      setLoadingCaption(false);
+    }
+  }
+
   async function fetchScheduled() {
     try {
       const res = await fetch("/api/instagram/schedule");
@@ -144,7 +217,7 @@ export function InstagramPublishModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
-          caption,
+          caption: editableCaption.trim() || undefined,
         }),
       });
 
@@ -182,7 +255,7 @@ export function InstagramPublishModal({
         body: JSON.stringify({
           projectId,
           scheduledTime: new Date(scheduledDate).toISOString(),
-          caption,
+          caption: editableCaption.trim() || undefined,
         }),
       });
 
@@ -233,6 +306,129 @@ export function InstagramPublishModal({
       setSavingAccount(false);
     }
   }
+
+  const renderCaptionEditor = () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+        <label
+          htmlFor="instagram-caption-textarea"
+          style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#0F172A", display: "flex", alignItems: "center", gap: "0.35rem" }}
+        >
+          <span>📝 Reel Caption & Hashtags</span>
+          {loadingCaption && (
+            <span style={{ fontSize: "0.7rem", color: "#6366F1", fontWeight: 500 }}>
+              (Fetching AI caption...)
+            </span>
+          )}
+          {pasteFeedback && (
+            <span style={{ fontSize: "0.7rem", color: "#059669", fontWeight: 700 }}>
+              ✓ {pasteFeedback}
+            </span>
+          )}
+        </label>
+        <div style={{ display: "flex", gap: "0.4rem" }}>
+          <button
+            type="button"
+            onClick={handlePasteClipboard}
+            style={{
+              padding: "0.3rem 0.65rem",
+              borderRadius: "8px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              background: "#EEF2FF",
+              color: "#4F46E5",
+              border: "1px solid #C7D2FE",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.25rem",
+            }}
+            title="Paste what you copied to clipboard"
+          >
+            📋 Paste Copied Caption
+          </button>
+          <button
+            type="button"
+            onClick={handleLoadAiCaption}
+            disabled={loadingCaption}
+            style={{
+              padding: "0.3rem 0.65rem",
+              borderRadius: "8px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              background: "#F8FAFC",
+              color: "#475569",
+              border: "1px solid #E2E8F0",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.25rem",
+            }}
+            title="Reload caption from AI Social Package"
+          >
+            ✦ Load AI Caption
+          </button>
+        </div>
+      </div>
+
+      <div style={{ position: "relative" }}>
+        <textarea
+          id="instagram-caption-textarea"
+          value={editableCaption}
+          onChange={(e) => setEditableCaption(e.target.value)}
+          placeholder="Paste or write your Reel caption and #hashtags here..."
+          rows={5}
+          maxLength={2200}
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            borderRadius: "10px",
+            border: "1.5px solid #CBD5E1",
+            fontSize: "0.85rem",
+            lineHeight: 1.5,
+            color: "#0F172A",
+            fontFamily: "inherit",
+            resize: "vertical",
+            outline: "none",
+            boxSizing: "border-box",
+            background: "#FFFFFF",
+          }}
+        />
+        {editableCaption && (
+          <button
+            type="button"
+            onClick={() => setEditableCaption("")}
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              background: "#F1F5F9",
+              border: "1px solid #CBD5E1",
+              borderRadius: "6px",
+              padding: "2px 6px",
+              fontSize: "0.7rem",
+              color: "#64748B",
+              cursor: "pointer",
+            }}
+            title="Clear caption"
+          >
+            ✕ Clear
+          </button>
+        )}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.72rem", color: "#64748B" }}>
+        <span>
+          {!editableCaption.trim()
+            ? "⚠️ If left blank, the AI Social Package caption will be used by default."
+            : "✓ This exact caption will be published with your Reel to Instagram."}
+        </span>
+        <span style={{ fontWeight: 600, color: editableCaption.length > 2000 ? "#DC2626" : "#64748B" }}>
+          {editableCaption.length} / 2,200
+        </span>
+      </div>
+    </div>
+  );
 
   if (!isOpen) return null;
 
@@ -474,37 +670,50 @@ export function InstagramPublishModal({
           {/* TAB 1: PUBLISH NOW */}
           {activeTab === "publish" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ background: "#F8FAFC", padding: "1rem", borderRadius: "12px", border: "1px solid #E2E8F0" }}>
-                <span style={{ fontSize: "0.72rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>
-                  Reel Video & Caption Preview:
-                </span>
-                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem", alignItems: "flex-start" }}>
-                  <div
-                    style={{
-                      width: "60px",
-                      height: "85px",
-                      borderRadius: "8px",
-                      background: "#0F172A",
-                      overflow: "hidden",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {videoUrl ? (
-                      <video src={videoUrl} muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    ) : (
-                      <div style={{ height: "100%", display: "grid", placeItems: "center", color: "#FFF", fontSize: "10px" }}>No Video</div>
-                    )}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ margin: "0 0 0.25rem", fontSize: "0.9375rem", fontWeight: 700, color: "#0F172A" }}>
-                      {projectTitle}
-                    </h4>
-                    <p style={{ margin: 0, fontSize: "0.78125rem", color: "#475569", maxHeight: "65px", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {caption || "No caption specified. Will use AI generated caption."}
-                    </p>
-                  </div>
+              {/* Selected Reel Video Card */}
+              <div
+                style={{
+                  background: "#F8FAFC",
+                  padding: "0.85rem 1rem",
+                  borderRadius: "12px",
+                  border: "1px solid #E2E8F0",
+                  display: "flex",
+                  gap: "0.85rem",
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: "52px",
+                    height: "76px",
+                    borderRadius: "8px",
+                    background: "#0F172A",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                  }}
+                >
+                  {videoUrl ? (
+                    <video src={videoUrl} muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <div style={{ height: "100%", display: "grid", placeItems: "center", color: "#FFF", fontSize: "10px" }}>No Video</div>
+                  )}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: "0.6875rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                    Selected Reel Video
+                  </span>
+                  <h4 style={{ margin: "0.15rem 0", fontSize: "0.9375rem", fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {projectTitle}
+                  </h4>
+                  <span style={{ fontSize: "0.72rem", color: "#4F46E5", fontWeight: 600 }}>
+                    9:16 Vertical Video (1080×1920) Ready
+                  </span>
                 </div>
               </div>
+
+              {/* Editable Caption Section */}
+              {renderCaptionEditor()}
 
               {/* Progress animation while publishing */}
               {publishing && (
@@ -627,6 +836,9 @@ export function InstagramPublishModal({
                   }}
                 />
               </div>
+
+              {/* Editable Caption for Scheduled Reel */}
+              {renderCaptionEditor()}
 
               {scheduleSuccess && (
                 <div style={{ padding: "0.75rem 1rem", background: "#D1FAE5", color: "#065F46", borderRadius: "10px", fontSize: "0.85rem", border: "1px solid #A7F3D0" }}>

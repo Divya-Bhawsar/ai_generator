@@ -187,6 +187,7 @@ export function StoryboardStudio({
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(initialProject.aspectRatio || "9:16");
   const [videoUrl, setVideoUrl] = useState<string | null>(initialProject.videoUrl || null);
   const [videoDuration, setVideoDuration] = useState<number | null>(initialProject.durationSeconds || null);
+  const [currentSocialPackage, setCurrentSocialPackage] = useState(initialProject.socialPackage);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
   // Total words & estimated duration
@@ -1074,10 +1075,11 @@ export function StoryboardStudio({
       {scenes.length > 0 && (
         <SocialPackageCard
           projectId={project._id}
-          initialPackage={project.socialPackage}
+          initialPackage={currentSocialPackage || project.socialPackage}
           topic={project.topic}
           title={storyboard?.title || project.title}
           onOpenPublish={() => setPublishModalOpen(true)}
+          onPackageUpdate={(pkg) => setCurrentSocialPackage(pkg)}
         />
       )}
 
@@ -2398,7 +2400,7 @@ export function StoryboardStudio({
         projectId={project._id}
         projectTitle={storyboard?.title || project.title}
         videoUrl={videoUrl}
-        caption={project.socialPackage?.fullCaption}
+        caption={currentSocialPackage?.fullCaption || project.socialPackage?.fullCaption}
         initialReelUrl={(project as any).instagramReelUrl}
       />
     </div>

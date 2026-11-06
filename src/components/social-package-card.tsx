@@ -9,6 +9,7 @@ interface SocialPackageCardProps {
   topic: string;
   title: string;
   onOpenPublish?: () => void;
+  onPackageUpdate?: (pkg: SocialPackage) => void;
 }
 
 export function SocialPackageCard({
@@ -17,6 +18,7 @@ export function SocialPackageCard({
   topic,
   title,
   onOpenPublish,
+  onPackageUpdate,
 }: SocialPackageCardProps) {
   const [socialPackage, setSocialPackage] = useState<SocialPackage | null>(
     initialPackage || null
@@ -57,6 +59,7 @@ export function SocialPackageCard({
       setCallToAction(data.socialPackage.callToAction);
       setHashtags(data.socialPackage.hashtags);
       setIsEditing(false);
+      onPackageUpdate?.(data.socialPackage);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error generating package");
     } finally {
@@ -83,6 +86,7 @@ export function SocialPackageCard({
       setSocialPackage(data.socialPackage);
       setIsEditing(false);
       setSaveSuccess(true);
+      onPackageUpdate?.(data.socialPackage);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error saving");
